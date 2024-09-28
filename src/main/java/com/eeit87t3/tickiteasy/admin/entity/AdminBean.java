@@ -1,4 +1,4 @@
-package com.eeit87t3.tickiteasy.test;
+package com.eeit87t3.tickiteasy.admin.entity;
 
 import org.springframework.stereotype.Component;
 
