@@ -1,14 +1,26 @@
 package com.eeit87t3.tickiteasy.test;
 
+import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.admin.entity.AdminBean;
 import com.eeit87t3.tickiteasy.admin.repository.AdminRepo;
+import com.eeit87t3.tickiteasy.image.ImageDirectory;
+import com.eeit87t3.tickiteasy.image.ImageUtil;
 
 
 @Controller
@@ -16,6 +28,10 @@ public class TestController {
 
 	@Autowired
 	private AdminRepo adminRepo;
+	@Autowired
+	private TestImagesRepo testImagesRepo;
+	@Autowired
+	private ImageUtil imageUtil;
 	
 	@ResponseBody
 	@GetMapping("/test/connection")
@@ -34,4 +50,65 @@ public class TestController {
 		return "test/adminTemplate";
 	}
 	
+	
+	@PostMapping("/test/image")
+	public String uploadImage(@RequestParam MultipartFile imageFile) {
+		String baseName = UUID.randomUUID().toString();
+		String pathString = null;
+		try {
+			pathString = imageUtil.saveImage(ImageDirectory.TEST, imageFile, baseName);
+			TestImagesPO testImagesPO = new TestImagesPO();
+			testImagesPO.setImagePath(pathString);
+			testImagesRepo.save(testImagesPO);
+		} catch (IllegalStateException | IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(pathString);
+		return "redirect:" + pathString;
+	}
+	
+	@ResponseBody
+	@GetMapping("/test/image")
+	public ResponseEntity<?> getImage(@RequestParam Integer id) {
+		Optional<TestImagesPO> resultOptional = testImagesRepo.findById(id);
+		if (resultOptional.isPresent()) {
+			TestImagesPO testImagesPO = resultOptional.get();
+			String imagePath = testImagesPO.getImagePath();
+			byte[] imageByteArray;
+			try {
+				imageByteArray = imageUtil.getImageByteArray(imagePath);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			
+			HttpHeaders headers = new HttpHeaders();
+			MediaType determinedMediaType = imageUtil.determineMediaType(imagePath);
+			headers.setContentType(determinedMediaType);
+			
+			return new ResponseEntity<>(imageByteArray, headers, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@ResponseBody
+	@DeleteMapping("/test/image")
+	public String deleteImage(@RequestParam Integer id) {
+		Optional<TestImagesPO> resultOptional = testImagesRepo.findById(id);
+		if (resultOptional.isPresent()) {
+			TestImagesPO testImagesPO = resultOptional.get();
+			String imagePath = testImagesPO.getImagePath();
+			Boolean deleteImageResult = imageUtil.deleteImage(imagePath);
+			if (deleteImageResult) {
+				testImagesRepo.delete(testImagesPO);
+				return "已成功執行。";
+			} else {
+				System.out.println("deleteImageResult: " + deleteImageResult);
+				return "未成功執行：請稍後再試。";
+			}
+		} else {
+			return "未執行：找不到該筆資料。";
+		}
+	}
 }
