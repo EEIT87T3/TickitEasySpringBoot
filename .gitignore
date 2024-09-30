@@ -34,41 +34,7 @@ build/
 ### secret ###
 /src/main/resources/application-secret.properties
 
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-### secret ###
-/src/main/resources/application-secret.properties
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,windows,linux,java,maven,eclipse
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,windows,linux,java,maven,eclipse
