@@ -7,8 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * @author Chuan(chuan13)
+ */
 @Entity @Table(name = "testImages")
-public class TestImagesPO {
+public class TestImagesEntity {
 
 	@Id @Column(name = "imageID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

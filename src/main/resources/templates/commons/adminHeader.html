@@ -3,36 +3,310 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
-    <link rel="stylesheet" th:href="@{/commons/css/bootstrap@5.3.3.css}">
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css">
+
+    <style>
+        /* 自訂變數，用來統一調整側邊欄和導覽列的高度與寬度 */
+        :root {
+            --sidebar-width: 220px;
+            --navbar-height: 60px;
+        }
+
+        /* 設定網頁的基本樣式 */
+        body {
+            padding-top: var(--navbar-height);
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* 設定導覽列的高度和陰影效果 */
+        .navbar {
+            height: var(--navbar-height);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+        }
+
+        /* 確保導航欄內容在小屏幕上正確對齊 */
+        .navbar .container-fluid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 調整登出按鈕在小屏幕上的樣式 */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                flex-direction: row;
+            }
+            
+            .nav-item {
+                padding-left: 10px;
+            }
+        }
+
+        /* 導覽列名稱的樣式 */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        /* 導覽列名稱內的圖示樣式 */
+        .navbar-brand i {
+            font-size: 1.3em;
+            color: #ffffff;
+            transition: transform 0.3s ease;
+        }
+
+        /* 懸停時讓圖示有旋轉效果 */
+        .navbar-brand:hover i {
+            transform: rotate(-15deg);
+        }
+
+        /* 側邊欄的樣式 */
+        #sidebar {
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            height: calc(100vh - var(--navbar-height));
+            z-index: 1000;
+            width: var(--sidebar-width);
+            transition: all 0.3s;
+            overflow-y: auto;
+            background-color: #343a40;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, .1);
+        }
+
+        /* 側邊欄收起時的樣式 */
+        #sidebar.active {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        /* 主內容區塊的樣式 */
+        .content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+            padding: 20px;
+        }
+
+        /* 當側邊欄隱藏時，內容占滿整個寬度 */
+        .content-active {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* 當螢幕寬度小於768px時的響應式處理 */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+
+            #sidebar.active {
+                margin-left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        /* 側邊欄鏈接的樣式 */
+        .sidebar-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        /* 側邊欄鏈接的懸停、聚焦和活動狀態樣式 */
+        .sidebar-link:hover,
+        .sidebar-link:focus,
+        .sidebar-link.active {
+            background-color: #495057;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* 側邊欄鏈接內的圖示樣式 */
+        .sidebar-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* 子選單的樣式 */
+        .submenu {
+            padding-left: 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #2c3136;
+        }
+
+        /* 當子選單展開時顯示 */
+        .submenu.show {
+            max-height: none;
+        }
+
+        /* 側邊欄鏈接的位置設置 */
+        .sidebar-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 下拉箭頭的樣式，使用 Font Awesome 圖示 */
+        .sidebar-link.dropdown-toggle::after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+        }
+
+        /* 當子選單展開時，箭頭向上 */
+        .sidebar-link.dropdown-toggle.active::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // 點擊側邊欄的收起按鈕，切換側邊欄的顯示與隱藏
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar, .content').toggleClass('active');
+                adjustContentWidth(); // 調整內容區域的寬度
+            });
+
+            // 點擊下拉選單，展開或收起子選單
+            $('.sidebar-link.dropdown-toggle').on('click', function (e) {
+                e.preventDefault();
+
+                var $submenu = $(this).next('.submenu'); // 獲取當前的子選單
+                var isCurrentlyActive = $(this).hasClass('active'); // 檢查當前狀態
+
+                // 關閉其他已展開的子選單
+                $('.submenu').not($submenu).removeClass('show');
+                $('.sidebar-link.dropdown-toggle').not($(this)).removeClass('active');
+
+                // 切換當前選單的狀態
+                if (isCurrentlyActive) {
+                    // 如果已經展開，則收起
+                    $submenu.removeClass('show');
+                    $(this).removeClass('active');
+                } else {
+                    // 如果是收起狀態，則展開
+                    $submenu.addClass('show');
+                    $(this).addClass('active');
+                }
+            });
+
+            // 調整內容區的寬度
+            function adjustContentWidth() {
+                if ($('#sidebar').hasClass('active')) {
+                    $('.content').css('width', '100%'); // 當側邊欄隱藏時，內容區占滿寬度
+                    $('.content').css('margin-left', '0');  // 當側邊欄顯示時，左方無 margin
+                } else {
+                    $('.content').css('width', 'calc(100% - var(--sidebar-width))'); // 當側邊欄顯示時，內容區依據側邊欄寬度調整
+                    $('.content').css('margin-left', 'var(--sidebar-width)');  // 當側邊欄顯示時，左方有 margin
+                }
+            }
+
+            // 當視窗大小改變時，重新調整內容區寬度
+            $(window).resize(adjustContentWidth);
+            // 預設加載時調整內容區寬度
+            adjustContentWidth();
+        });
+    </script>
 </head>
 
 <body>
-    <div>
-        <header class="container bg-success" style="height: 30px;">
-            <!-- 這裡是 header -->
-        </header>
-        <div class="container">
-            <div class="row">
-                <nav class="col-2 flex-column bg-secondary p-3">
-                    <!-- 這裡是左側的 nav -->
-                    <a class="nav-link active" href="#">首頁</a>
-                    <a class="nav-link" href="#">選項 1</a>
-                    <div class="dropdown">
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            下拉選單
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <li><a class="dropdown-item" href="#">子選項 1</a></li>
-                            <li><a class="dropdown-item" href="#">子選項 2</a></li>
-                            <li><a class="dropdown-item" href="#">子選項 3</a></li>
-                        </ul>
-                    </div>
-                    <a class="nav-link" href="#">選項 2</a>
-                </nav>
-                <main class="col-10 bg-light">
+    <!-- 固定在頂部的導航欄 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <!-- 側邊欄收起按鈕 -->
+            <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand ms-3" href="#">
+                <i class="fas fa-ticket-alt me-2"></i>
+                TickitEasy 管理系統
+            </a>
+            <!-- 登出按鈕，始終顯示在右側 -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> 登出</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="d-flex">
+        <!-- 側邊欄 -->
+        <nav id="sidebar">
+            <ul class="list-unstyled">
+                <li>
+                    <a href="#" class="sidebar-link"><i class="fas fa-home"></i> 後台管理首頁</a>
+                </li>
+                <li>
+                    <!-- 下拉選單 -->
+                    <a href="#memberSubmenu" data-bs-toggle="collapse" aria-expanded="false"
+                        class="sidebar-link dropdown-toggle">
+                        <i class="fas fa-users"></i> 會員管理
+                    </a>
+                    <ul class="collapse list-unstyled submenu" id="memberSubmenu">
+                        <li>
+                            <a href="#" class="sidebar-link"><i class="fas fa-list"></i> 會員列表</a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link"><i class="fas fa-chart-pie"></i> 會員統計分析</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <!-- 下拉選單 -->
+                    <a href="#eventSubmenu" data-bs-toggle="collapse" aria-expanded="false"
+                        class="sidebar-link dropdown-toggle">
+                        <i class="fas fa-calendar-alt"></i> 活動管理
+                    </a>
+                    <ul class="collapse list-unstyled submenu" id="eventSubmenu">
+                        <li>
+                            <a href="#" class="sidebar-link"><i class="fas fa-plus"></i> 新增活動</a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link"><i class="fas fa-list-alt"></i> 活動列表</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 訂單管理</a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link"><i class="fas fa-box"></i> 商品管理</a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link"><i class="fas fa-comments"></i> 討論區管理</a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link"><i class="fas fa-hand-holding-usd"></i> 募資活動管理</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+   <div class="content">
+
+    
 </body>
 
 </html>

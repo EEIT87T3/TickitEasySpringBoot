@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,10 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.admin.entity.AdminBean;
 import com.eeit87t3.tickiteasy.admin.repository.AdminRepo;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
+import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 
-
+/**
+ * @author Lilian(Curriane), Chuan(chuan13)
+ */
 @Controller
 public class TestController {
 
@@ -32,7 +39,14 @@ public class TestController {
 	private TestImagesRepo testImagesRepo;
 	@Autowired
 	private ImageUtil imageUtil;
+	@Autowired
+	private CategoryService categoryService;
+	@Autowired
+	private TagService tagService;
 	
+	/**
+	 * String Controller：資料庫連線測試。
+	 */
 	@ResponseBody
 	@GetMapping("/test/connection")
 	public String getMethodName() {
@@ -45,19 +59,24 @@ public class TestController {
 		return "連線失敗。";
 	}
 	
-	@GetMapping("/test/template")
+	/**
+	 * Page Controller：模板顯示測試。
+	 */
+	@GetMapping("/test/admin-template")
 	public String testTemplate() {
 		return "test/adminTemplate";
 	}
 	
-	
+	/**
+	 * Image Controller: 圖片上傳測試。
+	 */
 	@PostMapping("/test/image")
 	public String uploadImage(@RequestParam MultipartFile imageFile) {
 		String baseName = UUID.randomUUID().toString();
 		String pathString = null;
 		try {
 			pathString = imageUtil.saveImage(ImageDirectory.TEST, imageFile, baseName);
-			TestImagesPO testImagesPO = new TestImagesPO();
+			TestImagesEntity testImagesPO = new TestImagesEntity();
 			testImagesPO.setImagePath(pathString);
 			testImagesRepo.save(testImagesPO);
 		} catch (IllegalStateException | IOException e) {
@@ -67,12 +86,15 @@ public class TestController {
 		return "redirect:" + pathString;
 	}
 	
+	/**
+	 * Image Controller: 圖片讀取測試。
+	 */
 	@ResponseBody
 	@GetMapping("/test/image")
 	public ResponseEntity<?> getImage(@RequestParam Integer id) {
-		Optional<TestImagesPO> resultOptional = testImagesRepo.findById(id);
+		Optional<TestImagesEntity> resultOptional = testImagesRepo.findById(id);
 		if (resultOptional.isPresent()) {
-			TestImagesPO testImagesPO = resultOptional.get();
+			TestImagesEntity testImagesPO = resultOptional.get();
 			String imagePath = testImagesPO.getImagePath();
 			byte[] imageByteArray;
 			try {
@@ -92,15 +114,25 @@ public class TestController {
 		}
 	}
 	
+	/**
+	 * String Controller: 圖片刪除測試。
+	 */
 	@ResponseBody
 	@DeleteMapping("/test/image")
 	public String deleteImage(@RequestParam Integer id) {
-		Optional<TestImagesPO> resultOptional = testImagesRepo.findById(id);
+		Optional<TestImagesEntity> resultOptional = testImagesRepo.findById(id);
 		if (resultOptional.isPresent()) {
-			TestImagesPO testImagesPO = resultOptional.get();
+			TestImagesEntity testImagesPO = resultOptional.get();
 			String imagePath = testImagesPO.getImagePath();
-			Boolean deleteImageResult = imageUtil.deleteImage(imagePath);
-			if (deleteImageResult) {
+			Boolean deleteImageResult = null;
+			try {
+				deleteImageResult = imageUtil.deleteImage(imagePath);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (deleteImageResult == null) {
+				return "deleteImageResult == null";
+			} else if (deleteImageResult) {
 				testImagesRepo.delete(testImagesPO);
 				return "已成功執行。";
 			} else {
@@ -110,5 +142,22 @@ public class TestController {
 		} else {
 			return "未執行：找不到該筆資料。";
 		}
+	}
+	
+	/**
+	 * JSON Controller：取得 Post 功能的活動型態測試。
+	 */
+	@ResponseBody
+	@GetMapping("/test/event-categorylist")
+	public List<CategoryEntity> findEventCategoryList() {
+		return categoryService.findEventCategoryList();
+	}
+	/**
+	 * JSON Controller：取得 Post 功能的活動型態測試。
+	 */
+	@ResponseBody
+	@GetMapping("/test/post-taglist")
+	public List<TagEntity> findPostCategoryList() {
+		return tagService.findPostTagList();
 	}
 }
