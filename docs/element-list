@@ -1,5 +1,8 @@
 com.eeit87t3.tickiteasy
 com.eeit87t3.tickiteasy.admin.entity
 com.eeit87t3.tickiteasy.admin.repository
+com.eeit87t3.tickiteasy.categoryandtag.entity
+com.eeit87t3.tickiteasy.categoryandtag.repository
+com.eeit87t3.tickiteasy.categoryandtag.service
 com.eeit87t3.tickiteasy.image
 com.eeit87t3.tickiteasy.test

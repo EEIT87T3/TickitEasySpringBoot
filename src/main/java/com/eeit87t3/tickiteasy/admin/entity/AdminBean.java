@@ -9,6 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * @author Lilian(Curriane)
+ */
 @Entity 
 @Table(name = "administrator")
 @Component

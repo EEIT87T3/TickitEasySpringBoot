@@ -3,14 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-	<title>後台模板</title>
+	<title>網頁標題</title>
+	<script>
+		$(document).ready(function () {
+		
+		// 這裡是 JavaScript 內容
+		
+		});
+	</script>
 </head>
 
 <body>
-	<div th:replace="~{commons/navbar}"></div>
+	<div th:replace="~{commons/adminHeader}"></div>
     
 	<!--  這裡是網頁內容 >-->
-	<h1>這裡是網頁內容</h1>
+	<h1>網頁標題</h1>
 
    <div th:replace="~{commons/adminFooter}"></div>
 </body>
