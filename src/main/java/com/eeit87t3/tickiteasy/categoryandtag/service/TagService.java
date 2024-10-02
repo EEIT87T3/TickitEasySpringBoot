@@ -19,6 +19,16 @@ public class TagService {
 	private TagRepo tagRepo;
 	
 	/**
+	 * 以 tagString 取得 TagEntity 物件。
+	 * 
+	 * @param tagString String
+	 * @return tagEntity - TagEntity
+	 */
+	public TagEntity findByTagString(String tagString) {
+		return tagRepo.findByTagString(tagString);
+	}
+	
+	/**
 	 * 取得 Event 功能的主題分類列表。
 	 * 
 	 * @return eventTagList - List&lt;TagEntity>：Event 功能的主題分類列表。
@@ -56,5 +66,4 @@ public class TagService {
 	    postTagList.addAll(tagRepo.findByTagStatus((short) 1));
 	    return postTagList;
 	}
-
 }
