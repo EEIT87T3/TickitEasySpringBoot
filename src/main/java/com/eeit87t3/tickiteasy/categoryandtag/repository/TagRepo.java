@@ -12,4 +12,6 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 public interface TagRepo extends JpaRepository<TagEntity, Integer> {
 
 	List<TagEntity> findByTagStatus(Short tagStatus);
+	
+	TagEntity findByTagString(String tagString);
 }

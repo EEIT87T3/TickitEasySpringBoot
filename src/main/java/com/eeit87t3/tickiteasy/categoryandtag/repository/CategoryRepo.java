@@ -12,4 +12,6 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 public interface CategoryRepo extends JpaRepository<CategoryEntity, Integer> {
 
 	List<CategoryEntity> findByCategoryStatus(Short categoryStatus);
+	
+	CategoryEntity findByCategoryString(String categoryString);
 }
