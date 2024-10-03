@@ -1,6 +1,9 @@
 package com.eeit87t3.tickiteasy.cwdfunding.controller;
 
 import java.awt.print.Pageable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -14,9 +17,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
@@ -28,7 +33,8 @@ public class FundProjController {
 
 	@Autowired
 	private FundProjService projService;
-	
+
+	/* 列出所有募資活動頁面, api */
 	@GetMapping("/fundproject")
 	public String showProjPage(@RequestParam(value="p", defaultValue = "1") Integer pageNumber,Model model) {
 		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
@@ -44,6 +50,8 @@ public class FundProjController {
 		return page;
 	}
 	
+	
+	/* 刪除募資活動by ID, api */
 	@ResponseBody
 	@GetMapping("/api/fundproject/{projectID}")
 	public FundProjDTO findByID(@PathVariable Integer projectID) {
@@ -69,11 +77,47 @@ public class FundProjController {
 	    }		
 	}
 	
+	/* 新增募資活動, api */
 	@GetMapping("/add-project")
 	public String addProjPage(Model model) {
-		
 		return "cwdfunding/addFundProjnPlan";
 	}
+	
+	@ResponseBody
+	@PostMapping("/api/fundproject")
+	public String addProject(
+			@RequestParam String title,
+			@RequestParam String categoryID,
+			@RequestParam String tagID,
+			@RequestParam("startDate") String startDateStr,
+			@RequestParam("endDate") String endDateStr,
+			@RequestParam String targetAmount,
+			@RequestParam String currentAmount,
+			@RequestParam String threshold,
+			@RequestParam String postponeDateStr,
+			@RequestParam MultipartFile image,
+			@RequestParam String description,
+			@RequestParam("planTitle") String planTitle,
+			@RequestParam String projectID,
+			@RequestParam("planContent") String planContent,
+			@RequestParam("planUnitPrice") String planUnitPrice,
+			@RequestParam("planTotalAmount") String planTotalAmount,
+			@RequestParam("planBuyAmount") String planBuyAmount,
+			@RequestParam("planImage") MultipartFile planImage
+			) {
+		// 處理圖片（存進本端、將檔名寫進資料庫）
+        String filename = image.getOriginalFilename();
+        String planFilename = planImage.getOriginalFilename();
+        
+//        projService.saveProj(title, categoryID, tagID, startDateStr,
+//        		endDateStr, targetAmount, currentAmount, threshold, 
+//        		postponeDateStr, filename, description);
+        
+        projService.savePlan(projectID, planTitle, planUnitPrice, planTotalAmount, planBuyAmount, planFilename, planContent);
+        
+        return "Project added successfully!";
+	}
+ 
 	
 	
 

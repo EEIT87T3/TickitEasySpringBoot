@@ -25,15 +25,16 @@
     <div class="container">
       <form id="msform">
         <div class="row">
-          <div class="col col-3 m-3">
+          <div class="col col-2 m-3">
             <ul id="progressbar">
-              <li class="active" id="account"><strong>募資活動</strong></li>
-              <li id="personal"><strong>方案</strong></li>
-              <li id="confirm"><strong>完成</strong></li>
+              <li class="active" id="project"><strong>募資活動</strong></li>
+              <li><strong>方案總數</strong></li>
+              <li><strong>方案內容</strong></li>
+              <li><strong>完成</strong></li>
             </ul>
           </div>
           <div class="col col-8 m-3">
-            <fieldset>
+            <fieldset class="fieldset">
               <div class="row">
                 <div class="col">
                   <p class="fw-bolder text-start p-2">新增募資活動</p>
@@ -61,11 +62,31 @@
                         class="form-select form-select-sm w-25"
                         aria-label="Default select example"
                         name="category"
+                        id="category"
                       >
                         <option selected>Open this select menu</option>
                         <option value="1">One</option>
                         <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option value="3">Two</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr></tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">標籤</div>
+                    </td>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select-sm w-25"
+                        aria-label="Default select example"
+                        name="tag"
+                        id="tag"
+                      >
+                        <option selected>Open this select menu</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Two</option>
                       </select>
                     </td>
                   </tr>
@@ -75,6 +96,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="targetAmount"
                         type="number"
                         name="targetAmount"
                         class="form-control w-25"
@@ -87,6 +109,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="currentAmount"
                         type="number"
                         name="currentAmount"
                         placeholder="0"
@@ -101,6 +124,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="startDate"
                         type="datetime-local"
                         name="startDate"
                         class="form-control w-50"
@@ -113,6 +137,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="endDate"
                         type="datetime-local"
                         name="endDate"
                         class="form-control w-50"
@@ -125,6 +150,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="threshold"
                         type="range"
                         name="threshold"
                         class="form-range borderhidden float-start w-50"
@@ -140,6 +166,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="postponeDate"
                         type="datetime-local"
                         name="postponeDate"
                         class="form-control w-50"
@@ -152,8 +179,9 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="image"
                         type="file"
-                        name="postponeDate"
+                        name="image"
                         class="form-control w-50"
                       />
                     </td>
@@ -166,6 +194,7 @@
                   <tr>
                     <td class="col-2" colspan="2">
                       <textarea
+                        id="description"
                         rows="5"
                         name="description"
                         maxlength="150"
@@ -175,56 +204,72 @@
                   </tr>
                 </tbody>
               </table>
+              <button id="autofillBtnProj">一鍵填入</button>
               <input
                 type="button"
                 name="next"
-                class="next action-button"
+                class="next action-button btn"
                 value="Next"
               />
             </fieldset>
-          </div>
-          <div class="col col-8 m-3">
-            <fieldset>
-              <div class="form-card">
-                <div class="row">
-                  <div class="col-7">
-                    <h2 class="fs-title">Image Upload:</h2>
-                  </div>
-                  <br />
-                  <div class="col-5">
-                    <h2 class="steps"></h2>
-                  </div>
-                </div>
-                <label class="fieldlabels fw-medium">Upload Your Photo:</label>
-                <input type="file" name="pic" accept="image/*" />
-                <label class="fieldlabels fw-medium"
-                  >Upload Signature Photo:</label
-                >
-                <input type="file" name="pic" accept="image/*" />
-              </div>
+            <fieldset class="fieldset">
+              <table class="table table-borderless custom-table">
+                <tbody style="background-color: black">
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">請選取方案總數量</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select w-25"
+                        aria-label="Default planAmount"
+                        name="planAmount"
+                        id="planAmountSelect"
+                      >
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
               <input
+                id="planAmount-btn"
                 type="button"
                 name="next"
-                class="next action-button"
-                value="Submit"
+                class="next action-button btn"
+                value="Next"
               />
               <input
                 type="button"
                 name="previous"
-                class="previous action-button-previous"
+                class="previous action-button-previous btn"
                 value="Previous"
               />
             </fieldset>
-          </div>
-          <div class="col col-8 m-3">
-            <fieldset>
+            <fieldset class="fieldset">
+              <div id="outputBlock"></div>
+              <button id="autofillBtnPlan">一鍵填入</button>
+              <input
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+              <input
+                type="button"
+                name="previous"
+                class="previous action-button-previous btn"
+                value="Previous"
+              />
+            </fieldset>
+            <fieldset class="fieldset">
               <div class="form-card">
                 <div class="row">
                   <div class="col-7">
                     <h2 class="fs-title">Finish:</h2>
-                  </div>
-                  <div class="col-5">
-                    <h2 class="steps"></h2>
                   </div>
                 </div>
                 <br /><br />
@@ -233,12 +278,7 @@
                 </h2>
                 <br />
                 <div class="row justify-content-center">
-                  <div class="col-3">
-                    <img
-                      src="https://i.imgur.com/GwStPmg.png"
-                      class="fit-image"
-                    />
-                  </div>
+                  <div class="col-3"></div>
                 </div>
                 <br /><br />
                 <div class="row justify-content-center">

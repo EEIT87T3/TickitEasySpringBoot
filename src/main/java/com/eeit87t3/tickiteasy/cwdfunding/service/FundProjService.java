@@ -1,30 +1,123 @@
 package com.eeit87t3.tickiteasy.cwdfunding.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.Category;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.Tag;
+import com.eeit87t3.tickiteasy.cwdfunding.repository.CategoryRepository;
+import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
+import com.eeit87t3.tickiteasy.cwdfunding.repository.TagRepository;
 
 @Service
 public class FundProjService {
 
+	@Autowired
 	private FundProjRepository fundProjRepo;
+
+	@Autowired
+	private FundPlanRepository fundPlanRepo;
+	
+	@Autowired
+	private CategoryRepository categoryRepo;
+	
+	@Autowired
+	private TagRepository tagRepo;
 	
 	public FundProjService(FundProjRepository fundProjsRepository) {
 		this.fundProjRepo = fundProjsRepository;
 	}
 	
-	/* 新增 */
-	public FundProj saveProj(FundProj newProj) {
-		return fundProjRepo.save(newProj);
+	/* 新增募資活動 */
+	public FundProj saveProj(
+			 String title,
+			 String categoryID,
+			 String tagID,
+			 String startDateStr,
+			 String endDateStr,
+			 String targetAmount,
+			 String currentAmount,
+			 String threshold,
+			 String postponeDateStr,
+			 String filename,
+			 String description
+			) {
+		FundProj proj = new FundProj();
+		
+		//先用categoryID找出對應到的category實體，之後再塞進proj 
+		Optional<Category> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
+		Category category = coptional.get();
+		//先用tagID找出對應到的tag實體，之後再塞進proj 
+		Optional<Tag> toptional = tagRepo.findById(Integer.valueOf(tagID));
+		Tag tag = toptional.get();
+		
+        // 將請求中的日期先格式化再轉換成LocalDateTime
+        // 定義datetime-local格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+        // 將字符串轉換為LocalDateTime
+        LocalDateTime startDateTime = LocalDateTime.parse(startDateStr, formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(endDateStr, formatter);
+        LocalDateTime postponeDateTime = LocalDateTime.parse(postponeDateStr, formatter);
+        
+        // 設定FundProjBean屬性，日期轉成.sql.TimeStamp
+        proj.setTitle(title);
+        proj.setDescription(description);
+        proj.setImage(filename);
+        proj.setStartDate(Timestamp.valueOf(startDateTime));
+        proj.setEndDate(Timestamp.valueOf(endDateTime));
+        proj.setTargetAmount(targetAmount);
+        proj.setCurrentAmount(currentAmount);
+        proj.setThreshold(threshold);
+        proj.setPostponeDate(Timestamp.valueOf(postponeDateTime));
+        proj.setCategory(category);
+        proj.setTag(tag);
+		return fundProjRepo.save(proj);
 			
+	}
+	
+	/* 新增募資活動方案 */
+	public FundPlan savePlan(
+			String projectID,
+			String title,
+			String unitPrice,
+			String totalAmount,
+			String buyAmount,
+			String image,
+			String content
+			) {
+		FundPlan newFundPlan = new FundPlan();
+		
+		//先用categoryID找出對應到的category實體，之後再塞進proj 
+		Optional<FundProj> optional = fundProjRepo.findById(Integer.valueOf(projectID));
+		FundProj fundProj = optional.get();
+		
+        // 設定FundPlan屬性
+		newFundPlan.setFundProj(fundProj);
+		newFundPlan.setTitle(title);
+		newFundPlan.setUnitPrice(unitPrice);
+		newFundPlan.setTotalAmount(totalAmount);
+		newFundPlan.setBuyAmount(buyAmount);
+		newFundPlan.setImage(image);
+		newFundPlan.setContent(content);
+		
+		return fundPlanRepo.save(newFundPlan);
 	}
 	
 

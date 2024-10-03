@@ -29,8 +29,8 @@ public class Tag {
 	private Integer tagStatus;
 	
 	/*
-	 * Category沒有和Fundproject有關的欄位
-	 * [ mappedBy = "category" ] : 
+	 * Tag沒有和Fundproject有關的欄位
+	 * [ mappedBy = "tag" ] : 
 	 * 		告訴spring容器Tag類別會被FundProj類別參考，參考欄位為FundProj類別的"tag"屬性
 	 */
 	@OneToMany(mappedBy = "tag")

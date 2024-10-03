@@ -89,6 +89,15 @@ public class FundProj{
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "fundProj")
 	private List<FundProjPhoto> fundProjPhotos = new ArrayList<>();
 	
+	/*
+	 * Fundproj沒有和FundPlan有關的欄位
+	 * [ mappedBy = "fundProj" ] : 
+	 * 		告訴spring容器Fundproj資料表會被FundPlan資料表參考，參考欄位為fundPlan的"projectID"屬性
+	 */
+	@JsonIgnore
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "fundProj")
+	private List<FundPlan> fundPlan = new ArrayList<>();
+	
 	public FundProj() {
 		
 	}

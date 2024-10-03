@@ -17,22 +17,23 @@
     <div class="container">
       <form id="msform">
         <div class="row">
-          <div class="col col-3 m-3">
+          <div class="col col-2 m-3">
             <ul id="progressbar">
-              <li class="active" id="account"><strong>募資活動</strong></li>
-              <li id="personal"><strong>方案</strong></li>
-              <li id="confirm"><strong>完成</strong></li>
+              <li class="active" id="project"><strong>募資活動</strong></li>
+              <li><strong>方案總數</strong></li>
+              <li><strong>方案內容</strong></li>
+              <li><strong>完成</strong></li>
             </ul>
           </div>
           <div class="col col-8 m-3">
-            <fieldset>
+            <fieldset class="fieldset">
               <div class="row">
                 <div class="col">
                   <p class="fw-bolder text-start p-2">新增募資活動</p>
                 </div>
               </div>
-              <table class="table table-borderless">
-                <tbody>
+              <table class="table table-borderless custom-table">
+                <tbody style="background-color: black">
                   <tr>
                     <td>
                       <input
@@ -53,11 +54,12 @@
                         class="form-select form-select-sm w-25"
                         aria-label="Default select example"
                         name="category"
+                        id="category"
                       >
                         <option selected>Open this select menu</option>
                         <option value="1">One</option>
                         <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option value="3">Two</option>
                       </select>
                     </td>
                   </tr>
@@ -170,50 +172,174 @@
               <input
                 type="button"
                 name="next"
-                class="next action-button"
+                class="next action-button btn"
                 value="Next"
               />
             </fieldset>
-
-            <fieldset>
-              <div class="form-card">
-                <div class="row">
-                  <div class="col-7">
-                    <h2 class="fs-title">Image Upload:</h2>
-                  </div>
-                  <br />
-                  <div class="col-5">
-                    <h2 class="steps"></h2>
-                  </div>
-                </div>
-                <label class="fieldlabels fw-medium">Upload Your Photo:</label>
-                <input type="file" name="pic" accept="image/*" />
-                <label class="fieldlabels fw-medium"
-                  >Upload Signature Photo:</label
-                >
-                <input type="file" name="pic" accept="image/*" />
-              </div>
+            <fieldset class="fieldset">
+              <table class="table table-borderless custom-table">
+                <tbody style="background-color: black">
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">請選取方案總數量</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select w-25"
+                        aria-label="Default planAmount"
+                        name="planAmount"
+                        id="planAmountSelect"
+                      >
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
               <input
+                id="planAmount-btn"
                 type="button"
                 name="next"
-                class="next action-button"
-                value="Submit"
+                class="next action-button btn"
+                value="Next"
               />
               <input
                 type="button"
                 name="previous"
-                class="previous action-button-previous"
+                class="previous action-button-previous btn"
                 value="Previous"
               />
             </fieldset>
             <fieldset>
+              <div id="outputBlock"></div>
+              <input
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+              <input
+                type="button"
+                name="previous"
+                class="previous action-button-previous btn"
+                value="Previous"
+              />
+            </fieldset>
+            <fieldset class="fieldset">
+              <div class="row">
+                <div class="col">
+                  <p class="fw-bolder text-start p-2">《方案一》</p>
+                </div>
+              </div>
+              <table class="table table-borderless custom-table">
+                <tbody style="background-color: black">
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">方案名稱</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0 w-50"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">單價</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        type="number"
+                        name="targetAmount"
+                        class="form-control w-25 text-end"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">總數量</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        type="number"
+                        name="currentAmount"
+                        placeholder="0"
+                        class="form-control w-25 text-end"
+                        disabled
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">已購數量</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        type="number"
+                        name="startDate"
+                        class="form-control w-25 text-end"
+                        placeholder="0"
+                        disabled
+                      />
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">圖片</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        type="file"
+                        name="postponeDate"
+                        class="form-control w-50"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">內容</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2" colspan="2">
+                      <textarea
+                        rows="2"
+                        name="description"
+                        maxlength="50"
+                        class="form-control bg-light-subtle w-75"
+                      ></textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <input
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+              <input
+                type="button"
+                name="previous"
+                class="previous action-button-previous btn"
+                value="Previous"
+              />
+            </fieldset>
+            <fieldset class="fieldset">
               <div class="form-card">
                 <div class="row">
                   <div class="col-7">
                     <h2 class="fs-title">Finish:</h2>
                   </div>
                   <div class="col-5">
-                    <h2 class="steps"></h2>
+                    <h2 class="steps">Step 4 - 4</h2>
                   </div>
                 </div>
                 <br /><br />
@@ -222,12 +348,7 @@
                 </h2>
                 <br />
                 <div class="row justify-content-center">
-                  <div class="col-3">
-                    <img
-                      src="https://i.imgur.com/GwStPmg.png"
-                      class="fit-image"
-                    />
-                  </div>
+                  <div class="col-3"></div>
                 </div>
                 <br /><br />
                 <div class="row justify-content-center">
