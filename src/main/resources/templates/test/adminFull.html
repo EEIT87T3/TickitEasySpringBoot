@@ -11,7 +11,7 @@
         /* 自訂變數，用來統一調整側邊欄和導覽列的高度與寬度 */
         :root {
             /* 主要顏色，用於導航欄背景、主要按鈕等 */
-            --primary-color: #007bff;
+            --primary-color: #4C36C5;
 
             /* 主要顏色的懸停狀態，用於按鈕懸停效果等 */
             --primary-hover-color: #0056b3;
@@ -315,13 +315,14 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid">
             <!-- 側邊欄收起按鈕 -->
-            <button type="button" id="sidebarCollapse" class="btn">
+            <button style="margin-top:3px" type="button" id="sidebarCollapse" class="btn">
                 <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
             </button>
             <a class="navbar-brand ms-3" href="#">
                 <!-- 替換瑋芳logo 的位置 -->
-                <i class="fas fa-ticket-alt me-2"></i>
-                TickitEasy 管理系統
+                <i class=""><img height="18px" src="LOGOTICKIT.svg">&nbsp;	</i><img style="margin-top:3px" height="12px" src="LOGOTEXT.svg">	&nbsp;
+                <span style="margin-top:3px">  &nbsp;管理系統</span>
+                
             </a>
             <!-- 登出按鈕，始終顯示在右側 -->
             <ul class="navbar-nav ms-auto">
