@@ -13,7 +13,14 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * 與檔案系統中的圖片互動。
+ * 
  * @author Chuan
+ */
+/*
+ * 設計時，可選擇設計為——
+ * 1. static method：較為單純。
+ * 2. Spring Bean：如果本身有使用到其他 Spring Bean，則一定要自身是 Spring Bean。
  */
 @Component
 public class ImageUtil {
@@ -57,7 +64,6 @@ public class ImageUtil {
 			File imageFile = resource.getFile();
 			imageFile.delete();
 			result = !imageFile.exists();
-			System.out.println("result: " + !imageFile.exists());
 		}
 		return result;
 	}
