@@ -20,7 +20,7 @@ import com.eeit87t3.tickiteasy.post.service.PostService;
 
 
 @Controller
-@RequestMapping("/post/*")
+@RequestMapping("/admin/api/post")
 public class PostController {
 	
 	@Autowired
@@ -29,12 +29,12 @@ public class PostController {
 	private CommentService commentService ;
 	
 	//新增貼文
-	@GetMapping("/showInsertForm")
+	@GetMapping("/create")
 	    public String showInsertForm() {
 	        return "post/insertpost";  // 返回 insertpost.jsp 
 	    }
 	//取得所有貼文
- 	@GetMapping("/findAll")
+ 	@GetMapping("/")
  	public String findAll(Model model) {
  		List<PostEntity> posts = postService.findAll();
  		model.addAttribute("posts",posts);
@@ -43,7 +43,7 @@ public class PostController {
 		
 	}
  	//根據貼文ID取得單筆貼文
- 	@GetMapping("/findById")
+ 	@GetMapping("/{id}")
  	public String findById(
  			@ModelAttribute PostEntity post,
  			@RequestParam("postID")Integer postID,
