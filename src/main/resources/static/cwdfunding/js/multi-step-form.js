@@ -5,12 +5,15 @@ $(document).ready(function () {
   var steps = $("fieldset").length;
   let selectedValue = 1; // 讀取選擇的值
   let output = document.getElementById("outputBlock");
+  let resultOutput = document.getElementById("resultBlock");
+  const submitBtn = document.getElementById("submit-btn");
 
+  // 換頁 [next] [previos] 按鈕邏輯
   setProgressBar(current);
 
   $(".next").click(function () {
-    current_fs = $(this).closest("fieldset"); // 獲取當前的 fieldset
-    next_fs = current_fs.next(); // 獲取下一個 fieldset
+    current_fs = $(this).closest("fieldset");
+    next_fs = current_fs.next();
 
     console.log(current_fs);
     console.log(next_fs);
@@ -92,25 +95,19 @@ $(document).ready(function () {
     let planTitle;
     output.innerHTML = "";
     console.log(selectedValue);
-    planTitle = `《方案一》`;
-    planTitleMaker(planTitle);
-    planContentMaker();
-    if (selectedValue == "2") {
-      planTitle = `《方案二》`;
-      planTitleMaker(planTitle);
-      planContentMaker();
+    for (let i = 0; i < selectedValue; i++) {
+      planContentMaker(i);
     }
   });
 
-  function planTitleMaker(name) {
+  function planContentMaker(i) {
     output.innerHTML += `<div class="row">
                         <div class="col">
-                        <p class="fw-bolder text-start p-3 fs-4">${name}</p>
-                        </div></div>`;
-  }
-
-  function planContentMaker() {
-    output.innerHTML += `  <table class="table table-borderless custom-table">
+                        <p class="fw-bolder text-start p-3 fs-4">《方案 ${
+                          i + 1
+                        }》</p>
+                        </div></div>
+                        <table class="table table-borderless custom-table">
                           <tbody style="background-color: black">
                             <tr>
                               <td class="col-2">
@@ -119,7 +116,7 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="text"
-                                  name="title"
+                                  name="planTitles"
                                   id="title"
                                   class="form-control borderhidden bg-light-subtle text-start m-0 p-0 w-50"
                                 />
@@ -132,8 +129,9 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="number"
-                                  name="targetAmount"
+                                  name="planUnitPrices"
                                   class="form-control w-25 text-end"
+                                  min="0"
                                 />
                               </td>
                             </tr>
@@ -144,9 +142,10 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="number"
-                                  name="currentAmount"
+                                  name="planTotalAmounts"
                                   placeholder="0"
                                   class="form-control w-25 text-end"
+                                  min="0"
                                 />
                               </td>
                             </tr>
@@ -157,11 +156,12 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="number"
-                                  name="startDate"
-                                  class="form-control w-25 text-end"
+                                  name="planBuyAmounts"
                                   placeholder="0"
+                                  class="form-control w-25 text-end"
                                   disabled
                                 />
+                                <input type="hidden" name="planBuyAmounts" value="0" />
                               </td>
                             </tr>
                             <tr>
@@ -171,7 +171,7 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="file"
-                                  name="postponeDate"
+                                  name="planImages"
                                   class="form-control w-50"
                                 />
                               </td>
@@ -185,7 +185,7 @@ $(document).ready(function () {
                               <td class="col-2" colspan="2">
                                 <textarea
                                   rows="2"
-                                  name="description"
+                                  name="planContents"
                                   maxlength="50"
                                   class="form-control bg-light-subtle w-75"
                                 ></textarea>
@@ -194,7 +194,8 @@ $(document).ready(function () {
                           </tbody>
                         </table>`;
   }
-  //一鍵輸入：募資活動頁面
+
+  // 一鍵輸入：募資活動頁面
   document
     .getElementById("autofillBtnProj")
     .addEventListener("click", function () {
@@ -207,4 +208,54 @@ $(document).ready(function () {
       document.getElementById("image").value = "test.jpg";
       document.getElementById("description").value = "test測試測試";
     });
+
+  // 監聽送出按鈕
+  submitBtn.addEventListener("click", function () {
+    submitForm();
+  });
+
+  function spinner() {
+    resultOutput.innerHTML = "";
+    resultOutput.innerHTML = `<div class="d-flex m-5 justify-content-center">
+       <div class="spinner-border" role="status">
+         <span class="visually-hidden">Loading...</span>
+       </div>
+     </div>`;
+  }
+
+  // 使用ajax送出表單
+  function submitForm() {
+    // 創建一個 FormData 物件，將表單資料自動打包
+    const form = document.getElementById("msform");
+    const formData = new FormData(form);
+    spinner();
+    // 使用 Axios 發送 POST 請求
+    axios
+      .post(
+        "http://localhost:8080/TickitEasy/admin/api/fundproject",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then(function (response) {
+        const data = response.data;
+        console.log(data);
+        resultOutput.innerHTML = "";
+        if (data.status === "success") {
+          resultOutput.innerHTML = `<div class="d-flex m-5 justify-content-center">
+                                        ${data.message}
+                                    </div>`;
+        } else {
+          resultOutput.innerHTML = `<div class="d-flex m-5 justify-content-center">
+                                        ${data.message}
+                                    </div>`;
+        }
+      })
+      .catch((error) => {
+        resultOutput.innerHTML = `${error}`;
+      });
+  }
 });

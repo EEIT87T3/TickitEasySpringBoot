@@ -17,13 +17,14 @@
     />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/TickitEasy/cwdfunding/js/multi-step-form.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
   </head>
 
   <body>
     <div th:replace="~{commons/adminHeader}"></div>
     <!--  這裡是網頁內容 >-->
     <div class="container">
-      <form id="msform">
+      <form id="msform" method="post" enctype="multipart/form-data">
         <div class="row">
           <div class="col col-2 m-3">
             <ul id="progressbar">
@@ -35,11 +36,13 @@
           </div>
           <div class="col col-8 m-3">
             <fieldset class="fieldset">
-              <div class="row">
-                <div class="col">
-                  <p class="fw-bolder text-start p-2">新增募資活動</p>
-                </div>
-              </div>
+              <tr>
+                <td class="col-2">
+                  <div class="fieldlabels fw-medium p-2 text-start text-dark">
+                    新增募資活動
+                  </div>
+                </td>
+              </tr>
               <table class="table table-borderless custom-table">
                 <tbody style="background-color: black">
                   <tr>
@@ -50,6 +53,12 @@
                         placeholder="活動名稱"
                         id="title"
                         class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0"
+                        required
+                      />
+                      <input
+                        type="hidden"
+                        name="projectID"
+                        th:value="${projectID}"
                       />
                     </td>
                   </tr>
@@ -59,15 +68,18 @@
                     </td>
                     <td class="col-8">
                       <select
-                        class="form-select form-select-sm w-25"
+                        class="form-select form-select-sm w-25 text-end"
                         aria-label="Default select example"
-                        name="category"
-                        id="category"
+                        name="categoryID"
+                        id="categoryID"
                       >
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Two</option>
+                        <option selected></option>
+                        <th:block th:each=" aCategory : ${categories}">
+                          <option
+                            th:value="${aCategory.categoryID}"
+                            th:text="${aCategory.categoryName}"
+                          ></option>
+                        </th:block>
                       </select>
                     </td>
                   </tr>
@@ -78,15 +90,18 @@
                     </td>
                     <td class="col-8">
                       <select
-                        class="form-select form-select-sm w-25"
+                        class="form-select form-select-sm w-25 text-end"
                         aria-label="Default select example"
-                        name="tag"
-                        id="tag"
+                        name="tagID"
+                        id="tagID"
                       >
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Two</option>
+                        <option selected></option>
+                        <th:block th:each=" aTag : ${tags}">
+                          <option
+                            th:value="${aTag.tagID}"
+                            th:text="${aTag.tagName}"
+                          ></option>
+                        </th:block>
                       </select>
                     </td>
                   </tr>
@@ -99,7 +114,8 @@
                         id="targetAmount"
                         type="number"
                         name="targetAmount"
-                        class="form-control w-25"
+                        class="form-control w-25 text-end"
+                        min="0"
                       />
                     </td>
                   </tr>
@@ -111,11 +127,11 @@
                       <input
                         id="currentAmount"
                         type="number"
-                        name="currentAmount"
                         placeholder="0"
-                        class="form-control w-25"
+                        class="form-control w-25 text-end"
                         disabled
                       />
+                      <input type="hidden" name="currentAmount" value="0" />
                     </td>
                   </tr>
                   <tr>
@@ -253,6 +269,7 @@
               <div id="outputBlock"></div>
               <button id="autofillBtnPlan">一鍵填入</button>
               <input
+                id="submit-btn"
                 type="button"
                 name="next"
                 class="next action-button btn"
@@ -267,27 +284,12 @@
             </fieldset>
             <fieldset class="fieldset">
               <div class="form-card">
-                <div class="row">
-                  <div class="col-7">
-                    <h2 class="fs-title">Finish:</h2>
-                  </div>
-                </div>
                 <br /><br />
                 <h2 class="purple-text text-center">
-                  <strong>SUCCESS !</strong>
+                  <div id="resultBlock"></div>
                 </h2>
                 <br />
-                <div class="row justify-content-center">
-                  <div class="col-3"></div>
-                </div>
                 <br /><br />
-                <div class="row justify-content-center">
-                  <div class="col-7 text-center">
-                    <h5 class="purple-text text-center">
-                      You Have Successfully Signed Up
-                    </h5>
-                  </div>
-                </div>
               </div>
             </fieldset>
           </div>

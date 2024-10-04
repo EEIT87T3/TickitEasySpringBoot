@@ -110,12 +110,12 @@ public class FundProjService {
 		
         // 設定FundPlan屬性
 		newFundPlan.setFundProj(fundProj);
-		newFundPlan.setTitle(title);
-		newFundPlan.setUnitPrice(unitPrice);
-		newFundPlan.setTotalAmount(totalAmount);
-		newFundPlan.setBuyAmount(buyAmount);
-		newFundPlan.setImage(image);
-		newFundPlan.setContent(content);
+		newFundPlan.setPlanTitle(title);
+		newFundPlan.setPlanUnitPrice(unitPrice);
+		newFundPlan.setPlanTotalAmount(totalAmount);
+		newFundPlan.setPlanBuyAmount(buyAmount);
+		newFundPlan.setPlanImage(image);
+		newFundPlan.setPlanContent(content);
 		
 		return fundPlanRepo.save(newFundPlan);
 	}
@@ -168,6 +168,11 @@ public class FundProjService {
 			return dto;
 		});
 		return dto;
+	}
+	
+	/* 查詢project最新單筆的projectID */ 
+	public String findTopProject() {
+		return String.valueOf(fundProjRepo.findTopProjectById().getProjectID()+1);
 	}
 	
 	/* 刪除 */

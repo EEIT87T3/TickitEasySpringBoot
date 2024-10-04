@@ -19,22 +19,22 @@ public class FundPlan {
 	private Integer planID;
 	
 	@Column(name="title")
-	private String title;
+	private String planTitle;
 	
 	@Column(name="planContent")
-	private String content;
+	private String planContent;
 	
 	@Column(name="unitPrice")
-	private String unitPrice;
+	private String planUnitPrice;
 	
 	@Column(name = "totalAmount")
-	private String totalAmount;
+	private String planTotalAmount;
 	
 	@Column(name = "buyAmount")
-	private String buyAmount;
+	private String planBuyAmount;
 	
 	@Column(name = "image")
-	private String image;
+	private String planImage;
 	
 	@JsonIgnore
 	@ManyToOne
@@ -49,52 +49,52 @@ public class FundPlan {
 		this.planID = planID;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getPlanTitle() {
+		return planTitle;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setPlanTitle(String planTitle) {
+		this.planTitle = planTitle;
 	}
 
-	public String getContent() {
-		return content;
+	public String getPlanContent() {
+		return planContent;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setPlanContent(String planContent) {
+		this.planContent = planContent;
 	}
 
-	public String getUnitPrice() {
-		return unitPrice;
+	public String getPlanUnitPrice() {
+		return planUnitPrice;
 	}
 
-	public void setUnitPrice(String unitPrice) {
-		this.unitPrice = unitPrice;
+	public void setPlanUnitPrice(String planUnitPrice) {
+		this.planUnitPrice = planUnitPrice;
 	}
 
-	public String getTotalAmount() {
-		return totalAmount;
+	public String getPlanTotalAmount() {
+		return planTotalAmount;
 	}
 
-	public void setTotalAmount(String totalAmount) {
-		this.totalAmount = totalAmount;
+	public void setPlanTotalAmount(String planTotalAmount) {
+		this.planTotalAmount = planTotalAmount;
 	}
 
-	public String getBuyAmount() {
-		return buyAmount;
+	public String getPlanBuyAmount() {
+		return planBuyAmount;
 	}
 
-	public void setBuyAmount(String buyAmount) {
-		this.buyAmount = buyAmount;
+	public void setPlanBuyAmount(String planBuyAmount) {
+		this.planBuyAmount = planBuyAmount;
 	}
 
-	public String getImage() {
-		return image;
+	public String getPlanImage() {
+		return planImage;
 	}
 
-	public void setImage(String image) {
-		this.image = image;
+	public void setPlanImage(String planImage) {
+		this.planImage = planImage;
 	}
 
 	public FundProj getFundProj() {
@@ -105,4 +105,5 @@ public class FundPlan {
 		this.fundProj = fundProj;
 	}
 
+	
 }
