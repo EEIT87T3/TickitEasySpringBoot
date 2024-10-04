@@ -22,7 +22,7 @@ import jakarta.persistence.Transient;
 @Entity
 @Table(name = "post")
 @Component
-public class PostBean {
+public class PostEntity {
 	
 	@Id
 	@Column(name = "postID")
@@ -60,21 +60,21 @@ public class PostBean {
 	//  @ManyToOne 關聯到 Theme 實體
 	@ManyToOne
 	@JoinColumn(name = "themeID", referencedColumnName = "themeID", insertable = false, updatable = false)//避免重複映射
-    private ThemeBean theme;  
+    private ThemeEntity theme;  
 
 
     @OneToMany(mappedBy = "post")
-    private Set<CommentBean> comments;  // 使用 Set 來避免重複
+    private Set<CommentEntity> comments;  // 使用 Set 來避免重複
 	
 	//  @ManyToOne 關聯到 Member 實體
-	@ManyToOne
-	@JoinColumn(name = "memberID", referencedColumnName = "memberID", insertable = false, updatable = false)//避免重複映射
-	private MemberBean member;  
+//	@ManyToOne
+//	@JoinColumn(name = "memberID", referencedColumnName = "memberID", insertable = false, updatable = false)//避免重複映射
+//	private MemberBean member;  
 	
 	@Transient
     private static final String DEFAULT_PROFILE_PIC = "/images/default-avatar.png"; // 預設頭貼路徑
 	
-	public PostBean() {
+	public PostEntity() {
 		super();
 	}
 
@@ -101,59 +101,59 @@ public class PostBean {
 	public void setViewCount(Integer viewCount) {this.viewCount = viewCount;}
 	public void setStatus(Integer status) {this.status = status;}
 	
-	public ThemeBean getThemeName() {
+	public ThemeEntity getThemeName() {
 		return theme;
 	}
-	public void setThemeName(ThemeBean theme) {
+	public void setThemeName(ThemeEntity theme) {
 		this.theme = theme;
 	}
-	public MemberBean getMember() {
-		return member;
-	}
-	public void setMember(MemberBean member) {
-		this.member = member;
-	}
+//	public MemberBean getMember() {
+//		return member;
+//	}
+//	public void setMember(MemberBean member) {
+//		this.member = member;
+//	}
     
-	public Set<CommentBean> getComments() {
+	public Set<CommentEntity> getComments() {
 	        return comments;
 	}
-	public void setComments(Set<CommentBean> comments) {
+	public void setComments(Set<CommentEntity> comments) {
 	        this.comments = comments;
 	}
 	  
 	// 會員頭貼
 
-	public String getMemberProfilePic() {
-		if (member != null) {
-			return member.getProfilePic();
-		}
-		return null; // 或者返回一個預設值
-	}
-	
-	public void setMemberProfilePic(String profilePic) {
-		if (member != null) {
-				member.setProfilePic(profilePic);
-		} else {
-			// 處理 member 為 null 的情況
-			// 例如可以拋出異常或者設置一個默認值
-			throw new IllegalStateException("MemberBean is not initialized.");
-		}
-	}
-	public String getMemberNickname() {
-		if (member != null) {
-			return member.getNickname();
-		}
-		return null; // 或者返回一個預設值
-	}
-	
-	public void setMemberNickname(String nickname) {
-		if (member != null) {
-			member.setNickname(nickname);
-		} else {
-			// 處理 member 為 null 的情況
-			// 例如可以拋出異常或者設置一個默認值
-			throw new IllegalStateException("MemberBean is not initialized.");
-		}
-	}
+//	public String getMemberProfilePic() {
+//		if (member != null) {
+//			return member.getProfilePic();
+//		}
+//		return null; // 或者返回一個預設值
+//	}
+//	
+//	public void setMemberProfilePic(String profilePic) {
+//		if (member != null) {
+//				member.setProfilePic(profilePic);
+//		} else {
+//			// 處理 member 為 null 的情況
+//			// 例如可以拋出異常或者設置一個默認值
+//			throw new IllegalStateException("MemberBean is not initialized.");
+//		}
+//	}
+//	public String getMemberNickname() {
+//		if (member != null) {
+//			return member.getNickname();
+//		}
+//		return null; // 或者返回一個預設值
+//	}
+//	
+//	public void setMemberNickname(String nickname) {
+//		if (member != null) {
+//			member.setNickname(nickname);
+//		} else {
+//			// 處理 member 為 null 的情況
+//			// 例如可以拋出異常或者設置一個默認值
+//			throw new IllegalStateException("MemberBean is not initialized.");
+//		}
+//	}
 	
 }

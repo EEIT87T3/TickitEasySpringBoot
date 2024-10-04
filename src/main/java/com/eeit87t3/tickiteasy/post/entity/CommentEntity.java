@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "postComment")
 @Component
-public class CommentBean implements java.io.Serializable  {
+public class CommentEntity implements java.io.Serializable  {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
@@ -41,11 +41,11 @@ public class CommentBean implements java.io.Serializable  {
 
 	@ManyToOne
 	@JoinColumn(name = "postID", insertable = false, updatable = false)
-	private PostBean post;  // 使用 @ManyToOne 來表示多對一關聯
+	private PostEntity post;  // 使用 @ManyToOne 來表示多對一關聯
 	
-	@ManyToOne
-	@JoinColumn(name = "memberID", insertable = false, updatable = false)
-	private MemberBean member;  // 使用 @ManyToOne 來表示多對一關聯
+//	@ManyToOne
+//	@JoinColumn(name = "memberID", insertable = false, updatable = false)
+//	private MemberBean member;  // 使用 @ManyToOne 來表示多對一關聯
 	
 	public Integer getPostCommentID() {
 		return postCommentID;
@@ -89,25 +89,25 @@ public class CommentBean implements java.io.Serializable  {
 		this.commentDate = commentDate;
 	}
 
-	public String getMemberNickname() {
-		if (member != null) {
-			return member.getNickname();
-		}
-		return null; // 或者返回一個預設值
-	}
-	
-	public void setMemberNickname(String nickname) {
-		if (member != null) {
-			member.setNickname(nickname);
-		} else {
-			// 處理 member 為 null 的情況
-			// 例如可以拋出異常或者設置一個默認值
-			throw new IllegalStateException("MemberBean is not initialized.");
-		}
-	}
+//	public String getMemberNickname() {
+//		if (member != null) {
+//			return member.getNickname();
+//		}
+//		return null; // 或者返回一個預設值
+//	}
+//	
+//	public void setMemberNickname(String nickname) {
+//		if (member != null) {
+//			member.setNickname(nickname);
+//		} else {
+//			// 處理 member 為 null 的情況
+//			// 例如可以拋出異常或者設置一個默認值
+//			throw new IllegalStateException("MemberBean is not initialized.");
+//		}
+//	}
 
 	
-	public CommentBean() {
+	public CommentEntity() {
 		
 		
 	}
