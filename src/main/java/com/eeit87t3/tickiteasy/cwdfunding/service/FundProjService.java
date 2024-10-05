@@ -25,6 +25,8 @@ import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.TagRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class FundProjService {
 
@@ -104,7 +106,7 @@ public class FundProjService {
 			) {
 		FundPlan newFundPlan = new FundPlan();
 		
-		//先用categoryID找出對應到的category實體，之後再塞進proj 
+		//先用projectID找出對應到的FundProj實體，之後再塞進plan
 		Optional<FundProj> optional = fundProjRepo.findById(Integer.valueOf(projectID));
 		FundProj fundProj = optional.get();
 		
@@ -200,14 +202,88 @@ public class FundProjService {
 	}
 	
 	/* 更新 (尚未寫完)*/
-	public FundProj updateFundProjById(Integer id, FundProj newProj) {
-		Optional<FundProj> optional = fundProjRepo.findById(id);
+	public FundProj editProj(
+	        String projectID,
+	        String title,
+	        String categoryID,
+	        String tagID,
+	        String startDateStr,
+	        String endDateStr,
+	        String targetAmount,
+	        String currentAmount,
+	        String threshold,
+	        String postponeDateStr,
+	        String filename,
+	        String description
+	) {
+	    // 找到專案
+	    Optional<FundProj> optional = fundProjRepo.findById(Integer.valueOf(projectID));
+	    if (!optional.isPresent()) {
+	        throw new EntityNotFoundException("Project not found with ID: " + projectID);
+	    }
+	    
+	    FundProj proj = optional.get();
+	    // 更新 category 和 tag
+	    Optional<Category> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
+	    proj.setCategory(coptional.orElse(null));
+	    
+	    Optional<Tag> toptional = tagRepo.findById(Integer.valueOf(tagID));
+	    proj.setTag(toptional.orElse(null));
+
+	    proj.setTitle(title);
+	    proj.setDescription(description);
+	    proj.setImage(filename);
+
+	    // 解析日期
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+	    LocalDateTime startDateTime = LocalDateTime.parse(startDateStr, formatter);
+	    LocalDateTime endDateTime = LocalDateTime.parse(endDateStr, formatter);
+	    LocalDateTime postponeDateTime = LocalDateTime.parse(postponeDateStr, formatter);
+
+	    // 設定新的日期
+	    proj.setStartDate(Timestamp.valueOf(startDateTime));
+	    proj.setEndDate(Timestamp.valueOf(endDateTime));
+	    proj.setTargetAmount(targetAmount);
+	    proj.setCurrentAmount(currentAmount);
+	    proj.setThreshold(threshold);
+	    proj.setPostponeDate(Timestamp.valueOf(postponeDateTime));
+
+
+	    // 儲存更新的專案
+	    return fundProjRepo.save(proj);
+	}
+
+	/* 新增募資活動方案 */
+	public FundPlan editPlan(
+			String projectID,
+			String title,
+			String unitPrice,
+			String totalAmount,
+			String buyAmount,
+			String image,
+			String content
+			) {
+		FundPlan newFundPlan = new FundPlan();
 		
-		if(optional.isPresent()) {
-			FundProj oldProj = optional.get();
-			oldProj.setTitle(newProj.getTitle());
-			oldProj.setDescription(newProj.getDescription());
-		}
-		return null;
+	    // 找到專案
+	    Optional<FundPlan> optional = fundPlanRepo.findById(Integer.valueOf(projectID));
+	    if (!optional.isPresent()) {
+	        throw new EntityNotFoundException("Project not found with ID: " + projectID);
+	    }
+		
+		//先用projectID找出對應到的FundProj實體，之後再塞進plan
+		Optional<FundProj> poptional = fundProjRepo.findById(Integer.valueOf(projectID));
+		FundProj fundProj = poptional.get();
+		
+        // 設定FundPlan屬性
+		newFundPlan.setFundProj(fundProj);
+		newFundPlan.setPlanTitle(title);
+		newFundPlan.setPlanUnitPrice(unitPrice);
+		newFundPlan.setPlanTotalAmount(totalAmount);
+		newFundPlan.setPlanBuyAmount(buyAmount);
+		newFundPlan.setPlanImage(image);
+		newFundPlan.setPlanContent(content);
+		
+		return fundPlanRepo.save(newFundPlan);
 	}
 }

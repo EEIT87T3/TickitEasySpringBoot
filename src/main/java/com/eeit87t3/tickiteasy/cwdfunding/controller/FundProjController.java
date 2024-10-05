@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -188,10 +189,74 @@ public class FundProjController {
 					planFilename = planImages.get(i).getOriginalFilename();
 					System.out.println("projectID" + projectID);
 					System.out.println("planTitle: " + planTitle);
-					System.out.println("planUnitPrice: " + planUnitPrice);
-					System.out.println("planTotalAmount: " + planTotalAmount);
-					System.out.println("planBuyAmount: " + planBuyAmount);
-					System.out.println("planContent: " + planContent);
+					projService.savePlan(projectID, planTitle, planUnitPrice, planTotalAmount, planBuyAmount, planFilename,
+							planContent);
+				}
+				response.put("status", "success");
+				response.put("message", "Project added successfully!");
+				return ResponseEntity.ok(response);
+			}catch (Exception e) {
+				response.put("status", "error");
+				response.put("message", "Something wrong!");
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+			}
+	}
+
+	/* [API]修改募資活動 */
+	@ResponseBody
+	@PutMapping("/api/fundproject/{projectID}")
+	public ResponseEntity<Map<String, Object>> editProject(@PathVariable String projectID, @RequestParam String title,
+			@RequestParam String categoryID, @RequestParam String tagID, @RequestParam("startDate") String startDateStr,
+			@RequestParam("endDate") String endDateStr, @RequestParam String targetAmount,
+			@RequestParam String currentAmount, @RequestParam String threshold,
+			@RequestParam("postponeDate") String postponeDateStr, @RequestParam MultipartFile image,
+			@RequestParam String description, @RequestParam List<String> planTitles,
+			@RequestParam List<String> planUnitPrices, @RequestParam List<String> planTotalAmounts,
+			@RequestParam List<String> planBuyAmounts, @RequestParam List<MultipartFile> planImages,
+			@RequestParam List<String> planContents) {
+			// project 變數初始化
+			String filename = null;
+	
+			// plan 變數初始化
+			String planTitle = null;
+			String planUnitPrice = null;
+			String planTotalAmount = null;
+			String planBuyAmount = null;
+			String planContent = null;
+			String planFilename = null;
+			
+			// response定義
+		    Map<String, Object> response = new HashMap<>();
+
+	
+			try {
+		        // 1. Validate input (basic validation examples)
+		        if (title == null || title.isEmpty()) {
+		            response.put("status", "error");
+		            response.put("message", "Project title is required");
+		            return ResponseEntity.badRequest().body(response);
+		        }
+	
+				/*
+				 * 1. 存取fund project (1) 取得最新應填的projectID (2) 將image的檔名讀取出來
+				 */
+				filename = image.getOriginalFilename();
+	
+				projService.editProj(projectID ,title, categoryID, tagID, startDateStr, endDateStr, targetAmount, currentAmount,
+						threshold, postponeDateStr, filename, description);
+	
+				/*
+				 * 2. 存取fund plan (1) 取出所有陣列的元素
+				 */
+				for (int i = 0; i < planTitles.size(); i++) {
+					planTitle = planTitles.get(i);
+					planUnitPrice = planUnitPrices.get(i);
+					planTotalAmount = planTotalAmounts.get(i);
+					planBuyAmount = planBuyAmounts.get(i);
+					planContent = planContents.get(i);
+					planFilename = planImages.get(i).getOriginalFilename();
+					System.out.println("projectID" + projectID);
+					System.out.println("planTitle: " + planTitle);
 					projService.savePlan(projectID, planTitle, planUnitPrice, planTotalAmount, planBuyAmount, planFilename,
 							planContent);
 				}
