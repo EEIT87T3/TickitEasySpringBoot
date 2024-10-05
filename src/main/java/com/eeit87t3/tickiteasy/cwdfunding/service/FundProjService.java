@@ -146,8 +146,8 @@ public class FundProjService {
 		});
 		return dtoPage;
 	}
-	/* 查詢單筆 */
-	public FundProjDTO findFundProjById(Integer projectID) {
+	/* 查詢單筆fund proj DTO */
+	public FundProjDTO findFundProjDTOById(Integer projectID) {
 		Optional<FundProj> optional = fundProjRepo.findById(projectID);
 		FundProjDTO dto = new FundProjDTO();
 		optional.map(fundProj -> {
@@ -170,15 +170,24 @@ public class FundProjService {
 		return dto;
 	}
 	
+	/* 查詢單筆fund proj */
+	public FundProj findFundProjById(Integer projectID) {
+		Optional<FundProj> optional = fundProjRepo.findById(projectID);
+		FundProj fundProj = optional.get();
+		return fundProj;
+	}
+	
+	
 	/* 查詢project最新單筆的projectID */ 
 	public String findTopProject() {
 		return String.valueOf(fundProjRepo.findTopProjectById().getProjectID()+1);
 	}
 	
+	
 	/* 刪除 */
 	public boolean deleteFundProjById(Integer id) {
 		FundProjDTO exist = new FundProjDTO();
-		exist = findFundProjById(id);
+		exist = findFundProjDTOById(id);
 		// 使用getProjectID判斷專案是否存在
 		if (exist.getProjectID() != null) {
 			fundProjRepo.deleteById(id);

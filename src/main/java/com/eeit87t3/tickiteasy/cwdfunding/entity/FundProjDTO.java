@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.cwdfunding.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -31,6 +32,8 @@ public class FundProjDTO {
     private String tagString;
 
     private String tagName;
+    
+//    private List<E>
     
     
 	public Integer getProjectID() {

@@ -182,6 +182,26 @@ public class FundProj{
 		this.tag = tag;
 	}
 
+	public List<FundProjPhoto> getFundProjPhotos() {
+		return fundProjPhotos;
+	}
+
+
+	public void setFundProjPhotos(List<FundProjPhoto> fundProjPhotos) {
+		this.fundProjPhotos = fundProjPhotos;
+	}
+
+
+	public List<FundPlan> getFundPlan() {
+		return fundPlan;
+	}
+
+
+	public void setFundPlan(List<FundPlan> fundPlan) {
+		this.fundPlan = fundPlan;
+	}
+
+
 	// 返回格式化後的日期
     public String getFormattedStartDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

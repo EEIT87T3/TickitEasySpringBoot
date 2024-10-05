@@ -49,17 +49,18 @@
           pageData.content.forEach((el) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `<td> ${el.projectID} </td>
-             <td nowrap> ${el.title} </td>
-             <td class="text-truncate" style="max-width: 150px; nowrap"> ${el.description}</td>
-             <td> ${el.image} </td>
+             <td nowrap> <a href="/TickitEasy/admin/fundproject/${el.projectID}">${el.title}</a></td>
+             <!-- <td class="text-truncate" style="max-width: 150px; nowrap"> ${el.description}</td> -->
+             <!-- <td> ${el.image} </td> -->
              <td> ${el.startDate} </td>
              <td> ${el.endDate} </td>
-             <td> ${el.targetAmount} </td>
-             <td> ${el.currentAmount} </td>
+             <td class="text-end"> ${el.targetAmount} </td>
+             <td class="text-end"> ${el.currentAmount} </td>
              <td> ${el.threshold} </td>
              <td> ${el.postponeDate} </td>
              <td> ${el.categoryName} </td>
-             <td> <button class="btn btn-delete" data-projectID="${el.projectID}"><i class="fa-solid fa-trash" style="color: #ff5c5c;"></i></button></td>`;
+             <td> <a href="/TickitEasy/admin/fundproject/${el.projectID}/edit"><button class="btn btn-edit" data-projectID="${el.projectID}"><i class="fa-solid fa-pen-to-square" style="color: #64d93a;"></i></button></a>
+             <button class="btn btn-delete" data-projectID="${el.projectID}"><i class="fa-solid fa-trash" style="color: #ff5c5c;"></i></button> </td>`;
             output.append(tr);
           });
           // 印頁數 (pageData.totalPages)
@@ -116,8 +117,21 @@
             .then((res) => {
               if (res.status === 204) {
                 // 刪除成功，重新加載當前頁面
-                alert("Project deleted successfully.");
-                loadThatPage(currentPage); // 使用當前頁面號碼重新加載
+                swal({
+                  title: "刪除成功！",
+                  icon: "success",
+                  buttons: {
+                    confirm: {
+                      text: "確定",
+                      visible: true,
+                    },
+                  },
+                }).then((ok) => {
+                  if (ok) {
+                    console.log("ok");
+                    loadThatPage(currentPage); // 使用當前頁面號碼重新加載
+                  }
+                });
               }
             })
             .catch((err) => {
@@ -137,12 +151,12 @@
     <div th:replace="~{commons/adminHeader}"></div>
     <!--  這裡是網頁內容 >-->
     <div class="container">
-      <table class="table table-hover">
+      <table class="table table-hover text-center">
         <thead>
-          <th scope="col">ID</th>
+          <th scope="col">#</th>
           <th scope="col">名稱</th>
-          <th scope="col">敘述</th>
-          <th scope="col">封面</th>
+          <!-- <th scope="col">敘述</th> -->
+          <!-- <th scope="col">封面</th> -->
           <th scope="col">開始時間</th>
           <th scope="col">結束時間</th>
           <th scope="col">目標金額</th>

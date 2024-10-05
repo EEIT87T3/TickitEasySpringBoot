@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.cwdfunding.controller;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
@@ -42,7 +44,7 @@ public class FundProjController {
 	@Autowired
 	private TagServiceTemp tagServiceTemp;
 
-	/* 列出所有募資活動頁面, api */
+	/* 查詢所有募資活動頁面, api */
 	@GetMapping("/fundproject")
 	public String showProjPage(@RequestParam(value = "p", defaultValue = "1") Integer pageNumber, Model model) {
 		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
@@ -57,14 +59,36 @@ public class FundProjController {
 		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
 		return page;
 	}
+	
+	/* [頁面] 查詢單筆募資活動by ID */
+	@GetMapping("/fundproject/{projectID}")
+	public String showProjPageByID(@PathVariable Integer projectID, Model model) {
+		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
+		FundProj fundProj = projService.findFundProjById(projectID);
+		List<FundPlan> fundPlans = fundProj.getFundPlan();
+		
+		model.addAttribute("projectDTO",fundProjDTO);
+		model.addAttribute("plans",fundPlans);
+		return "cwdfunding/showOneFundProj";
+	}
 
-	/* 刪除募資活動by ID, api */
+	/* [API] 查詢單筆募資活動by ID */
 	@ResponseBody
 	@GetMapping("/api/fundproject/{projectID}")
 	public FundProjDTO findByID(@PathVariable Integer projectID) {
-		return projService.findFundProjById(projectID);
+		return projService.findFundProjDTOById(projectID);
 	}
+	
+//	/* [API] 查詢單筆募資活動方案 by project ID */
+//	@ResponseBody
+//	@GetMapping("/api/fundproject/planID/{projectID}")
+//	public List<FundPlan> findPlanByProjID(@PathVariable Integer projectID){
+//		FundProj fundProj = projService.findFundProjById(projectID);
+//		List<FundPlan> fundPlans = fundProj.getFundPlan();
+//		return fundPlans;
+//	}
 
+	/* [API] 刪除募資活動by ID */
 	@ResponseBody
 	@DeleteMapping("/api/fundproject/{projectID}")
 	public ResponseEntity<String> deleteFundProj(@PathVariable Integer projectID) {
@@ -83,9 +107,21 @@ public class FundProjController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
 		}
 	}
+	
+	/* [頁面] 修改單筆募資活動by ID */
+	@GetMapping("/fundproject/{projectID}/edit")
+	public String showEditProjPageByID(@PathVariable Integer projectID, Model model) {
+		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
+		FundProj fundProj = projService.findFundProjById(projectID);
+		List<FundPlan> fundPlans = fundProj.getFundPlan();
+		
+		model.addAttribute("projectDTO",fundProjDTO);
+		model.addAttribute("plans",fundPlans);
+		return "cwdfunding/editOneFundProj";
+	}
 
-	/* 新增募資活動, api */
-	@GetMapping("/add-project")
+	/* [頁面] 新增募資活動 */
+	@GetMapping("/fundproject/create")
 	public String addProjPage(Model model) {
 		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
 		List<Tag> tags = tagServiceTemp.findFundProjTagList();
@@ -96,7 +132,8 @@ public class FundProjController {
 		model.addAttribute("tags", tags);
 		return "cwdfunding/addFundProjnPlan";
 	}
-
+	
+	/* [API]新增募資活動 */
 	@ResponseBody
 	@PostMapping("/api/fundproject")
 	public ResponseEntity<Map<String, Object>> addProject(@RequestParam String projectID, @RequestParam String title,

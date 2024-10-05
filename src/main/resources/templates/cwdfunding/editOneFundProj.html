@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <meta charset="UTF-8" />
+    <title>修改募資專案 - TickitEasy 管理系統</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+    <script>
+      $(document).ready(function () {
+        // 這裡是 JavaScript 內容
+      });
+    </script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/adminHeader}"></div>
+
+    <!--  這裡是網頁內容 >-->
+	<div class="container">
+		<h1>修改頁面</h1>
+		   <div class="container">
+      <div class="row mb-3">
+        <div class="col">
+          <span
+            class="fw-bold fs-4 text-start"
+            th:text="${projectDTO.title}"
+          ></span>
+        </div>
+      </div>
+	</div>
+    <div th:replace="~{commons/adminFooter}"></div>
+  </body>
+</html>
