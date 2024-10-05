@@ -23,9 +23,9 @@ public class CommentService {
 	
 	//根據貼文ID取得多筆留言
 	@Transactional(readOnly = true)
-	public List<CommentEntity> findById(int postId) {
+	public List<CommentEntity> findById(int postID) {
 	    // 直接從 commentRepo 取得結果，若沒有資料則返回空的 List
-	    return commentRepo.findByPostId(postId);
+	    return commentRepo.findByPostPostID(postID);
 	}
 
 	

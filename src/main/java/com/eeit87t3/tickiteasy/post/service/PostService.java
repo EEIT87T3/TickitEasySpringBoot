@@ -48,14 +48,14 @@ public class PostService {
     
     //根據Category取得多筆貼文
     @Transactional(readOnly = true)
-    public  List<PostEntity> findByCategory(CategoryEntity category) {
-    	return postRepo.findByCategory(category);
+    public  List<PostEntity> findByCategory(CategoryEntity postCategory) {
+    	return postRepo.findByPostCategory(postCategory);
     }
-    //根據搜尋內容取得多筆貼文
-    @Transactional(readOnly = true)
-    public List<PostEntity> findByEnter(String enter){
-    	return postRepo.findByEnter(enter);
-    }
+//    //根據搜尋內容取得多筆貼文
+//    @Transactional(readOnly = true)
+//    public List<PostEntity> findByEnter(String enter){
+//    	return postRepo.findByEnter(enter);
+//    }
     
     //新增單筆貼文
     @Transactional

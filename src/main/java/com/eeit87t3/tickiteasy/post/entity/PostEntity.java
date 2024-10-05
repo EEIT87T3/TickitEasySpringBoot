@@ -7,6 +7,9 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
 
+import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -62,6 +65,15 @@ public class PostEntity {
 	@JoinColumn(name = "themeID", referencedColumnName = "themeID", insertable = false, updatable = false)//避免重複映射
     private ThemeEntity theme;  
 
+	//  @ManyToOne 關聯到 Category 實體
+	@ManyToOne
+	@JoinColumn(name = "categoryID", referencedColumnName = "categoryID", insertable = false, updatable = false)//避免重複映射
+	private CategoryEntity postCategory; 
+	
+	//  @ManyToOne 關聯到 Tag 實體
+	@ManyToOne
+	@JoinColumn(name = "tagID", referencedColumnName = "tagID", insertable = false, updatable = false)//避免重複映射
+	private TagEntity postTag; 
 
     @OneToMany(mappedBy = "post")
     private Set<CommentEntity> comments;  // 使用 Set 來避免重複
@@ -89,6 +101,24 @@ public class PostEntity {
 	public Integer getViewCount() {return viewCount;}
 	public Integer getStatus() {return status;}
 
+
+	public CategoryEntity getPostCategory() {
+		return postCategory;
+	}
+
+	public void setPostCategory(CategoryEntity postCategory) {
+		this.postCategory = postCategory;
+	}
+
+
+
+	public TagEntity getPostTag() {
+		return postTag;
+	}
+
+	public void setPostTag(TagEntity postTag) {
+		this.postTag = postTag;
+	}
 
 	public void setPostID(Integer postID) {this.postID = postID;}
 	public void setThemeID(Integer themeID) {this.themeID = themeID;}

@@ -12,7 +12,7 @@ import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 
 public interface PostRepo extends JpaRepository<PostEntity, Integer> {
 
-	List<PostEntity> findByCategory(CategoryEntity category);
-	List<PostEntity> findByTag(TagEntity tag);
-	List<PostEntity> findByEnter(String enter);
+	List<PostEntity> findByPostCategory(CategoryEntity postCategory);
+//	List<PostEntity> findByTag(TagEntity tag);
+//	List<PostEntity> findByEnter(String enter);
 }

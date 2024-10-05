@@ -24,7 +24,6 @@
 </head>
 <body>
     <nav>
-    
         <a class="navbar-brand" href="${pageContext.request.contextPath}/admin/dashboard">後台主頁</a>
         <ul class="navbar-nav">
             <li class="nav-item active">
