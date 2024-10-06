@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +46,7 @@ public class ProductService {
 
     
     @Transactional
-    public ProductEntity addProduct(ProductEntity product, MultipartFile imageFile, Integer categoryId, Integer tagId) throws IOException {
+    public ProductEntity createProduct(ProductEntity product, MultipartFile imageFile, Integer categoryId, Integer tagId) throws IOException {
         // 設置分類和標籤
         CategoryEntity category = categoryService.findProductCategoryById(categoryId);
         TagEntity tag = tagService.findProductTagById(tagId);
@@ -62,7 +65,7 @@ public class ProductService {
     }
     
     @Transactional
-    public ProductEntity updateProductById(Integer productID, ProductEntity newProduct, MultipartFile imageFile, Integer categoryId, Integer tagId) throws IOException {
+    public ProductEntity editProductById(Integer productID, ProductEntity newProduct, MultipartFile imageFile, Integer categoryId, Integer tagId) throws IOException {
         Optional<ProductEntity> optional = productRepo.findById(productID);
 
         if(optional.isPresent()) {
@@ -132,5 +135,19 @@ public class ProductService {
 		return productRepo.findAll();
 	}
 	
+	public Page<ProductEntity> findAllProductsPageSortedByIdAndName(String productName, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        return productRepo.findAllOrderByProductIdAndName(productName, pageable);
+    }
+	
+//	public Page<ProductEntity> findAllProductsPageSortedByTag(int pageNumber, int pageSize) {
+//        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+//        return productRepo.findAllOrderByProductTag(pageable);
+//    }
+	
+//	public Page<ProductEntity> findAllProductsPageSortedByTagAndName(String productName, int pageNumber, int pageSize) {
+//        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+//        return productRepo.findAllOrderByProductTagAndName(productName, pageable);
+//    }
 	
 }
