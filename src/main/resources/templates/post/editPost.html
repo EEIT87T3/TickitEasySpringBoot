@@ -94,14 +94,16 @@
   <div id="updateResult"></div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const postID = urlParams.get('postID');  // 從 URL 中獲取 postID
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const postID = urlParams.get('postID');  // 從 URL 中獲取 postID
+    const postID = window.location.pathname.split("/")[4];
+
     console.log("Post ID:", postID); // 調試用
 
     // 當頁面加載時，取得要編輯的貼文內容並填充到表單
     async function loadPostData() {
       try {
-        const response = await fetch(`/TickitEasy/admin/api/post/update?postID=${postID}`, { method: 'GET' });
+        const response = await fetch(`/TickitEasy/admin/api/post/GET/${postID}`, { method: 'GET' });
 
         if (response.ok) {
           const post = await response.json();
@@ -126,7 +128,7 @@
       };
 
       try {
-        const response = await fetch(`/TickitEasy/admin/api/post/${postID}`, {
+        const response = await fetch(`/TickitEasy/admin/api/post/PUT/${postID}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json"
@@ -138,8 +140,8 @@
           document.getElementById("updateResult").innerText = "Post updated successfully!";
           document.getElementById("updateResult").className = "success";
           setTimeout(() => {
-            window.location.href = `/TickitEasy/admin/api/post/posts`;
-          }, 1000); // 2秒後跳轉
+            window.location.href = `/TickitEasy/admin/post`;
+          }, 1000); // 1秒後跳轉
         } else {
           document.getElementById("updateResult").innerText = `Failed to update post: ${response.status}`;
         }
@@ -152,7 +154,7 @@
     loadPostData();
     $('.postList').on('click', function() {
                
-               window.location.href = `/TickitEasy/admin/api/post/posts`; 
+               window.location.href = `/TickitEasy/admin/post`; 
            });
   </script>
 <div th:replace="~{commons/adminFooter}"></div>

@@ -94,7 +94,7 @@
         <select id="fullPostTag" name="tagID" class="border p-2 mb-4 w-full"></select>
     
         <br>
-        <button type="submit">新增貼文</button>
+        <button class="button" type="submit">新增貼文</button>
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -117,10 +117,10 @@
     postData.append('categoryID', $('#fullPostCategory').val());
     postData.append('tagID', $('#fullPostTag').val());
     console.log(postData);
-    axios.post('/TickitEasy/admin/api/post/create', postData)
+    axios.post('/TickitEasy/admin/api/post/POST/', postData)
         .then(response => {
             alert("貼文新增成功！");
-            window.location.href = '/TickitEasy/admin/api/post/posts'; // 跳轉到貼文列表頁
+            window.location.href = '/TickitEasy/admin/post'; // 跳轉到貼文列表頁
         })
         .catch(error => {
             console.error("新增貼文失敗:", error);
@@ -146,7 +146,7 @@ axios.get('/TickitEasy/admin/api/post/tags')
     });
     $('.postList').on('click', function() {
                
-               window.location.href = `/TickitEasy/admin/api/post/posts`; 
+               window.location.href = `/TickitEasy/admin/post`; 
            });
         </script>
         <div th:replace="~{commons/adminFooter}"></div>
