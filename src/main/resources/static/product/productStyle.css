@@ -175,3 +175,31 @@ table.display .btn {
     background-color: #fff;
     border-color: #ddd;
 }
+
+/*調整按鈕*/
+
+.action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .action-buttons form {
+            display: inline-block;
+        }
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn btn-primary {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+

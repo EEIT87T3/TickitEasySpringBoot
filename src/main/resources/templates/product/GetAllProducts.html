@@ -89,7 +89,7 @@
         <td th:text="${prod.status == 1} ? '上架' : '下架'"></td>
         <td th:text="${prod.prodTotalReviews}"></td>
         <td th:text="${prod.prodTotalScore}"></td>
-        <td>
+        <td class="action-buttons">
           <form th:action="@{/admin/product/{id}/edit(id=${prod.productID})}" method="get">
             <button type="submit" value="修改" class="btn btn-primary">修改</button>
           </form>
@@ -99,9 +99,11 @@
             <input type="hidden" name="productID" th:value="${prod.productID}" />
             <button type="submit" class="btn btn-danger">刪除</button>
           </form>
+          <!--  
           <form th:action="@{/admin/product/{id}(id=${prod.productID})}" method="get">
             <button type="submit" value="查詢" class="btn btn-primary">查詢</button>
           </form>
+          -->
         </td>
       </tr>
     </tbody>
