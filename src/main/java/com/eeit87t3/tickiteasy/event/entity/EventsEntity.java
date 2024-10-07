@@ -12,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
@@ -25,17 +24,17 @@ public class EventsEntity {
     @Column(name = "eventID")
     private Integer eventID;
 
-    @Column(name = "status")
-    private Short status;
+    @Column(name = "status", nullable = false)
+    private Short status = 0;
 
-    @Column(name = "eventName")
+    @Column(name = "eventName", nullable = false, unique = true)
     private String eventName;
 
     @Column(name = "eventPic")
     private String eventPic;
 
     @ManyToOne
-    @JoinColumn(name = "eventCategory")
+    @JoinColumn(name = "eventCategory", nullable = false)
     private CategoryEntity eventCategory;
 
     @ManyToOne
@@ -54,16 +53,12 @@ public class EventsEntity {
     @Column(name = "earliestStartSaleTime")
     private LocalDateTime earliestStartSaleTime;
 
-    @Column(name = "totalReviews")
-    private Integer totalReviews;
+    @Column(name = "totalReviews", nullable = false)
+    private Integer totalReviews = 0;
 
-    @Column(name = "totalScore")
-    private Integer totalScore;
+    @Column(name = "totalScore", nullable = false)
+    private Integer totalScore = 0;
 
-    @PrePersist
-    public void onCreate() {
-//		測試
-	}
 
 	public EventsEntity() {
 		super();

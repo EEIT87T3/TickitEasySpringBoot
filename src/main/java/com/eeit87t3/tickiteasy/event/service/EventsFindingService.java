@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
@@ -57,6 +60,21 @@ public class EventsFindingService {
 	}
 	
 	/**
+	 * 以活動名稱查詢單筆活動、並更新狀態。
+	 * 
+	 * @param eventName：活動名稱。
+	 * @return 查詢結果。
+	 */
+	public EventsEntity findByEventName(String eventName) {
+		EventsEntity result = eventsRepo.findByEventName(eventName);
+		if (result != null) {
+			return updateStatus(result);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
 	 * 以活動類別查詢多筆活動、並更新狀態。
 	 * 
 	 * @param eventCategory：活動類別。
@@ -84,4 +102,26 @@ public class EventsFindingService {
 		return eventsList;
 	}
 
+	/**
+	 * 以 Pageable 查詢多筆活動、並更新狀態。
+	 * 
+	 * @param pageable：分頁條件。
+	 * @return 查詢結果。
+	 */
+	public Page<EventsEntity> findByPageable(Pageable pageable) {
+		Page<EventsEntity> resultPage = eventsRepo.findAll(pageable);
+		for (EventsEntity eventsEntity : resultPage) {
+			updateStatus(eventsEntity);
+		}
+		return resultPage;
+	}
+	
+	
+	public Page<EventsEntity> findBySpecificationAndPageable(Specification<EventsEntity> specification,Pageable pageable) {
+		Page<EventsEntity> resultPage = eventsRepo.findAll(specification, pageable);
+		for (EventsEntity eventsEntity : resultPage) {
+			updateStatus(eventsEntity);
+		}
+		return resultPage;
+	}
 }
