@@ -18,7 +18,7 @@
             <!-- 登出按鈕，始終顯示在右側 -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> 登出</a>
+                    <a class="nav-link" th:href="@{/admin/logout}"><i class="fas fa-sign-out-alt"></i> 登出</a>
                 </li>
             </ul>
         </div>
@@ -38,10 +38,10 @@
                     </a>
                     <ul class="collapse list-unstyled submenu" id="memberSubmenu">
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-user-friends"></i> 會員列表</a>
+                            <a th:href="@{/admin/member}" class="sidebar-link"><i class="fas fa-user-friends"></i> 會員列表</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-chart-line"></i> 會員統計分析</a>
+                            <a th:href="@{/admin/member/analytics}" class="sidebar-link"><i class="fas fa-chart-line"></i> 會員統計分析</a>
                         </li>
                     </ul>
                 </li>
