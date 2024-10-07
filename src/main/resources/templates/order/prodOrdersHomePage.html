@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
-
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css">
+	
+	<head>
+		<meta th:replace="~{commons/adminHead}">
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css">
+		<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
+		<script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+		<title>商品訂單管理</title>
 
 	<style>
 		.btnn {
@@ -27,7 +32,7 @@
 		}
 
 		table {
-			width: 1500px;
+			width: 1600px;
 			border-collapse: collapse;
 		}
 
@@ -63,15 +68,10 @@
 			margin-left: 20px;
 		}
 		
-		 
-        
-        
-	</style>
-	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
 
-	    <meta th:replace="~{commons/adminHead}">
-	<title>商品訂單管理</title>
+	</style>
+
+
 	
 </head>
 
@@ -138,17 +138,18 @@
 								<td th:text="${prodOrders.phone}" />
 
 								<td>
-									<form method="post" action="http://localhost:8080/TickitEasy/order/delete">
+									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/delete">
 										<input type="hidden" name="prodOrderID" th:value="${prodOrders.prodOrderID}">
-										<button type="submit" class="btnn" name="button" value="delete">
-											刪除</button>
+										<button type="submit" class="btn btn-danger" name="button" value="delete">
+											<i class="fas fa-trash-alt mr-1"></i>刪除</button>
 									</form>
-									<form method="post" action="http://localhost:8080/TickitEasy/order/update">
+									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/update">
 										<input type="hidden" name="prodOrderID" th:value="${prodOrders.prodOrderID}">
-										<button type="submit" class="btnn" name="button" value="update">
-											修改</button>
+										<button type="submit" class="btn btn-success" name="button" value="update">
+											<i class="fas fa-edit mr-1"></i>修改</button>
 									</form>
-									<button type="submit" class="btnn" name="button">檢查詳細</button>
+									<button type="submit" class="btn btn-secondary" name="button">
+										<i class="fas fa-search mr-1"></i>檢查詳細</button>
 								</td>
 							</tr>
 						</th:block>
@@ -157,9 +158,9 @@
 				</table>
 			</div>
 			<div class="actions">
-				<form method="post" th:action="@{/order/insert}">
-					<button type="submit" class="btnn" name="button" value="insert">
-						新增訂單</button>
+				<form method="post" th:action="@{/admin/order/insert}">
+					<button type="submit" class="btn btn-primary" name="button" value="insert">
+						<i class="fas fa-plus mr-1"></i>新增訂單</button>
 				</form>
 			</div>
 			<!-- 放頁數 -->
@@ -170,169 +171,169 @@
 		<div th:replace="~{commons/adminFooter}"></div>
 	
 
-	<script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
-	<script>
-		let url = "http://localhost:8080/TickitEasy/order/page"
-		let pageNumber = 1;
-		let records = document.querySelector("#select2").value
-
-		axios.get(url, {
-			params: {
-				pageNumber: pageNumber,
-				records: records
-			}
-		})
-			.then(res => {
-				console.log(res)
-				NumberOfPages(res.data.totalPages); //抓取頁數
-				NumberOfEvent(); //給予每頁按鈕事件
-			})
-			.catch(err => {
-				console.log(err);
-			})
-
-		//抓取頁數
-		function NumberOfPages(data) {
-			let div = document.querySelector(".pagination-container")
-			div.innerHTML = "";
-			for (let i = 1; i <= data; i++) {
-				div.innerHTML += `<button class="buttons btn btn-primary"> ${i} </button>`
-			}
-		}
-		//給予每頁按鈕事件
-		function NumberOfEvent() {
-			let buttons = document.querySelectorAll(".pagination-container button")
-			for (let i = 1; i <= buttons.length; i++) {
-				buttons[i - 1].addEventListener("click", function (e) {
-					axios.get("http://localhost:8080/TickitEasy/order/page", {
-						params: {
-							pageNumber: i,
-							records: document.querySelector("#select2").value
-						}
-					})
-						.then(res => {
-							viewData(res.data.content)
-						})
-						.catch(err => {
-							console.log(err);
-						})
-				})
-			}
-		}
-		//將每頁數據顯示
-		function viewData(data) {
-			let tbody = document.querySelector("tbody");
-			tbody.innerHTML = ""
-			data.forEach(prodOrders => {
-				tbody.innerHTML += `
-				<tr align="center">
-					<td>${prodOrders.prodOrderID}</td>
-					<td>${prodOrders.memberID}</td>
-					<td>${prodOrders.orderDate}</td>
-					<td>${prodOrders.payments}</td>
-					<td>${prodOrders.paymenInfo}</td>
-					<td>${prodOrders.status}</td>
-					<td>${prodOrders.totalAmount}</td>
-					<td>${prodOrders.shippingStatus}</td>
-					<td>${prodOrders.shippingID}</td>
-					<td>${prodOrders.recipientName}</td>
-					<td>${prodOrders.address}</td>
-					<td>${prodOrders.phone}</td>
-					<td>
-						<form method="get" action="http://localhost:8080/TickitEasy/order/delete">
-							<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
-							<button type="submit" class="btnn" name="button" value="delete">
-								刪除</button>
-						</form>
-						<form method="post" action="http://localhost:8080/TickitEasy/order/update">
-							<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
-							<button type="submit" class="btnn" name="button" value="update">
-								修改</button>
-						</form>
-						<button type="submit" class="btnn" name="button">檢查詳細</button>
-					</td>
-				</tr>
-				`
-			});
-
-		}
-
-		//search添加事件
-		let input = document.querySelector(".form-control");
-
-		input.addEventListener('input', function (e) {
-			let select = document.querySelector(".form-select").value
-			let value = document.querySelector(".form-control").value
-			if (select === "訂單編號" || select === "會員編號") {
-				document.querySelector(".form-control").type = "number";
-			} else {
-				document.querySelector(".form-control").type = "search";
-			}
+		<script>
+			const contextPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
 			let pageNumber = 1;
-
-			axios.post("http://localhost:8080/TickitEasy/order/findByProdidOrMemberidOrDate", null, {
+			let records = document.querySelector("#select2").value
+	
+			axios.get(contextPath + "/admin/order/page", {
 				params: {
-					name: select,
-					number: value,
 					pageNumber: pageNumber,
-					records: document.querySelector("#select2").value
+					records: records
 				}
 			})
 				.then(res => {
-					viewData(res.data.content)
-					NumberOfPages(res.data.totalPages); //抓取頁數
-					NumberOfEventSelect(select, value, pageNumber); //給予每頁按鈕事件
-				})
-				.catch(err => {
-					console.log(err);
-				})
-
-
-		})
-
-		function NumberOfEventSelect(select, value, pageNumber) {
-			let buttons = document.querySelectorAll(".pagination-container button")
-
-			for (let i = 1; i <= buttons.length; i++) {
-				buttons[i - 1].addEventListener("click", function (e) {
-					axios.post("http://localhost:8080/TickitEasy/order/findByProdidOrMemberidOrDate", null, {
-						params: {
-							name: select,
-							number: value,
-							pageNumber: i,
-							records: document.querySelector("#select2").value
-						}
-					})
-						.then(res => {
-							viewData(res.data.content)
-						})
-						.catch(err => {
-							console.log(err);
-						})
-				})
-			}
-		}
-
-
-		//筆數選單事件
-		document.querySelector("#select2").addEventListener("change", function (e) {
-			let selectEvent = document.querySelector("#select2").value
-			axios.get("http://localhost:8080/TickitEasy/order/page", {
-				params: {
-					pageNumber: 1,
-					records: selectEvent
-				}
-			})
-				.then(res => {
-					viewData(res.data.content)
+					console.log(res);
 					NumberOfPages(res.data.totalPages); //抓取頁數
 					NumberOfEvent(); //給予每頁按鈕事件
 				})
 				.catch(err => {
 					console.log(err);
 				})
-		})
-	</script>
+	
+			//抓取頁數
+			function NumberOfPages(data) {
+				let div = document.querySelector(".pagination-container")
+				div.innerHTML = "";
+				for (let i = 1; i <= data; i++) {
+					div.innerHTML += `<button class="buttons btn btn-primary">${i} </button>`
+				}
+			}
+			//給予每頁按鈕事件
+			function NumberOfEvent() {
+				let buttons = document.querySelectorAll(".pagination-container button")
+				for (let i = 1; i <= buttons.length; i++) {
+					buttons[i - 1].addEventListener("click", function (e) {
+						axios.get(contextPath + "/admin/order/page", {
+							params: {
+								pageNumber: i,
+								records: document.querySelector("#select2").value
+							}
+						})
+							.then(res => {
+								viewData(res.data.content)
+							})
+							.catch(err => {
+								console.log(err);
+							})
+					})
+				}
+			}
+			//將每頁數據顯示
+			function viewData(data) {
+				let tbody = document.querySelector("tbody");
+				tbody.innerHTML = ""
+				data.forEach(prodOrders => {
+					tbody.innerHTML += `
+					<tr align="center">
+						<td>${prodOrders.prodOrderID}</td>
+						<td>${prodOrders.memberID}</td>
+						<td>${prodOrders.orderDate}</td>
+						<td>${prodOrders.payments}</td>
+						<td>${prodOrders.paymenInfo}</td>
+						<td>${prodOrders.status}</td>
+						<td>${prodOrders.totalAmount}</td>
+						<td>${prodOrders.shippingStatus}</td>
+						<td>${prodOrders.shippingID}</td>
+						<td>${prodOrders.recipientName}</td>
+						<td>${prodOrders.address}</td>
+						<td>${prodOrders.phone}</td>
+						<td>
+							<form method="get" action="http://localhost:8080/TickitEasy/admin/order/delete">
+								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
+								<button type="submit" class="btn btn-danger" name="button" value="delete">
+									<i class="fas fa-trash-alt mr-1"></i>刪除</button>
+							</form>
+							<form method="post" action="http://localhost:8080/TickitEasy/admin/order/update">
+								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
+								<button type="submit" class="btn btn-success" name="button" value="update">
+									<i class="fas fa-edit mr-1"></i>修改</button>
+							</form>
+							<button type="submit" class="btn btn-secondary" name="button"><i class="fas fa-search mr-1"></i>檢查詳細</button>
+						</td>
+					</tr>
+					`
+				});
+	
+			}
+	
+			//search添加事件
+			let input = document.querySelector(".form-control");
+	
+			input.addEventListener('input', function (e) {
+				let select = document.querySelector(".form-select").value
+				let value = document.querySelector(".form-control").value
+				if (select === "訂單編號" || select === "會員編號") {
+					document.querySelector(".form-control").type = "number";
+				} else {
+					document.querySelector(".form-control").type = "search";
+				}
+				let pageNumber = 1;
+	
+				axios.post(contextPath + "/admin/order/findByProdidOrMemberidOrDate", null, {
+					params: {
+						name: select,
+						number: value,
+						pageNumber: pageNumber,
+						records: document.querySelector("#select2").value
+					}
+				})
+					.then(res => {
+						viewData(res.data.content)
+						NumberOfPages(res.data.totalPages); //抓取頁數
+						NumberOfEventSelect(select, value, pageNumber); //給予每頁按鈕事件
+					})
+					.catch(err => {
+						console.log(err);
+					})
+	
+	
+			})
+	
+			function NumberOfEventSelect(select, value, pageNumber) {
+				let buttons = document.querySelectorAll(".pagination-container button")
+	
+				for (let i = 1; i <= buttons.length; i++) {
+					buttons[i - 1].addEventListener("click", function (e) {
+						axios.post(contextPath + "/admin/order/findByProdidOrMemberidOrDate", null, {
+							params: {
+								name: select,
+								number: value,
+								pageNumber: i,
+								records: document.querySelector("#select2").value
+							}
+						})
+							.then(res => {
+								viewData(res.data.content)
+							})
+							.catch(err => {
+								console.log(err);
+							})
+					})
+				}
+			}
+	
+	
+			//筆數選單事件
+			document.querySelector("#select2").addEventListener("change", function (e) {
+				let selectEvent = document.querySelector("#select2").value
+				axios.get(contextPath + "/admin/order/page", {
+					params: {
+						pageNumber: 1,
+						records: selectEvent
+					}
+				})
+					.then(res => {
+						viewData(res.data.content)
+						NumberOfPages(res.data.totalPages); //抓取頁數
+						NumberOfEvent(); //給予每頁按鈕事件
+					})
+					.catch(err => {
+						console.log(err);
+					})
+			})
+		</script>
+	
 </body>
 
 </html>
