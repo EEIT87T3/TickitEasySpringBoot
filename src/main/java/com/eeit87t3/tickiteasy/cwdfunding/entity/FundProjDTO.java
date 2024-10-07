@@ -25,10 +25,14 @@ public class FundProjDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC+8") // 設置日期格式
     private LocalDateTime postponeDate;
     
+    private Integer categoryID;
+    
     private String categoryString;
     
     private String categoryName;
 
+    private Integer tagID;
+    
     private String tagString;
 
     private String tagName;
@@ -119,6 +123,18 @@ public class FundProjDTO {
 	}
 	public void setTagName(String tagName) {
 		this.tagName = tagName;
+	}
+	public Integer getCategoryID() {
+		return categoryID;
+	}
+	public void setCategoryID(Integer categoryID) {
+		this.categoryID = categoryID;
+	}
+	public Integer getTagID() {
+		return tagID;
+	}
+	public void setTagID(Integer tagID) {
+		this.tagID = tagID;
 	}
 
 

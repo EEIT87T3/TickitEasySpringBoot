@@ -1,9 +1,12 @@
 package com.eeit87t3.tickiteasy.cwdfunding.controller;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,8 +32,13 @@ import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.Tag;
 import com.eeit87t3.tickiteasy.cwdfunding.service.CategoryServiceTemp;
+import com.eeit87t3.tickiteasy.cwdfunding.service.FileService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.TagServiceTemp;
+import com.eeit87t3.tickiteasy.image.ImageDirectory;
+import com.eeit87t3.tickiteasy.image.ImageUtil;
+import com.eeit87t3.tickiteasy.test.TestImagesEntity;
+import com.eeit87t3.tickiteasy.test.TestImagesRepo;
 
 @Controller
 @RequestMapping("/admin")
@@ -44,6 +52,15 @@ public class FundProjController {
 
 	@Autowired
 	private TagServiceTemp tagServiceTemp;
+	
+	@Autowired
+	private ImageUtil imageUtil;
+	
+	@Autowired
+	private TestImagesRepo testImagesRepo;
+	
+	@Autowired
+	private FileService fileService;
 
 	/* 查詢所有募資活動頁面, api */
 	@GetMapping("/fundproject")
@@ -115,8 +132,12 @@ public class FundProjController {
 		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
 		FundProj fundProj = projService.findFundProjById(projectID);
 		List<FundPlan> fundPlans = fundProj.getFundPlan();
+		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
+		List<Tag> tags = tagServiceTemp.findFundProjTagList();
 		
 		model.addAttribute("projectDTO",fundProjDTO);
+		model.addAttribute("categories", categories);
+		model.addAttribute("tags", tags);
 		model.addAttribute("plans",fundPlans);
 		return "cwdfunding/editOneFundProj";
 	}
@@ -134,7 +155,8 @@ public class FundProjController {
 		return "cwdfunding/addFundProjnPlan";
 	}
 	
-	/* [API]新增募資活動 */
+
+	/* [API] 新增募資活動（含方案） */
 	@ResponseBody
 	@PostMapping("/api/fundproject")
 	public ResponseEntity<Map<String, Object>> addProject(@RequestParam String projectID, @RequestParam String title,
@@ -147,7 +169,8 @@ public class FundProjController {
 			@RequestParam List<String> planBuyAmounts, @RequestParam List<MultipartFile> planImages,
 			@RequestParam List<String> planContents) {
 			// project 變數初始化
-			String filename = null;
+			String baseNameProj = null;
+			String pathStringProj = null;
 	
 			// plan 變數初始化
 			String planTitle = null;
@@ -155,12 +178,27 @@ public class FundProjController {
 			String planTotalAmount = null;
 			String planBuyAmount = null;
 			String planContent = null;
-			String planFilename = null;
+			MultipartFile planImage = null;
+			String baseNamePlan = null;
+			String pathStringPlan = null;
+
 			
 			// response定義
 		    Map<String, Object> response = new HashMap<>();
 
 	
+		    // 上傳圖片 1.募資方案 
+		    baseNameProj = UUID.randomUUID().toString();
+		    System.out.println("圖片檔名為："+baseNameProj);
+
+			try {
+				pathStringProj = imageUtil.saveImage(ImageDirectory.CWDFUNDING, image, baseNameProj);
+				System.out.println("圖片路徑："+pathStringProj);
+			} catch (IllegalStateException | IOException e) {
+				e.printStackTrace();
+			}
+
+			// 與Service互動
 			try {
 		        // 1. Validate input (basic validation examples)
 		        if (title == null || title.isEmpty()) {
@@ -168,14 +206,9 @@ public class FundProjController {
 		            response.put("message", "Project title is required");
 		            return ResponseEntity.badRequest().body(response);
 		        }
-	
-				/*
-				 * 1. 存取fund project (1) 取得最新應填的projectID (2) 將image的檔名讀取出來
-				 */
-				filename = image.getOriginalFilename();
-	
+		        
 				projService.saveProj(title, categoryID, tagID, startDateStr, endDateStr, targetAmount, currentAmount,
-						threshold, postponeDateStr, filename, description);
+						threshold, postponeDateStr, pathStringProj, description);
 	
 				/*
 				 * 2. 存取fund plan (1) 取出所有陣列的元素
@@ -186,10 +219,20 @@ public class FundProjController {
 					planTotalAmount = planTotalAmounts.get(i);
 					planBuyAmount = planBuyAmounts.get(i);
 					planContent = planContents.get(i);
-					planFilename = planImages.get(i).getOriginalFilename();
+					planImage = planImages.get(i);
+					
+					// 上傳圖片 ＆ 給予圖片UUID並連同路徑(/images/cwdfunding/!@#$%%^&.___)存進資料庫
+				    baseNamePlan = UUID.randomUUID().toString();
+				    System.out.println("圖片檔名為："+baseNamePlan);
+					try {
+						pathStringPlan = imageUtil.saveImage(ImageDirectory.CWDFUNDING, planImage, baseNamePlan);
+						System.out.println("方案圖片路徑："+pathStringPlan);
+					} catch (IllegalStateException | IOException e) {
+						e.printStackTrace();
+					}
+					
 					System.out.println("projectID" + projectID);
-					System.out.println("planTitle: " + planTitle);
-					projService.savePlan(projectID, planTitle, planUnitPrice, planTotalAmount, planBuyAmount, planFilename,
+					projService.savePlan(projectID, planTitle, planUnitPrice, planTotalAmount, planBuyAmount, pathStringPlan,
 							planContent);
 				}
 				response.put("status", "success");
@@ -200,9 +243,10 @@ public class FundProjController {
 				response.put("message", "Something wrong!");
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 			}
-	}
 
-	/* [API]修改募資活動 */
+	}
+	
+	/* [API] 編輯募資活動(含方案) */
 	@ResponseBody
 	@PutMapping("/api/fundproject/{projectID}")
 	public ResponseEntity<Map<String, Object>> editProject(@PathVariable String projectID, @RequestParam String title,
@@ -210,25 +254,29 @@ public class FundProjController {
 			@RequestParam("endDate") String endDateStr, @RequestParam String targetAmount,
 			@RequestParam String currentAmount, @RequestParam String threshold,
 			@RequestParam("postponeDate") String postponeDateStr, @RequestParam MultipartFile image,
-			@RequestParam String description, @RequestParam List<String> planTitles,
+			@RequestParam("old-image") String oldImage,
+			@RequestParam String description, @RequestParam List<String> planIDs, @RequestParam List<String> planTitles,
 			@RequestParam List<String> planUnitPrices, @RequestParam List<String> planTotalAmounts,
-			@RequestParam List<String> planBuyAmounts, @RequestParam List<MultipartFile> planImages,
+			@RequestParam List<String> planBuyAmounts, @RequestParam List<MultipartFile> planImages, @RequestParam("old-planImage") List<String> oldPlanImages,
 			@RequestParam List<String> planContents) {
 			// project 變數初始化
-			String filename = null;
+			String baseNameProj = null;
+			String pathStringProj = null;
 	
 			// plan 變數初始化
+			String planID = null;
 			String planTitle = null;
 			String planUnitPrice = null;
 			String planTotalAmount = null;
 			String planBuyAmount = null;
 			String planContent = null;
-			String planFilename = null;
+			MultipartFile planImage = null;
+			String baseNamePlan = null;
+			String pathStringPlan = null;
+
 			
 			// response定義
 		    Map<String, Object> response = new HashMap<>();
-
-	
 			try {
 		        // 1. Validate input (basic validation examples)
 		        if (title == null || title.isEmpty()) {
@@ -238,37 +286,54 @@ public class FundProjController {
 		        }
 	
 				/*
-				 * 1. 存取fund project (1) 取得最新應填的projectID (2) 將image的檔名讀取出來
+				 * 1. 存取fund project (1) 取得最新應填的projectID (2) 將image的檔名讀取出來，若使用者有上傳圖片則用此檔名，若無則用舊檔名
 				 */
-				filename = image.getOriginalFilename();
-	
-				projService.editProj(projectID ,title, categoryID, tagID, startDateStr, endDateStr, targetAmount, currentAmount,
-						threshold, postponeDateStr, filename, description);
+			    // 上傳圖片 1.募資方案 
+			    
+		        if(!image.getOriginalFilename().isEmpty()) {
+				    baseNameProj = UUID.randomUUID().toString();
+				    pathStringProj = imageUtil.saveImage(ImageDirectory.CWDFUNDING, image, baseNameProj);
+				    System.out.println("new, baseNameProj:" + baseNameProj);
+		        }else {
+		        	pathStringProj = oldImage;
+				    System.out.println("old, baseNameProj:" + baseNameProj);
+		        }
+
+				
+				projService.editProj(projectID,title, categoryID, tagID, startDateStr, endDateStr, targetAmount, currentAmount,
+						threshold, postponeDateStr, pathStringProj, description);
 	
 				/*
 				 * 2. 存取fund plan (1) 取出所有陣列的元素
 				 */
 				for (int i = 0; i < planTitles.size(); i++) {
+					planID = planIDs.get(i);
 					planTitle = planTitles.get(i);
 					planUnitPrice = planUnitPrices.get(i);
 					planTotalAmount = planTotalAmounts.get(i);
 					planBuyAmount = planBuyAmounts.get(i);
 					planContent = planContents.get(i);
-					planFilename = planImages.get(i).getOriginalFilename();
-					System.out.println("projectID" + projectID);
-					System.out.println("planTitle: " + planTitle);
-					projService.savePlan(projectID, planTitle, planUnitPrice, planTotalAmount, planBuyAmount, planFilename,
+					planImage = planImages.get(i);
+					
+					// 使用者如有上傳新照片，則用此檔名；若無則用舊檔名
+					if(! planImage.getOriginalFilename().isEmpty()) {
+						baseNamePlan = UUID.randomUUID().toString();
+						pathStringPlan = imageUtil.saveImage(ImageDirectory.CWDFUNDING, planImage, baseNamePlan);
+					}else {
+						pathStringPlan = oldPlanImages.get(i);
+					}
+
+					projService.editPlan(projectID, planID,planTitle, planUnitPrice, planTotalAmount, planBuyAmount, pathStringPlan,
 							planContent);
 				}
 				response.put("status", "success");
-				response.put("message", "Project added successfully!");
+				response.put("message", "Project edited successfully!");
 				return ResponseEntity.ok(response);
 			}catch (Exception e) {
 				response.put("status", "error");
 				response.put("message", "Something wrong!");
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 			}
-
 	}
 
 }

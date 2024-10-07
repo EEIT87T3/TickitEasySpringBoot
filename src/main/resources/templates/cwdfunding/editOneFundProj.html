@@ -16,8 +16,6 @@
     <div th:replace="~{commons/adminHeader}"></div>
 
     <!--  這裡是網頁內容 >-->
-    <h1>修改頁面</h1>
-    <!--  這裡是網頁內容 >-->
     <div class="container">
       <form id="msform" method="post" enctype="multipart/form-data">
         <div class="row">
@@ -33,21 +31,21 @@
               <tr>
                 <td class="col-2">
                   <div class="fieldlabels fw-medium p-2 text-start text-dark">
-                    新增募資活動
+                    編輯募資活動
                   </div>
                 </td>
               </tr>
               <table class="table table-borderless custom-table">
                 <tbody style="background-color: black">
                   <tr>
-                    <td>
+                    <td colspan="2" class="col-5">
                       <input
                         type="text"
                         name="title"
                         placeholder="活動名稱"
                         id="title"
-                        class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0"
-                        required
+                        class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0 w-50"
+                        th:value="${projectDTO.title}"
                       />
                       <input
                         type="hidden"
@@ -67,7 +65,11 @@
                         name="categoryID"
                         id="categoryID"
                       >
-                        <option selected></option>
+                        <option
+                          th:value="${projectDTO.categoryID}"
+                          th:text="${projectDTO.categoryName}"
+                          selected
+                        ></option>
                         <th:block th:each=" aCategory : ${categories}">
                           <option
                             th:value="${aCategory.categoryID}"
@@ -77,7 +79,6 @@
                       </select>
                     </td>
                   </tr>
-                  <tr></tr>
                   <tr>
                     <td class="col-2">
                       <div class="fieldlabels fw-medium">標籤</div>
@@ -89,7 +90,11 @@
                         name="tagID"
                         id="tagID"
                       >
-                        <option selected></option>
+                        <option
+                          th:value="${projectDTO.tagID}"
+                          th:text="${projectDTO.tagName}"
+                          selected
+                        ></option>
                         <th:block th:each=" aTag : ${tags}">
                           <option
                             th:value="${aTag.tagID}"
@@ -110,6 +115,7 @@
                         name="targetAmount"
                         class="form-control w-25 text-end"
                         min="0"
+                        th:value="${projectDTO.targetAmount}"
                       />
                     </td>
                   </tr>
@@ -121,11 +127,15 @@
                       <input
                         id="currentAmount"
                         type="number"
-                        placeholder="0"
                         class="form-control w-25 text-end"
                         disabled
+                        th:value="${projectDTO.currentAmount}"
                       />
-                      <input type="hidden" name="currentAmount" value="0" />
+                      <input
+                        type="hidden"
+                        name="currentAmount"
+                        th:value="${projectDTO.currentAmount}"
+                      />
                     </td>
                   </tr>
                   <tr>
@@ -138,6 +148,7 @@
                         type="datetime-local"
                         name="startDate"
                         class="form-control w-50"
+                        th:value="${projectDTO.startDate}"
                       />
                     </td>
                   </tr>
@@ -151,6 +162,7 @@
                         type="datetime-local"
                         name="endDate"
                         class="form-control w-50"
+                        th:value="${projectDTO.endDate}"
                       />
                     </td>
                   </tr>
@@ -159,6 +171,10 @@
                       <div class="fieldlabels fw-medium">展延門檻</div>
                     </td>
                     <td class="col-8">
+                      <span
+                        id="valBox"
+                        th:text="${projectDTO.threshold}"
+                      ></span>
                       <input
                         id="threshold"
                         type="range"
@@ -167,6 +183,8 @@
                         min="0"
                         max="1"
                         step="0.1"
+                        th:value="${projectDTO.threshold}"
+                        oninput="showVal(this.value)"
                       />
                     </td>
                   </tr>
@@ -180,6 +198,7 @@
                         type="datetime-local"
                         name="postponeDate"
                         class="form-control w-50"
+                        th:value="${projectDTO.postponeDate}"
                       />
                     </td>
                   </tr>
@@ -197,6 +216,22 @@
                     </td>
                   </tr>
                   <tr>
+                    <td class="col-2"></td>
+                    <td class="col-8 text-start">
+                      <img
+                        class="col-3"
+                        th:src="'/TickitEasy'+${projectDTO.image}"
+                        width="150px"
+                      />
+                      <input
+                        type="hidden"
+                        id="old-image"
+                        name="old-image"
+                        th:value="${projectDTO.image}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
                     <td class="col-2">
                       <div class="fieldlabels fw-medium">敘述</div>
                     </td>
@@ -209,6 +244,7 @@
                         name="description"
                         maxlength="150"
                         class="form-control bg-light-subtle w-75"
+                        th:text="${projectDTO.description}"
                       ></textarea>
                     </td>
                   </tr>
@@ -248,6 +284,25 @@
                           class="form-control borderhidden bg-light-subtle text-start m-0 p-0 w-25"
                           th:value="${plan.planTitle}"
                         />
+                        <input
+                          type="hidden"
+                          name="planIDs"
+                          th:value="${plan.planID}"
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="col-2">
+                        <div class="fieldlabels fw-medium">單價</div>
+                      </td>
+                      <td class="col-8">
+                        <input
+                          type="number"
+                          name="planUnitPrices"
+                          class="form-control w-25 text-start"
+                          min="0"
+                          th:value="${plan.planUnitPrice}"
+                        />
                       </td>
                     </tr>
                     <!-- -------------以上完成------------------------------------------------->
@@ -273,7 +328,7 @@
                       <td class="col-8">
                         <input
                           type="number"
-                          name="planTotalAmounts"
+                          name="planBuyAmounts"
                           class="form-control w-25 text-start"
                           min="0"
                           th:value="${plan.planBuyAmount}"
@@ -291,7 +346,22 @@
                           name="planImages"
                           class="form-control w-50"
                         />
-                        <input type="hidden" th:value="${plan.planImage}" />
+                        <tr>
+                          <td class="col-2"></td>
+                          <td class="col-8 text-start">
+                            <img
+                              class="col-3"
+                              th:src="'/TickitEasy'+${plan.planImage}"
+                              width="120px"
+                            />
+                            <input
+                              type="hidden"
+                              id="old-planImage"
+                              name="old-planImage"
+                              th:value="${plan.planImage}"
+                            />
+                          </td>
+                        </tr>
                       </td>
                     </tr>
                     <!-- -------------以上完成------------------------------------------------->

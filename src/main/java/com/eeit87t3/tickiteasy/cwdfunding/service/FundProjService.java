@@ -1,5 +1,6 @@
 package com.eeit87t3.tickiteasy.cwdfunding.service;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +25,7 @@ import com.eeit87t3.tickiteasy.cwdfunding.repository.CategoryRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.TagRepository;
+import com.eeit87t3.tickiteasy.image.ImageUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -41,6 +43,9 @@ public class FundProjService {
 	
 	@Autowired
 	private TagRepository tagRepo;
+	
+	@Autowired
+	private ImageUtil imageUtil;
 	
 	public FundProjService(FundProjRepository fundProjsRepository) {
 		this.fundProjRepo = fundProjsRepository;
@@ -163,8 +168,10 @@ public class FundProjService {
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
 			dto.setThreshold(fundProj.getThreshold());
 			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+			dto.setCategoryID(fundProj.getCategory().getCategoryID());
 			dto.setCategoryString(fundProj.getCategory().getCategoryString());
 			dto.setCategoryName(fundProj.getCategory().getCategoryName());
+			dto.setTagID(fundProj.getTag().getTagID());
 			dto.setTagString(fundProj.getTag().getTagString());
 			dto.setTagName(fundProj.getTag().getTagName());
 			return dto;
@@ -190,9 +197,17 @@ public class FundProjService {
 	public boolean deleteFundProjById(Integer id) {
 		FundProjDTO exist = new FundProjDTO();
 		exist = findFundProjDTOById(id);
+		String imagePath = exist.getImage();
+
 		// 使用getProjectID判斷專案是否存在
 		if (exist.getProjectID() != null) {
 			fundProjRepo.deleteById(id);
+			//try{}catch{}：順便把/images/cwdfunding/內的
+			try {
+				imageUtil.deleteImage(imagePath);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			System.out.println(id+" project exists");
 			return true;
 		}else {
@@ -201,7 +216,7 @@ public class FundProjService {
 		}
 	}
 	
-	/* 更新 (尚未寫完)*/
+	/* 編輯募資活動 (尚未寫完)*/
 	public FundProj editProj(
 	        String projectID,
 	        String title,
@@ -230,7 +245,7 @@ public class FundProjService {
 	    Optional<Tag> toptional = tagRepo.findById(Integer.valueOf(tagID));
 	    proj.setTag(toptional.orElse(null));
 
-	    proj.setTitle(title);
+//	    proj.setTitle(title);
 	    proj.setDescription(description);
 	    proj.setImage(filename);
 
@@ -253,9 +268,10 @@ public class FundProjService {
 	    return fundProjRepo.save(proj);
 	}
 
-	/* 新增募資活動方案 */
+	/* 編輯募資活動方案 */
 	public FundPlan editPlan(
 			String projectID,
+			String planID,
 			String title,
 			String unitPrice,
 			String totalAmount,
@@ -266,10 +282,12 @@ public class FundProjService {
 		FundPlan newFundPlan = new FundPlan();
 		
 	    // 找到專案
-	    Optional<FundPlan> optional = fundPlanRepo.findById(Integer.valueOf(projectID));
+	    Optional<FundPlan> optional = fundPlanRepo.findById(Integer.valueOf(planID));
 	    if (!optional.isPresent()) {
-	        throw new EntityNotFoundException("Project not found with ID: " + projectID);
+	        throw new EntityNotFoundException("Project not found with ID: " + planID);
 	    }
+	    
+	    newFundPlan = optional.get();
 		
 		//先用projectID找出對應到的FundProj實體，之後再塞進plan
 		Optional<FundProj> poptional = fundProjRepo.findById(Integer.valueOf(projectID));

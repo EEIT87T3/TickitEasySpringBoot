@@ -42,9 +42,12 @@
         function htmlMaker(pageData) {
           let output = document.getElementById("outputBlock");
           let pageBtnBlock = document.getElementById("pageBtnBlock");
+          let elementBlock = document.getElementById("totalElementsBlock");
+
           output.innerHTML = "";
           spinnerBlock.innerHTML = "";
           pageBtnBlock.innerHTML = "";
+          elementBlock.innerHTML = "";
 
           pageData.content.forEach((el) => {
             const tr = document.createElement("tr");
@@ -106,6 +109,9 @@
               });
             });
           }
+
+          //重新塞入page.totalElements總數
+          elementBlock.innerHTML = `總共有 <span>${pageData.totalElements}筆</span> `;
         }
 
         function deleteProjByID(id) {
@@ -171,7 +177,7 @@
       <div id="spinnerBlock"></div>
       <div id="pageBtnBlock"></div>
       <br />
-      <div>總共有 <span th:text="${page.totalElements}"></span> 筆</div>
+      <div id="totalElementsBlock"></div>
     </div>
     <div th:replace="~{commons/adminFooter}"></div>
   </body>

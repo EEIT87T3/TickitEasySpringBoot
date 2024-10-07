@@ -85,6 +85,20 @@ $(document).ready(function () {
     return false;
   });
 
+  // 初始化範圍條的值 (從 Thymeleaf 渲染的 input 初始值取得)
+  let initialVal = $("#threshold").val();
+  document.getElementById("valBox").innerHTML = initialVal;
+
+  // 使<input type="range">的數值即時顯示在頁面上
+  function showVal(newVal) {
+    document.getElementById("valBox").innerHTML = newVal;
+  }
+
+  // 即時更新範圍條數值
+  $("#threshold").on("input", function () {
+    showVal(this.value); // 每次範圍條變動都會更新顯示值
+  });
+
   // 步驟3: 填方案內容
   $("#planAmountSelect").change(function () {
     selectedValue = $(this).val();
