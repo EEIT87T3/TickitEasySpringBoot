@@ -78,10 +78,21 @@ public class PostService {
         return postRepo.save(existingPost); // 返回更新後的貼文實體
     }
     
-    //刪除單筆貼文
     @Transactional
-    public void delete(Integer postId) {
-    	postRepo.deleteById(postId);
+    public Boolean delete(Integer postID) {
+        // 查詢貼文是否存在
+        Optional<PostEntity> optional = postRepo.findById(postID);
+        
+        // 如果存在則刪除
+        if (optional.isPresent()) {
+            postRepo.deleteById(postID);
+            return !postRepo.existsById(postID); // 返回是否成功刪除
+        } 
+        
+        // 如果貼文不存在，返回 false
+        return false;
     }
+
+
     
 }
