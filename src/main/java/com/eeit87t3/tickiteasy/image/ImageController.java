@@ -29,7 +29,7 @@ public class ImageController {
     public ResponseEntity<?> getImage(
     		@PathVariable String folderName,
     		@PathVariable String fileName) {
-		String pathString = "/images/"+ folderName + "/" + fileName;
+		String pathString = "/images/" + folderName + "/" + fileName;
         try {
 			byte[] imageByteArray = imageUtil.getImageByteArray(pathString);
 			
@@ -44,4 +44,22 @@ public class ImageController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
     }
+	
+	@ResponseBody
+	@GetMapping("/logo/{fileName}")
+	public ResponseEntity<?> getLogo(@PathVariable String fileName) {
+		String pathString = "/images/logo/" + fileName;
+        try {
+			byte[] imageByteArray = imageUtil.getImageByteArray(pathString);
+			
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Content-Type", "image/svg+xml");
+			
+			return new ResponseEntity<>(imageByteArray, headers, HttpStatus.OK);
+		} catch (IOException e) {
+			System.out.println("在 /images/ 下未找到指定的圖片檔案。");
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
 }

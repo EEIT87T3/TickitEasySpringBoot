@@ -59,4 +59,11 @@ public class EventsDTO {
 	public void setEventDesc(String eventDesc) {
 		this.eventDesc = eventDesc;
 	}
+	
+	@Override
+	public String toString() {
+		return "EventsDTO [eventID=" + eventID + ", statusString=" + statusString + ", eventName=" + eventName
+				+ ", eventPicFile=" + eventPicFile + ", categoryString=" + categoryString + ", tagString=" + tagString
+				+ ", eventDesc=" + eventDesc + "]";
+	}
 }

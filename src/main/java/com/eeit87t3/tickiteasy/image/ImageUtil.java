@@ -50,7 +50,7 @@ public class ImageUtil {
 	
 	/**
 	 * 將圖片從檔案系統裡刪除。<br><br>
-	 * 注意：時間間隔太短，可能導致刪除失敗；目前尚未找到解決方法，請稍後再試。
+	 * 注意：目前偶發刪除失敗，尚未找到原因與解決方法；因此暫時保留 console 輸出執行結果。
 	 * 
 	 * @param pathString String：資料庫儲存的路徑字串。
 	 * @return result - Boolean：<code>true</code> 表示此檔案已不存在、<code>false</code> 表示刪除失敗。
@@ -65,6 +65,12 @@ public class ImageUtil {
 			imageFile.delete();
 			result = !imageFile.exists();
 		}
+		
+		// TODO 測試用
+		System.out.println("===== 執行刪除圖片 =====");
+		System.out.println("圖片路徑字串：" + pathString);
+		System.out.println("執行結果：" + result);
+		
 		return result;
 	}
 	

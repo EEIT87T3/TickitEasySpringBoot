@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	<meta th:replace="~{commons/adminHead}">
+	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<title>活動列表</title>
+	<script>
+		$(document).ready(function () {
+
+			// 初始化常數與 function
+
+			const contextPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
+			const currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
+
+			// 搜尋 Ajax
+			function search(params) {
+				axios.get(contextPath + "/admin/api/event", params)
+					.then(res => {
+						console.log(res.data);
+						tbodyMaker(res.data.content);
+						paginationMaker(res.data);
+					})
+					.catch(err => {
+						console.error(err);
+					})
+			}
+
+			// tbody 內容處理：參數接受 res.data.content
+			function tbodyMaker(data) {
+				const tbody = document.getElementById("tbody");
+				tbody.innerHTML = "";
+
+				for (const event of data) {
+					let tbodyHtml = `<tr>
+							<td>${event.eventID}</td>
+							<td>${event.eventName}</td>`;
+					
+					if (event.eventPic != null) {
+						tbodyHtml += `<td><img src="${contextPath}${event.eventPic}" alt="活動主圖" width=320px></td>`;
+					} else {
+						tbodyHtml += `<td>（無圖片）</td>`;
+					}
+							
+					tbodyHtml += `<td>${event.eventCategory.categoryName}</td>`;
+
+					if (event.eventTag != null) {
+						tbodyHtml += `<td>${event.eventTag.tagName}</td>`;
+					} else {
+						tbodyHtml += `<td>（無標籤）</td>`;
+					}
+
+					switch (event.status) {
+						case 0:
+							tbodyHtml += `<td class="text-danger">未上架</td>`;
+							break;
+						case 1:
+							tbodyHtml += `<td class="text-success">已上架</td>`;
+							break;
+						case 2:
+							tbodyHtml += `<td class="text-primary">已啟售</td>`;
+							break;
+					}
+
+					tbodyHtml += `
+						<td><button class="event-detail btn btn-primary" data-event-id="${event.eventID}">查看</button></td>
+						</tr>`;
+
+					tbody.innerHTML += tbodyHtml;
+				}
+			}
+
+			// pagination 內容處理：參數接受 res.data
+			function paginationMaker(data) {
+				const ulPagination = document.querySelector("ul.pagination");
+				ulPagination.innerHTML = "";
+
+				let paginationHtml = "";
+				paginationHtml += `
+					<li class="page-item">
+						<button class="page-link" aria-label="Previous" data-page-num="previous">
+							<span aria-hidden="true">&laquo;</span>
+						</button>
+					</li>
+					<li class="page-item"><button class="page-link" data-page-num="1">1</button></li>`;
+				for (let i = 1; i < data.totalPages; i++) {
+					paginationHtml += `<li class="page-item"><button class="page-link" data-page-num="${i + 1}">${i + 1}</button></li>`;
+				}
+				paginationHtml += `
+					<li class="page-item">
+						<button class="page-link" aria-label="Next" data-page-num="next">
+							<span aria-hidden="true">&raquo;</span>
+						</button>
+					</li>`;
+
+				ulPagination.innerHTML += paginationHtml;
+
+				// EventListener
+				[...document.querySelectorAll("button.page-link")].forEach((element, index) => {
+					switch (element.getAttribute("data-page-num")) {
+						case "previous":
+							if (data.pageable.pageNumber == 0) {
+								element.classList.add("disabled");
+							} else {
+								element.setAttribute("data-page-num", data.pageable.pageNumber);
+							}
+							break;
+						case "next":
+							if (data.pageable.pageNumber + 1 == data.totalPages) {
+								element.classList.add("disabled");
+							} else {
+								element.setAttribute("data-page-num", data.pageable.pageNumber + 2);
+							}
+							break;
+					}
+					element.addEventListener("click", function() {
+						let param = {
+							p: this.getAttribute("data-page-num")
+						};
+						console.log(param);
+						search(param);
+					})
+				})
+			}
+
+
+			// 初始執行
+			search();
+
+
+			// EventListener
+
+			// tbody 的「查看」按鈕
+			$("#tbody").on("click", ".event-detail", function () {
+				let eventID = this.getAttribute("data-event-id")
+				window.location.href = `${currentPath}/${eventID}`;
+			})
+		});
+	</script>
+</head>
+
+<body>
+	<div th:replace="~{commons/adminHeader}"></div>
+
+	<!--  這裡是網頁內容 -->
+	<div class="container">
+
+		<h1>活動列表</h1>
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>活動編號</th>
+					<th>活動名稱</th>
+					<th>活動主圖</th>
+					<th>類別</th>
+					<th>標籤</th>
+					<th>狀態</th>
+					<th>詳情</th>
+				</tr>
+			</thead>
+			<tbody id="tbody">
+
+			</tbody>
+		</table>
+		<!-- <div id="page-buttons"></div> -->
+		<div class="d-flex flex-row-reverse">
+			<nav>
+				<ul class="pagination">
+				</ul>
+			</nav>
+		</div>
+	</div>
+
+	<div th:replace="~{commons/adminFooter}"></div>
+</body>
+
+</html>
