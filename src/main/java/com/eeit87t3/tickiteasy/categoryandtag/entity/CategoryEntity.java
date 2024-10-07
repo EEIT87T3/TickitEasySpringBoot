@@ -3,6 +3,7 @@ package com.eeit87t3.tickiteasy.categoryandtag.entity;
 import java.util.List;
 
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
+import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -36,6 +37,11 @@ public class CategoryEntity {
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "eventCategory")  // mappedBy 寫對方的外鍵 Java property 名稱
 	private List<EventsEntity> events;
+	
+	
+	@JsonIgnore
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "postCategory") 
+	private List<PostEntity> posts;
 	
 	public CategoryEntity() {
 	}

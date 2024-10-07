@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta th:replace="~{commons/adminHead}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts List</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        // 獲取所有貼文的函數，postID 是從模板中注入的變量
+        function fetchAllComments(postID) {
+            const url = `/TickitEasy/admin/api/post/comment?postID=${postID}`; // 使用相對路徑，確保 API 路徑正確
+            
+            axios.get(url)
+                .then(response => {
+                    const comments = response.data; // 獲取 JSON 數據
+                    populateTable(comments); // 將資料填充到表格
+                })
+                .catch(error => {
+                    console.error("Error fetching comments:", error);
+                });
+        }
+   		 
+        // 將貼文資料填充到表格中的函數
+        function populateTable(comments) {
+            // 清空現有資料
+            $('#commentsTable tbody').empty();
+        
+            // 將獲取到的貼文資料加入表格
+            comments.forEach(comment => {
+                $('#commentsTable tbody').append(`
+                    <tr>
+                        <td>${comment.postID}</td>
+                        <td>${comment.postCommentID}</td>
+                        <td>${comment.memberID}</td>
+                        <td>${comment.content || 'N/A'}</td> 
+                        <td>${comment.commentDate || 'N/A'}</td> 
+                        <td><button class="bg-blue-500 text-white px-2 py-2 rounded">編輯</button>
+                        <button class="bg-red-500 text-white px-2 py-2 rounded">刪除</button></td>
+                    </tr>
+                `);
+            });
+        
+            // 初始化 DataTable
+            $('#commentsTable').DataTable();
+        }
+    
+        // 當頁面加載時抓取所有貼文
+        $(document).ready(function() {
+        const postID = $('body').attr('data-post-id');
+        if (postID) {
+            fetchAllComments(postID);
+        } else {
+            console.error("No postID found");
+        }
+        $('.postList').on('click', function() {
+               
+                window.location.href = `/TickitEasy/admin/api/post/posts`; 
+            });
+    });
+    </script>
+</head>
+<body th:data-post-id="${postID}">
+    <div th:replace="~{commons/adminHeader}"></div>
+    <button class="postList bg-blue-500 text-white px-2 py-2 rounded">上一頁</button></td>
+    <h1>All Comments for Post [[${postID}]]</h1>
+    <table id="commentsTable" class="display">
+        <thead>
+            <tr>
+                <th>Post ID</th>
+                <th>postCommentID</th>
+                <th>memberID</th>
+                <th>content</th>
+                <th>commentDate</th>
+                <th>動作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 這裡的資料會動態填充 -->
+        </tbody>
+    </table>
+
+    <div th:replace="~{commons/adminFooter}"></div>
+</body>
+</html>
