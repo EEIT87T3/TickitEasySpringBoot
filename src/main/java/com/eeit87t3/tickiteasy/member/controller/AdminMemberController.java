@@ -22,32 +22,32 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin/member")
+@RequestMapping("/admin")
 public class AdminMemberController {
 
     @Autowired
     private MemberService memberService;
 
     // 會員列表頁面
-    @GetMapping
+    @GetMapping("/member")
     public String memberList() {
         return "admin/memberList"; // 返回會員列表頁面
     }
 
     // 會員圖表分析頁面
-    @GetMapping("/analytics")
+    @GetMapping("/member/analytics")
     public String memberAnalytics() {
         return "admin/memberAnalytics"; // 返回會員分析頁面
     }
 
     // 取得所有會員的 JSON 資料
-    @GetMapping("/api")
+    @GetMapping("/member/api")
     public ResponseEntity<List<Member>> getAllMembers() {
         List<Member> members = memberService.getAllMembers();
         return ResponseEntity.ok(members);
     }
 
-    @GetMapping("/api/age-distribution")
+    @GetMapping("/member/api/age-distribution")
     public ResponseEntity<Map<String, Long>> getAgeDistribution() {
         List<Member> members = memberService.getAllMembers();
         // 根據生日計算年齡，並分組統計
@@ -57,7 +57,7 @@ public class AdminMemberController {
         return ResponseEntity.ok(ageDistribution);
     }
 
-    @GetMapping("/api/registration-trend")
+    @GetMapping("/member/api/registration-trend")
     public ResponseEntity<Map<String, Long>> getRegistrationTrend() {
         LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
         List<Member> recentMembers = memberService.getRecentRegisteredMembers(sixMonthsAgo);
@@ -70,7 +70,7 @@ public class AdminMemberController {
 
 
     // 更改會員狀態
-    @PutMapping("/api/{memberId}/status")
+    @PutMapping("/member/api/{memberId}/status")
     public ResponseEntity<String> updateMemberStatus(@PathVariable Integer memberId, @RequestBody Map<String, String> request) {
         Optional<Member> member = memberService.getMemberById(memberId);
         if (member.isPresent()) {
@@ -83,7 +83,7 @@ public class AdminMemberController {
     }
 
     // 移除會員頭貼
-    @DeleteMapping("/api/{memberId}/profile-pic")
+    @DeleteMapping("/member/api/{memberId}/profile-pic")
     public ResponseEntity<String> removeProfilePic(@PathVariable Integer memberId) {
         try {
             memberService.removeProfilePic(memberId);

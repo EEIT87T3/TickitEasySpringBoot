@@ -55,6 +55,7 @@ public class AdminFilter implements Filter {
     // 初始化方法
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+    	 System.out.println("AdminFilter initialized.");
     }
 
     // 銷毀方法

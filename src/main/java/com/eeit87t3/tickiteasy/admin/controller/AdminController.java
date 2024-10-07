@@ -40,6 +40,7 @@ public class AdminController {
         return adminService.login(email, password)
                 .map(admin -> {
                     session.setAttribute("admin", admin);
+                    System.out.println("Admin stored in session: " + session.getAttribute("admin")); // 加入此行
                     return "redirect:/admin/dashboard";
                 })
                 .orElseGet(() -> {
@@ -53,7 +54,9 @@ public class AdminController {
      */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.removeAttribute("admin");
+    	 System.out.println("Admin before logout: " + session.getAttribute("admin")); // 加入此行
+    	    session.removeAttribute("admin");
+    	    System.out.println("Admin after logout: " + session.getAttribute("admin"));  // 加入此行
         return "redirect:/admin/login?logout=true"; // 添加 query string 表示已成功登出
     }
     /**
@@ -80,6 +83,7 @@ public class AdminController {
         if (adminOptional.isPresent()) {
             Admin admin = adminOptional.get();
             session.setAttribute("admin", admin);
+            System.out.println("Admin stored in session (API): " + session.getAttribute("admin")); // 加入此行
             return ResponseEntity.ok().body(admin);
         } else {
             return ResponseEntity.badRequest().body("無效的電子信箱或密碼");
