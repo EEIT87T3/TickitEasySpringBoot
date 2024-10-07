@@ -32,8 +32,8 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer postID;
 	
-	@Column(name = "themeID")
-	private Integer themeID;
+//	@Column(name = "themeID")
+//	private Integer themeID;
 	
 	@Column(name = "memberID")
 	private Integer memberID;
@@ -60,19 +60,19 @@ public class PostEntity {
 	@Column(name = "status")
 	private Integer status;
 	
-	//  @ManyToOne 關聯到 Theme 實體
-	@ManyToOne
-	@JoinColumn(name = "themeID", referencedColumnName = "themeID", insertable = false, updatable = false)//避免重複映射
-    private ThemeEntity theme;  
+//	//  @ManyToOne 關聯到 Theme 實體
+//	@ManyToOne
+//	@JoinColumn(name = "themeID", referencedColumnName = "themeID", insertable = false, updatable = false)//避免重複映射
+//    private ThemeEntity theme;  
 
 	//  @ManyToOne 關聯到 Category 實體
 	@ManyToOne
-	@JoinColumn(name = "categoryID", referencedColumnName = "categoryID", insertable = false, updatable = false)//避免重複映射
+	@JoinColumn(name = "categoryID", referencedColumnName = "categoryID")//name沒有重複就不需要insertable = false, updatable = false
 	private CategoryEntity postCategory; 
 	
 	//  @ManyToOne 關聯到 Tag 實體
 	@ManyToOne
-	@JoinColumn(name = "tagID", referencedColumnName = "tagID", insertable = false, updatable = false)//避免重複映射
+	@JoinColumn(name = "tagID", referencedColumnName = "tagID")
 	private TagEntity postTag; 
 
     @OneToMany(mappedBy = "post")
@@ -91,7 +91,7 @@ public class PostEntity {
 	}
 
 	public Integer getPostID() {return postID;}
-	public Integer getThemeID() {return themeID;}
+//	public Integer getThemeID() {return themeID;}
 	public Integer getMemberID() {return memberID;}
 	public String getPostTitle() {return postTitle;}
 	public String getPostContent() {return postContent;}
@@ -121,7 +121,7 @@ public class PostEntity {
 	}
 
 	public void setPostID(Integer postID) {this.postID = postID;}
-	public void setThemeID(Integer themeID) {this.themeID = themeID;}
+//	public void setThemeID(Integer themeID) {this.themeID = themeID;}
 	public void setMemberID(Integer memberID) {this.memberID = memberID;}
 	public void setPostTitle(String postTitle) {this.postTitle = postTitle;}
 	public void setPostContent(String postContent) {this.postContent = postContent;}
@@ -131,12 +131,12 @@ public class PostEntity {
 	public void setViewCount(Integer viewCount) {this.viewCount = viewCount;}
 	public void setStatus(Integer status) {this.status = status;}
 	
-	public ThemeEntity getThemeName() {
-		return theme;
-	}
-	public void setThemeName(ThemeEntity theme) {
-		this.theme = theme;
-	}
+//	public ThemeEntity getThemeName() {
+//		return theme;
+//	}
+//	public void setThemeName(ThemeEntity theme) {
+//		this.theme = theme;
+//	}
 //	public MemberBean getMember() {
 //		return member;
 //	}

@@ -40,10 +40,10 @@
                         <td>${post.postCategory.categoryName || 'N/A'}</td> 
                         <td>${post.postTag.tagName || 'N/A'}</td> 
                         <td>
-                            <button class="view-comments" data-id="${post.postID}">查看留言</button>
-                            <button class="editPost" data-id="${post.postID}">編輯</button>
+                            <button class="view-comments bg-blue-500 text-white px-2 py-2 rounded" data-id="${post.postID}">查看留言</button>
+                            <button class="edit-post bg-blue-500 text-white px-2 py-2 rounded" data-id="${post.postID}">編輯</button>
                            
-                            <button class="delete-post" data-id="${post.postID}">刪除</button>
+                            <button class="delete-post bg-red-500 text-white px-2 py-2 rounded" data-id="${post.postID}">刪除</button>
                         </td>
                     </tr>
                 `);
@@ -52,23 +52,23 @@
             // 初始化 DataTable==================================
             $('#postsTable').DataTable();
 
+              
+            // 新增貼文==================================
+            $('.add-post').on('click', function() {
+                const postId = $(this).data('id'); // 獲取 postID
+                window.location.href = `/TickitEasy/admin/api/post/create`; 
+            });
+
+            
             // 查看留言==================================
-            $('.view-comments').on('click', function() {
+            // $('.view-comments').on('click', function() {
+            $('#postsTable tbody').on('click', '.view-comments', function() {// 使用事件委派來處理按鈕點擊事件
                 const postId = $(this).data('id'); // 獲取 postID
                 window.location.href = `/TickitEasy/admin/api/post/comments/${postId}`; // 跳轉到留言頁面
             });
-            // 編輯貼文==================================
-
-            // $('.editPost').on('click', function() {
-            //     const postId = $(this).data('id'); // 獲取 postID
-            //     console.log("Post ID:", postId); // 調試用
-            //     window.location.href = `/TickitEasy/admin/api/post/update?postID=${postId}`; 
-            // });
-
             
-
             // 刪除貼文==================================
-            $('.delete-post').on('click', function() {
+            $('#postsTable tbody').on('click', '.delete-post', function() {
                 const postId = $(this).data('id'); // 獲取 postID
                 if (confirm('確定要刪除此貼文嗎？')) {
                     axios.delete(`/TickitEasy/admin/api/post/delete?postID=${postId}`)
@@ -83,8 +83,8 @@
                 }
                 // window.location.href = `/TickitEasy/admin/api/post`; 
             });
-            // 更新貼文==================================
-            $('.editPost').on('click', function() {
+            // 編輯貼文==================================
+            $('#postsTable tbody').on('click', '.edit-post', function() {
                 const postId = $(this).data('id'); // 獲取 postID
 
                 // 先獲取貼文數據
@@ -169,13 +169,16 @@
         }
 
             
+
+        
+
     </script>
 </head>
 <body>
     <div th:replace="~{commons/adminHeader}"></div>
     <h1>All Posts</h1>
      <!-- 類別篩選選單 -->
-     <button id="openModalBtn" class="bg-blue-500 text-white px-4 py-2 rounded">新增貼文</button>
+     <button id="openModalBtn" class=" add-post bg-blue-500 text-white px-4 py-2 rounded">新增貼文</button>
      <label for="categoryFilter">Filter by Category: </label>
      <select id="categoryFilter">
          <option value="">All Categories</option>

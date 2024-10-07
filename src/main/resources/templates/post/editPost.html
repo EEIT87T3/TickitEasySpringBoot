@@ -57,7 +57,9 @@
       transition: background-color 0.3s;
       width: 100%;
     }
-
+    .listbtn{
+      width: 5%;
+    }
     button:hover {
       background-color: #45a049;
     }
@@ -78,6 +80,7 @@
 <body>
   <div th:replace="~{commons/adminHeader}"></div>
   <h1>Edit Post</h1>
+  <button class="button listbtn postList ">上一頁</button></td>
   <form id="editPostForm">
     <label for="postTitle">Title:</label>
     <input type="text" id="postTitle" name="postTitle" required>
@@ -136,7 +139,7 @@
           document.getElementById("updateResult").className = "success";
           setTimeout(() => {
             window.location.href = `/TickitEasy/admin/api/post/posts`;
-          }, 2000); // 2秒後跳轉
+          }, 1000); // 2秒後跳轉
         } else {
           document.getElementById("updateResult").innerText = `Failed to update post: ${response.status}`;
         }
@@ -147,6 +150,10 @@
 
     // 初始化載入
     loadPostData();
+    $('.postList').on('click', function() {
+               
+               window.location.href = `/TickitEasy/admin/api/post/posts`; 
+           });
   </script>
 <div th:replace="~{commons/adminFooter}"></div>
 </body>

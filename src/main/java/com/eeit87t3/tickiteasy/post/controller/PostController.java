@@ -65,13 +65,13 @@ public class PostController {
 	 //更新貼文頁面
 	 @GetMapping("/GetUpdate")
 	 public String showUpdateForm() {
-		 return "post/editPost";  // 返回 insertpost.html
+		 return "/post/editPost"; 
 	 }
 	 
 	//新增貼文頁面 *未完成*
 	@GetMapping("/create")
 	    public String showInsertForm() {
-	        return "post/insertpost";  
+	        return "/post/addPost";  
 	    }
 	//留言頁面
 	 @GetMapping("/comments/{postID}")
@@ -146,27 +146,38 @@ public class PostController {
  	public ResponseEntity<String> createPost(@RequestParam("postTitle") String title, 
  	                                         @RequestParam("postContent") String content,
  	                                         @RequestParam("categoryID") Integer categoryID,
+ 	                                         @RequestParam("memberID") Integer memberID,
+ 	                                         @RequestParam("status") Integer status,
  	                                         @RequestParam("tagID") Integer tagID) {
+ 		System.out.println(categoryID);
+ 		System.out.println(tagID);
  	    PostEntity post = new PostEntity();
  	    post.setPostTitle(title);
  	    post.setPostContent(content);
+ 	    post.setMemberID(memberID);
+ 	    post.setStatus(status);
  	    
- 	    
- 	   Optional<CategoryEntity> categoryOpt = categoryRepo.findById(categoryID);
- 	   if (!categoryOpt.isPresent()) {
- 		   throw new IllegalArgumentException("該分類不存在");
- 	   }
- 	   CategoryEntity category = categoryOpt.get();
- 	   
- 	   Optional<TagEntity> tagOpt = tagRepo.findById(tagID);
- 	   if (!tagOpt.isPresent()) {
- 		   throw new IllegalArgumentException("該標籤不存在");
- 	   }
- 	  TagEntity tag = tagOpt.get();
- 	    
- 	     
+ 	    TagEntity tag= tagService.findProductTagById(tagID);
+ 	    CategoryEntity category= categoryService.findProductCategoryById(categoryID);
  	    post.setPostCategory(category);
  	    post.setPostTag(tag);
+ 	   System.out.println(category!=null);
+		System.out.println(tag!=null);
+// 	   Optional<CategoryEntity> categoryOpt = categoryRepo.findById(categoryID);
+// 	   if (!categoryOpt.isPresent()) {
+// 		   throw new IllegalArgumentException("該分類不存在");
+// 	   }
+// 	   CategoryEntity category = categoryOpt.get();
+// 	   
+// 	   Optional<TagEntity> tagOpt = tagRepo.findById(tagID);
+// 	   if (!tagOpt.isPresent()) {
+// 		   throw new IllegalArgumentException("該標籤不存在");
+// 	   }
+// 	  TagEntity tag = tagOpt.get();
+ 	    
+ 	     
+// 	    post.setPostCategory(category);
+// 	    post.setPostTag(tag);
  	    
  	    postService.insert(post);
  	    

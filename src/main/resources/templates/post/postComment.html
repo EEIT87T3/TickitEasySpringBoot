@@ -25,7 +25,7 @@
                     console.error("Error fetching comments:", error);
                 });
         }
-    
+   		 
         // 將貼文資料填充到表格中的函數
         function populateTable(comments) {
             // 清空現有資料
@@ -40,7 +40,8 @@
                         <td>${comment.memberID}</td>
                         <td>${comment.content || 'N/A'}</td> 
                         <td>${comment.commentDate || 'N/A'}</td> 
-                        <td><button>編輯</button><button>刪除</button></td>
+                        <td><button class="bg-blue-500 text-white px-2 py-2 rounded">編輯</button>
+                        <button class="bg-red-500 text-white px-2 py-2 rounded">刪除</button></td>
                     </tr>
                 `);
             });
@@ -57,12 +58,16 @@
         } else {
             console.error("No postID found");
         }
+        $('.postList').on('click', function() {
+               
+                window.location.href = `/TickitEasy/admin/api/post/posts`; 
+            });
     });
     </script>
 </head>
 <body th:data-post-id="${postID}">
     <div th:replace="~{commons/adminHeader}"></div>
-    
+    <button class="postList bg-blue-500 text-white px-2 py-2 rounded">上一頁</button></td>
     <h1>All Comments for Post [[${postID}]]</h1>
     <table id="commentsTable" class="display">
         <thead>
