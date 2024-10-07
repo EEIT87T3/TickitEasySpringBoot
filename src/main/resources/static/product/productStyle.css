@@ -1,0 +1,205 @@
+@charset "UTF-8";
+
+
+/* 外層容器，使用 flexbox 排版 */
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* 搜索框樣式 */
+.search-form {
+    display: flex;
+    align-items: center;
+}
+
+.search-form input {
+    margin-right: 5px;
+}
+
+/* 新增商品按鈕與搜索框並排 */
+.add-product-form {
+    margin-right: auto;
+}
+
+table.display {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-family: Arial, sans-serif;
+}
+
+/* 表頭樣式 */
+table.display thead th {
+    background-color: #f2f2f2;
+    /* 淺灰色背景 */
+    color: #333;
+    /* 深色文字 */
+    padding: 12px 15px;
+    border-bottom: 2px solid #ddd;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* 表格內容樣式 */
+table.display tbody td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    /* 內容居中對齊 */
+    vertical-align: middle;
+    /* 垂直居中 */
+}
+
+/* 表格列的背景色交替 */
+table.display tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table.display tbody tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+/* 商品圖片樣式 */
+table.display tbody td img {
+    border-radius: 5px;
+    width: 80px;
+    height: auto;
+}
+
+/* 修改和刪除按鈕樣式 */
+button.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.btn-primary:hover,
+button.btn-danger:hover {
+    opacity: 0.85;
+}
+
+/* 測試樣式 */
+/* 表格表头设置灰色背景 */
+table.display th {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 10px;
+    text-align: left;
+}
+
+/* 表格内容单元格样式 */
+table.display td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* 操作按钮的列样式 */
+table.display td[colspan="2"] {
+    background-color: #f0f0f0; /* 灰色背景，与表头保持一致 */
+    text-align: center;
+}
+
+/* 調整按鈕之間的距離 */
+table.display .btn {
+    margin-right: 5px;
+}
+
+
+
+
+
+
+/* 搜尋框樣式 */
+.search-form input[type="text"] {
+    padding: 5px 10px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.search-form button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #28a745;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.search-form button:hover {
+    opacity: 0.85;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    /* 讓分頁按鈕水平居中 */
+    padding-left: 0;
+    list-style: none;
+}
+
+
+
+.page-link {
+    padding: 8px 16px;
+    color: #007bff;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.page-item.active .page-link {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #ddd;
+}
+
+/*調整按鈕*/
+
+.action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .action-buttons form {
+            display: inline-block;
+        }
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn btn-primary {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+

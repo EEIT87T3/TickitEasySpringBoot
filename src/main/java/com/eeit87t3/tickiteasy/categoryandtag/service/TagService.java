@@ -45,7 +45,9 @@ public class TagService {
 	public List<TagEntity> findProductTagList() {
 	    return tagRepo.findByTagStatus((short) 0);
 	}
-
+	public TagEntity findProductTagById(Integer tagId) {
+	    return tagRepo.findById(tagId).orElse(null);
+	}
 	/**
 	 * 取得 CwdFunding 功能的主題分類列表。
 	 * 

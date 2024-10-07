@@ -45,6 +45,9 @@ public class CategoryService {
 	public List<CategoryEntity> findProductCategoryList() {
 		return categoryRepo.findByCategoryStatus((short) 0);
 	}
+	public CategoryEntity findProductCategoryById(Integer categoryId) {
+	    return categoryRepo.findById(categoryId).orElse(null);
+	}
 	
 	/**
 	 * 取得 CwdFunding 功能的活動型態列表。
