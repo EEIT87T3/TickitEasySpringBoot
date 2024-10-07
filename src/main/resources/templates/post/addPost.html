@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增貼文</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <h1>新增貼文</h1>
+
+    <form id="fullCreatePostForm">
+        <label for="fullPostTitle">標題:</label>
+        <input type="text" id="fullPostTitle" name="title" required class="border p-2 mb-4 w-full">
+
+        <label for="fullPostContent">內容:</label>
+        <textarea id="fullPostContent" name="content" required class="border p-2 mb-4 w-full"></textarea>
+
+        <label for="fullPostCategory">分類:</label>
+        <select id="fullPostCategory" name="categoryID" class="border p-2 mb-4 w-full"></select>
+
+        <label for="fullPostTag">標籤:</label>
+        <select id="fullPostTag" name="tagID" class="border p-2 mb-4 w-full"></select>
+
+        <!-- 其他可能的欄位 -->
+
+        <button type="submit" class="btn btn-success">新增貼文</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // 和彈窗內邏輯類似，處理表單提交和選項動態加載
+        $('#fullCreatePostForm').on('submit', function(event) {
+            event.preventDefault();
+            const postData = {
+                title: $('#fullPostTitle').val(),
+                content: $('#fullPostContent').val(),
+                categoryID: $('#fullPostCategory').val(),
+                tagID: $('#fullPostTag').val()
+            };
+
+            axios.post('/TickitEasy/admin/api/post/create', postData)
+                .then(response => {
+                    alert("貼文新增成功！");
+                    window.location.href = '/TickitEasy/admin/postList'; // 回到貼文列表頁面
+                })
+                .catch(error => {
+                    console.error("新增貼文失敗:", error);
+                    alert("新增失敗，請稍後再試。");
+                });
+        });
+
+        // 動態填充分類和標籤選項
+        axios.get('/TickitEasy/admin/api/categories')
+            .then(response => {
+                const categories = response.data;
+                categories.forEach(category => {
+                    $('#fullPostCategory').append(new Option(category.categoryName, category.categoryID));
+                });
+            });
+
+        axios.get('/TickitEasy/admin/api/tags')
+            .then(response => {
+                const tags = response

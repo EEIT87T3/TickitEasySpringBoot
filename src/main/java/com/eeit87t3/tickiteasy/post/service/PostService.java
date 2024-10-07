@@ -64,9 +64,8 @@ public class PostService {
     }
     //更新單筆貼文
     @Transactional
-    public void update(Integer postID,PostEntity updatedPost) {
-    
-  
+    public PostEntity update(Integer postID, PostEntity updatedPost) {
+
         // 首先查找該貼文是否存在
         PostEntity existingPost = postRepo.findById(postID)
                                           .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -74,10 +73,9 @@ public class PostService {
         // 更新貼文的屬性
         existingPost.setPostTitle(updatedPost.getPostTitle());
         existingPost.setPostContent(updatedPost.getPostContent());
-      
 
         // 儲存更新後的貼文
-        postRepo.save(existingPost);
+        return postRepo.save(existingPost); // 返回更新後的貼文實體
     }
     
     //刪除單筆貼文
