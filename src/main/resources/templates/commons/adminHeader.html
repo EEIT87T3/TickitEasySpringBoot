@@ -11,7 +11,8 @@
             </button>
             <a class="navbar-brand ms-3" href="#">
                 <!-- 替換瑋芳 logo 的位置 -->
-                <i class="fas fa-ticket-alt me-2"></i>
+                <!-- <i class="fas fa-ticket-alt me-2"></i> -->
+                <img th:src="@{/logo/LogoWhite.svg}" alt="logo" width=34px class="me-2">
                 TickitEasy 管理系統
             </a>
             <!-- 登出按鈕，始終顯示在右側 -->
@@ -51,10 +52,10 @@
                     </a>
                     <ul class="collapse list-unstyled submenu" id="eventSubmenu">
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-calendar-day"></i> 活動列表</a>
+                            <a th:href="@{/admin/event}" class="sidebar-link"><i class="fas fa-calendar-day"></i> 活動列表</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-calendar-plus"></i> 新增活動</a>
+                            <a th:href="@{/admin/event/create}" class="sidebar-link"><i class="fas fa-calendar-plus"></i> 新增活動</a>
                         </li>
                         <li>
                             <a href="#" class="sidebar-link"><i class="fas fa-ticket-alt"></i> 票券訂單列表</a>
