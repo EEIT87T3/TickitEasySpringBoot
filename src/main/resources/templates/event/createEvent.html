@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	<meta th:replace="~{commons/adminHead}">
+	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<title>新增活動</title>
+	<style>
+		table>tbody>tr>th {
+			width: 100px;
+			text-align: right;
+			vertical-align: middle;
+		}
+
+		table>tbody>tr>td {
+			text-align: left;
+			vertical-align: middle;
+		}
+		.mustMark {
+            color: red;
+        }
+	</style>
+	<script>
+		$(document).ready(function () {
+
+			// 初始化常數與 function
+
+			const contextPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
+			const currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
+
+
+			// EventListener
+
+			// 新增
+			const createForm = document.getElementById("create-form");
+			const resultDiv = document.getElementById("result");
+			createForm.addEventListener("submit", function (event) {
+				event.preventDefault();
+				resultDiv.innerHTML = `
+					<div class="spinner-border" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>`;
+				resultDiv.classList.remove("text-danger");
+				resultDiv.classList.remove("text-success");
+
+				let formData = new FormData(createForm);
+
+				// 測試用
+				let formDataObject = {};
+				formData.forEach((value, key) => {
+					formDataObject[key] = value;
+				});
+				console.log(formDataObject);
+
+				axios.post(contextPath + "/admin/api/event", formData)
+					.then(res => {
+						console.log(res);
+						if (res.status == 201) {
+							resultDiv.classList.add("text-success");
+							resultDiv.innerText = "新增成功！";
+							createForm.reset();
+						}
+					})
+					.catch(err => {
+						console.error(err);
+						if (err.status == 400) {
+							resultDiv.classList.add("text-danger");
+							resultDiv.innerText = err.response.data;
+						}
+					})
+			})
+
+			// 取消
+			document.getElementById("cancel").addEventListener("click", function () {
+				window.location.href = currentPath.substring(0, currentPath.lastIndexOf("/"));
+			})
+
+			// 示範輸入
+			document.getElementById("demo").addEventListener("click", function () {
+				document.getElementsByName("eventName")[0].value = "示範輸入活動名稱 01";
+				document.getElementsByName("eventDesc")[0].value = "示範輸入活動介紹";
+				document.getElementsByName("categoryString")[0].value = "other";
+				document.getElementsByName("tagString")[0].value = "";
+			})
+		});
+	</script>
+</head>
+
+<body>
+	<div th:replace="~{commons/adminHeader}"></div>
+
+	<!--  這裡是網頁內容 >-->
+	<div class="container">
+		<h1>新增活動</h1>
+		<form id="create-form" enctype="multipart/form-data">
+			<table class="table table-hover">
+				<tbody>
+					<tr>
+						<th><span class="mustMark">*</span>活動名稱</th>
+						<td>
+							<input type="text" class="form-control" name="eventName" placeholder="活動名稱">
+						</td>
+					</tr>
+					<tr>
+						<th>活動主圖</th>
+						<td>
+							<input type="file" class="form-control" name="eventPicFile">
+						</td>
+					</tr>
+					<tr>
+						<th><span class="mustMark">*</span>活動類別</th>
+						<td>
+							<select class="form-select" name="categoryString">
+								<option value="">（未選擇）</option>
+								<th:block th:each="category : ${categoryList}">
+									<option th:value="${category.categoryString}">[[${category.categoryName}]]</option>
+								</th:block>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>活動標籤</th>
+						<td>
+							<select class="form-select" name="tagString">
+								<option value="">（未選擇）</option>
+								<th:block th:each="tag : ${tagList}">
+									<option th:value="${tag.tagString}">[[${tag.tagName}]]</option>
+								</th:block>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>活動介紹</th>
+						<td>
+							<textarea class="form-control" name="eventDesc" placeholder="活動介紹"></textarea>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div id="action-buttons" class="d-flex mb-3">
+				<div id="result" class="d-flex align-items-center"></div>
+				<button class="btn btn-warning ms-auto" type="button" id="demo">示範輸入</button>
+				<button class="btn btn-secondary ms-3" type="button" id="cancel">取消</button>
+				<button class="btn btn-primary ms-3" type="submit" id="create">新增</button>
+			</div>
+		</form>
+	</div>
+
+
+	<div th:replace="~{commons/adminFooter}"></div>
+</body>
+
+</html>

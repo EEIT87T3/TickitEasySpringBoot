@@ -145,7 +145,7 @@ public class TestController {
 	}
 	
 	/**
-	 * JSON Controller：取得 Post 功能的活動型態測試。
+	 * JSON Controller：取得 Event 功能的活動型態測試。
 	 */
 	@ResponseBody
 	@GetMapping("/test/event-categorylist")
