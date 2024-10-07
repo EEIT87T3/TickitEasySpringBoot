@@ -1,7 +1,6 @@
 package com.eeit87t3.tickiteasy.event.controller;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
