@@ -9,7 +9,7 @@
             <button type="button" id="sidebarCollapse" class="btn">
                 <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
             </button>
-            <a class="navbar-brand ms-3" href="#">
+            <a class="navbar-brand ms-3" th:href="@{/admin/dashboard}">
                 <!-- 替換瑋芳 logo 的位置 -->
                 <!-- <i class="fas fa-ticket-alt me-2"></i> -->
                 <img th:src="@{/logo/LogoWhite.svg}" alt="logo" width=34px class="me-2">
@@ -29,7 +29,7 @@
         <nav id="sidebar">
             <ul class="list-unstyled">
                 <li>
-                    <a href="#" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> 後台管理首頁</a>
+                    <a th:href="@{/admin/dashboard}" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> 後台管理首頁</a>
                 </li>
                 <li>
                     <a href="#memberSubmenu" data-bs-toggle="collapse" aria-expanded="false"
