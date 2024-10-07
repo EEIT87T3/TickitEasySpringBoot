@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.catalina.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 import com.eeit87t3.tickiteasy.order.service.Impl.ProdOrdersServiceImpl;
+
+import io.micrometer.common.util.StringUtils;
 
 @Controller
 @RequestMapping("order")
@@ -61,13 +64,15 @@ public class ProdOrdersController {
 
 			ProdOrders prodOrdersBean = new ProdOrders(prodOrderID, memberID, orderDate, payments, paymentInfo,
 					status, totalAmount, shippingStatus, shippingID, recipientName, address, phone);
+			
 			if(prodOrderID != 0) {
 				prodOrdersService.saveOrder(prodOrdersBean);
 				Integer prodOrderID1 = 1;
 				model.addAttribute("prodOrderID",prodOrderID1);
 				return "redirect:/order";
 			}
-			
+			ProdOrders latestProdOrder = prodOrdersService.findLatestProdOrder();
+			model.addAttribute("prodOrderId",latestProdOrder.getProdOrderID());
 			return "/order/prodOrdersAdd";
 		}
 
@@ -107,9 +112,9 @@ public class ProdOrdersController {
 		
 		@GetMapping("page")
 		@ResponseBody
-		public Page<ProdOrders> findByPage(@RequestParam Integer pageNumber) { 
+		public Page<ProdOrders> findByPage(@RequestParam Integer pageNumber,@RequestParam Integer records) { 
 			
-			return prodOrdersService.findAllPage(pageNumber);
+			return prodOrdersService.findAllPage(pageNumber,records);
 		}
 		
 		@PostMapping("findByProdidOrMemberidOrDate")
@@ -117,15 +122,24 @@ public class ProdOrdersController {
 		public Page<ProdOrders> findByDate(
 				@RequestParam String name,
 				@RequestParam String number,
-				@RequestParam int pageNumber){
+				@RequestParam int pageNumber,
+				@RequestParam Integer records){
 			
 			switch (name) {
 			case "訂單編號":
+				if(StringUtils.isNotBlank(number)) {
+					int numberProdOrderId = Integer.parseInt(number);					
+					return prodOrdersService.findByProdOrdersId(numberProdOrderId, pageNumber,records);
+				}
+				return prodOrdersService.findAllPage(pageNumber);
 			case "會員編號":
-				int number2 = Integer.parseInt(number);
-				return null;
+				if(StringUtils.isNotBlank(number)) {
+					int	numberMemberId = Integer.parseInt(number);					
+					return prodOrdersService.findByMemberId(numberMemberId, pageNumber,records);
+				}
+				return prodOrdersService.findAllPage(pageNumber);
 			case "訂單日期":
-				return prodOrdersService.findByDate(number,pageNumber);
+				return prodOrdersService.findByDate(number,pageNumber,records);
 			}
 			
 			return null;

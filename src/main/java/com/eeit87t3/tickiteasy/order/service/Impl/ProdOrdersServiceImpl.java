@@ -78,15 +78,32 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		return por.findLatestProdOrder();
 	}
 	
+	public Page<ProdOrders> findAllPage(Integer id,Integer records){
+        Pageable pageable = PageRequest.of(id-1,records, Sort.Direction.ASC,"prodOrderID");
+        return por.findAll(pageable);
+    }
+	
 	public Page<ProdOrders> findAllPage(Integer id){
         Pageable pageable = PageRequest.of(id-1,5, Sort.Direction.ASC,"prodOrderID");
         return por.findAll(pageable);
     }
 
 	@Override
-	public Page<ProdOrders> findByDate(String number,Integer id) {
-		Pageable pageable = PageRequest.of(id-1,5, Sort.Direction.ASC,"prodOrderID");
+	public Page<ProdOrders> findByDate(String number,Integer id,Integer records) {
+		Pageable pageable = PageRequest.of(id-1,records, Sort.Direction.ASC,"prodOrderID");
 		return por.findByDate(number,pageable);
+	}
+
+	@Override
+	public Page<ProdOrders> findByProdOrdersId(Integer number, Integer id,Integer records) {
+		Pageable pageable = PageRequest.of(id-1,records, Sort.Direction.ASC,"prodOrderID");
+		return por.findByProdOrdersId(number, pageable);
+	}
+
+	@Override
+	public Page<ProdOrders> findByMemberId(Integer number, Integer id,Integer records) {
+		Pageable pageable = PageRequest.of(id-1,records, Sort.Direction.ASC,"prodOrderID");
+		return por.findByMemberId(number, pageable);
 	}
 	
 	

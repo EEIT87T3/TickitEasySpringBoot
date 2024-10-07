@@ -7,38 +7,38 @@ import java.util.List;
 import jakarta.persistence.*;
 
 @Entity 
-@Table(name = "prodorders")
+@Table(name = "prodOrders")
 public class ProdOrders {
 	@Id
-	@Column(name = "prodorderid")
+	@Column(name = "prodOrderId")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer prodOrderID; 
 	
     @Column(name = "memberID")
 	private int memberID; 
 	
-	@Column(name = "orderdate")
+	@Column(name = "orderDate")
 	private Date orderDate;
 	
 	@Column(name = "payments")
 	private String payments;
 	
-	@Column(name = "paymentinfo")
+	@Column(name = "paymentInfo")
 	private String paymenInfo;
 	
 	@Column(name = "status")
 	private String status;
 	
-	@Column(name = "totalamount")
+	@Column(name = "totalAmount")
 	private int totalAmount;
 	
-	@Column(name = "shippingstatus")
+	@Column(name = "shippingStatus")
 	private String shippingStatus;
 	
 	@Column(name = "shippingID")
 	private int shippingID;
 	
-	@Column(name = "recipientname")
+	@Column(name = "recipientName")
 	private String recipientName;
 	
 	@Column(name = "address")

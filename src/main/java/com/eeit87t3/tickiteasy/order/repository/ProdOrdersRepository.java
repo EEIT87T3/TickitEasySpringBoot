@@ -18,4 +18,10 @@ public interface ProdOrdersRepository extends JpaRepository<ProdOrders, Integer>
 	
 	@Query(value = "SELECT * FROM ProdOrders WHERE orderDate LIKE CONCAT('%', :number, '%')", nativeQuery = true)
 	public Page<ProdOrders> findByDate(@Param("number") String number, Pageable pageable);
+
+	@Query(value = "SELECT * FROM ProdOrders WHERE prodOrderId LIKE CONCAT('%', :number, '%')", nativeQuery = true)
+	public Page<ProdOrders> findByProdOrdersId(@Param("number") Integer number, Pageable pageable);
+	
+	@Query(value = "SELECT * FROM ProdOrders WHERE memberId LIKE CONCAT('%', :number, '%')", nativeQuery = true)
+	public Page<ProdOrders> findByMemberId(@Param("number") Integer number, Pageable pageable);
 }
