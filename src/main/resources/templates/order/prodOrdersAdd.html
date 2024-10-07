@@ -11,7 +11,7 @@
         /* 自訂變數，用來統一調整側邊欄和導覽列的高度與寬度 */
         :root {
             /* 主要顏色，用於導航欄背景、主要按鈕等 */
-            --primary-color: #4C36C5;
+            --primary-color: #007bff;
 
             /* 主要顏色的懸停狀態，用於按鈕懸停效果等 */
             --primary-hover-color: #0056b3;
@@ -250,6 +250,13 @@
             font-size: 14px;
             color: #6c757d;
         }
+		.box {
+			width: 600px;
+			margin: 0 auto;
+		}
+		.background{
+			background-color: #e9ecef;
+		}
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
@@ -315,14 +322,13 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid">
             <!-- 側邊欄收起按鈕 -->
-            <button style="margin-top:3px" type="button" id="sidebarCollapse" class="btn">
+            <button type="button" id="sidebarCollapse" class="btn">
                 <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
             </button>
             <a class="navbar-brand ms-3" href="#">
                 <!-- 替換瑋芳logo 的位置 -->
-                <i class=""><img height="18px" src="LOGOTICKIT.svg">&nbsp;	</i><img style="margin-top:3px" height="12px" src="LOGOTEXT.svg">	&nbsp;
-                <span style="margin-top:3px">  &nbsp;管理系統</span>
-                
+                <i class="fas fa-ticket-alt me-2"></i>
+                TickitEasy 管理系統
             </a>
             <!-- 登出按鈕，始終顯示在右側 -->
             <ul class="navbar-nav ms-auto">
@@ -414,8 +420,117 @@
     </div>
     <div class="content">
         <!-- 這裡是網頁內容 -->
-        <h1>網頁標題</h1>
-
+        <h1>新增訂單</h1>
+        <div class='box'>
+            <form method='post' th:action='@{/order/insert}'>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right">訂單編號</label>
+                    <div class="col-sm-10">
+                        <input type="number" id="prodOrderID" class="form-control col-md-6 background" name="prodOrderID"
+                             placeholder="訂單編號" th:value="${prodOrderId + 1}" readonly>
+                    </div>
+                </div></br>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right">會員編號</label>
+                    <div class="col-sm-10">
+                        <input type="number" id="memberID" class="form-control col-md-6" name="memberID"
+                             placeholder="會員編號">
+                    </div>
+                </div></br>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right">訂單日期</label>
+                    <div class="col-sm-10">
+                        <input type="date" id="orderDate" class="form-control col-md-6" name="orderDate"
+                             placeholder="訂單日期">
+                    </div>
+                </div></br>
+                <fieldset class="form-group">
+                    <div class="row">
+                        <legend class="col-form-label col-sm-2 pt-0 text-right">付款方式</legend>
+                        <div class="col-sm-10">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payments"
+                                    id="gridRadios1" value="信用卡" checked> 
+                                <label class="form-check-label" for="gridRadios1"> 信用卡 </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payments"
+                                    id="gridRadios2" value="LINE PAY"> 
+                                <label class="form-check-label" for="gridRadios2"> LINE PAY </label>
+                            </div>
+                            <div class="form-check disabled">
+                                <input class="form-check-input" type="radio" name="payments"
+                                    id="gridRadios3" value="現金" disabled> 
+                                <label class="form-check-label" for="gridRadios3"> 現金 </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset></br>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right">付款資訊</label>
+                    <div class="col-sm-10">
+                        <input type="password" id="paymentInfo" class="form-control  col-md-8" name="paymentInfo"
+                             placeholder="付款資訊">
+                    </div>
+                </div></br>
+                <input type='hidden' name="status" placeholder="請輸入訂單狀態">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right">總金額</label>
+                    <div class="col-sm-10">
+                        <input type="number" id="totalAmount" class="form-control  col-md-6" name="totalAmount"
+                          placeholder="請輸入總金額">
+                    </div>
+                </div></br>
+                <input type='hidden' name="shippingStatus" placeholder="請輸入配送狀態">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right">配送編號</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="shippingID" class="form-control  col-md-6" name="shippingID"
+                             placeholder="輸入配送編號">
+                    </div>
+                </div></br>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right ">收件人</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="recipientName" class="form-control  col-md-6" name="recipientName"
+                             placeholder="輸入收件人姓名">
+                    </div>
+                </div></br>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right ">收件地址</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="address" class="form-control  col-md-6" name="address"
+                             placeholder="收件地址">
+                    </div>
+                </div></br>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-right ">電話</label>
+                    <div class="col-sm-10">
+                        <input type="number" id="phone" class="form-control  col-md-8" name="phone"
+                             placeholder="電話">
+                    </div>
+                </div></br>
+                <div class="text-center">
+                    <button class="btn btn-primary btn-sm" type='submit' name="button"
+                        value="add">新增</button>
+                </div>
+            </form>
+            <button id="autofillBtn" class="btn btn-secondary btn-sm">一鍵輸入</button>
+        </div>
+    
+        <script>
+            document.getElementById('autofillBtn').addEventListener('click', function() {
+                document.getElementById('memberID').value = '5';
+                document.getElementById('orderDate').value = '1990-05-05';
+                document.getElementById('gridRadios2').checked = true;
+                document.getElementById('paymentInfo').value = '22224444666688';
+                document.getElementById('totalAmount').value = '96767';
+                document.getElementById('shippingID').value = '123456';
+                document.getElementById('recipientName').value = '二狗子';
+                document.getElementById('address').value = '桃園市';
+                document.getElementById('phone').value = '0912345678';
+            });
+        </script>
         <footer class="footer">
             <div class="container">
                 &copy; 2024 TickitEasy. 版權所有.

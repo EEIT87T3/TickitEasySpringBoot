@@ -68,13 +68,13 @@
                         <i class="fas fa-shopping-bag"></i> 商品管理</a>
                     <ul class="collapse list-unstyled submenu" id="produuctSubmenu">
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-boxes"></i> 商品列表</a>
+                            <a th:href="@{/admin/product}" class="sidebar-link"><i class="fas fa-boxes"></i> 商品列表</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-plus-circle"></i> 新增商品</a>
+                            <a th:href="@{/admin/product/create}" class="sidebar-link"><i class="fas fa-plus-circle"></i> 新增商品</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 商品訂單列表</a>
+                            <a th:href="@{/order}" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 商品訂單列表</a>
                         </li>
                     </ul>
                 </li>
@@ -83,10 +83,10 @@
                         class="sidebar-link dropdown-toggle"><i class="fas fa-hand-holding-usd"></i> 募資活動管理</a>
                     <ul class="collapse list-unstyled submenu" id="cwdfundingSubmenu">
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-calendar-day"></i> 募資活動列表</a>
+                            <a href="/TickitEasy/admin/fundproject" class="sidebar-link"><i class="fas fa-calendar-day"></i> 募資活動列表</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-calendar-plus"></i> 新增募資活動</a>
+                            <a href="/TickitEasy/admin/fundproject/create" class="sidebar-link"><i class="fas fa-calendar-plus"></i> 新增募資活動</a>
                         </li>
                     </ul>
                 </li>
@@ -96,13 +96,12 @@
                         <i class="fas fa-comments"></i> 討論區管理</a>
                     <ul class="collapse list-unstyled submenu" id="postSubmenu">
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-list-alt"></i> 貼文列表</a>
+                            <a href="/TickitEasy/admin/api/post/posts" class="sidebar-link"><i class="fas fa-list-alt"></i> 貼文列表</a>
                         </li>
                     </ul>
                 </li>
-                <li>
+
                     <a href="#" class="sidebar-link">前台首頁</a>
-                </li>
             </ul>
         </nav>
     </div>
