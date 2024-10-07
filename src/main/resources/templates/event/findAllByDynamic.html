@@ -15,7 +15,15 @@
 
 			// 搜尋 Ajax
 			function search(params) {
-				axios.get(contextPath + "/admin/api/event", params)
+				let urlWithParams = contextPath + "/admin/api/event?";
+				if (params != null) {
+					Object.entries(params).forEach(([key, value]) => {
+						urlWithParams += `${key}=${value}`;
+					});
+				}
+				console.log(urlWithParams);
+
+				axios.get(urlWithParams)
 					.then(res => {
 						console.log(res.data);
 						tbodyMaker(res.data.content);
