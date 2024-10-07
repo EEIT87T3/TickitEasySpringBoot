@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eeit87t3.tickiteasy.admin.entity.AdminBean;
+import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.admin.repository.AdminRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
@@ -50,7 +50,7 @@ public class TestController {
 	@ResponseBody
 	@GetMapping("/test/connection")
 	public String getMethodName() {
-		Optional<AdminBean> optional = adminRepo.findById(1);
+		Optional<Admin> optional = adminRepo.findById(1);
 		if (optional.isPresent()) {
 			if ("T3管理員".equals(optional.get().getName())) {
 				return "連線成功！";

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>後台登入頁面 - TickitEasy</title>
+        <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.9/dist/sweetalert2.all.min.js"></script>
+    <!-- 引入 SweetAlert2 -->
+</head>
+<style>
+    .logo img {
+        width: 150px;
+    }
+</style>
+
+<body class="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
+    <div class="max-w-screen-xl m-0 sm:m-20 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+        <div class="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
+            <div class="mt-12 flex flex-col items-center">
+                <h1 class="text-2xl xl:text-3xl font-extrabold text-blue-500">TickitEasy 後台管理平台</h1>
+                <div class="w-full flex-1 mt-8">
+                    <div class="logo flex justify-center items-center mb-8">
+                        <img alt="TickitEasy Logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjwh
+RE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cu
+dzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+Cjxzdmcgd2lkdGg9IjEwMCUi
+IGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDUwNSAzNDciIHZlcnNpb249IjEuMSIgeG1sbnM9
+Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5v
+cmcvMTk5OS94bGluayIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgeG1sbnM6c2VyaWY9Imh0dHA6Ly93
+d3cuc2VyaWYuY29tLyIgc3R5bGU9ImZpbGwtcnVsZTpldmVub2RkO2NsaXAtcnVsZTpldmVub2Rk
+O3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoyOyI+CiAgICA8ZyB0cmFu
+c2Zvcm09Im1hdHJpeCgwLjQ3NjEyNCwwLDAsMC40NzYxMjQsLTI0Mi44NjQsLTEzMC45MzQpIj4K
+ICAgICAgICA8ZyBpZD0iTGF5ZXIxIj4KICAgICAgICA8L2c+CiAgICAgICAgPGcgdHJhbnNmb3Jt
+PSJtYXRyaXgoMS4xOTM1OCwwLDAsMS40MDI1OCw1NTIuNDg2LC04NjAuNDAxKSI+CiAgICAgICAg
+ICAgIDxwYXRoIGQ9Ik04NTIuNzEyLDExODEuMzFMODUyLjcxMiwxMjg5LjU5Qzg1Mi43MTIsMTMx
+MC43MiA4MzIuNTQ5LDEzMjcuODggODA3LjcxNSwxMzI3Ljg4TDUxNS44NiwxMzI3Ljg4TDUxNS44
+Niw4MDkuNTA5TDgwNy43MTUsODA5LjUwOUM4MzIuNTQ5LDgwOS41MDkgODUyLjcxMiw4MjYuNjY3
+IDg1Mi43MTIsODQ3LjgwMUw4NTIuNzEyLDEwMDQuNThDNzk1LjQwNCwxMDA0LjU4IDc0OC44Nzgs
+MTA0NC4xOCA3NDguODc4LDEwOTIuOTRDNzQ4Ljg3OCwxMTQxLjcxIDc5NS40MDQsMTE4MS4zMSA4
+NTIuNzEyLDExODEuMzFaIiBzdHlsZT0iZmlsbDpyZ2IoOTUsNzAsMjMyKTsiLz4KICAgICAgICA8
+L2c+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJtYXRyaXgoMC42NjI2NjgsMCwwLDEuNDAyNTgsMTY4
+LjI0MiwtODYwLjQwMSkiPgogICAgICAgICAgICA8cGF0aCBkPSJNNTE1Ljg2LDEwMDAuNThMNTE1
+Ljg2LDg0MC45ODNDNTE1Ljg2LDgyMy42MTIgNTQ1LjcwOSw4MDkuNTA5IDU4Mi40NzYsODA5LjUw
+OUwxNDE3LjY4LDgwOS41MDlMMTQxNy42OCwxMzI3Ljg4TDU4Mi40NzYsMTMyNy44OEM1NDUuNzA5
+LDEzMjcuODggNTE1Ljg2LDEzMTMuNzggNTE1Ljg2LDEyOTYuNDFMNTE1Ljg2LDExNzcuMzFDNjE5
+LjA4LDExNzcuMzEgNzAyLjg4MiwxMTM3LjcxIDcwMi44ODIsMTA4OC45NEM3MDIuODgyLDEwNDAu
+MTggNjE5LjA4LDEwMDAuNTggNTE1Ljg2LDEwMDAuNThaIiBzdHlsZT0iZmlsbDpyZ2IoMjU1LDE4
+MCw3Nyk7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnIHRyYW5zZm9ybT0ibWF0cml4KDAuNjc4
+MTMxLDAsMCwwLjY3ODEzMSwtMjYxLjY4OSwtMTk1LjI1OCkiPgogICAgICAgICAgICA8Y2lyY2xl
+IGN4PSIxNjczLjY1IiBjeT0iMTEwOS4xIiByPSIxMzMuMDAyIiBzdHlsZT0iZmlsbDpyZ2IoOTUs
+NzAsMjMyKTsiLz4KICAgICAgICA8L2c+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJtYXRyaXgoMC40
+OTIzOSwwLDAsMC40OTIzOSw0NTYuMDg3LC00My4yNTAyKSI+CiAgICAgICAgICAgIDxjaXJjbGUg
+Y3g9IjE2NzMuNjUiIGN5PSIxMTA5LjEiIHI9IjEzMy4wMDIiIHN0eWxlPSJmaWxsOnJnYigyNTUs
+MTgwLDc3KTsiLz4KICAgICAgICA8L2c+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJtYXRyaXgoMS4y
+OTQ2LDAsMCwwLjk4MjAzNCwtNDUyLjUxNCwtMzM3Ljc4NikiPgogICAgICAgICAgICA8cGF0aCBk
+PSJNMTM2Ni45LDEwMDAuMzZDMTM2Ny42NSwxMDAxLjM0IDEzNzEuOTMsMTAwNi45MiAxMzcxLjk4
+LDEwMTYuNDFDMTM3MS45OSwxMDE5LjM0IDEzNzEuNTksMTAyMi4zMiAxMzcwLjc2LDEwMjUuMDRD
+MTM2OS45MSwxMDI3Ljg0IDEzNjguMzUsMTAzMC4xNyAxMzY3LjA0LDEwMzIuNjRDMTM2Ni42OCwx
+MDMzLjMyIDEzNTkuMzksMTA0NC4zMiAxMzU4LjcyLDEwNDUuMzNDMTMwNC44OSwxMTI2LjUxIDEy
+MjQuOCwxMjI2LjYyIDExMTQuNTUsMTIxOS4zOEMxMDY4LjUyLDEyMTYuMzUgMTAzMC4wNSwxMTk1
+LjI4IDEwMDMuOTUsMTE3Ny4zM0MxMDAwLjksMTE3NS4yNCA5OTcuMjU5LDExNzAuOCA5OTYuNzI4
+LDExNzAuMTVDOTk0Ljc0NywxMTY3Ljc0IDk4My40NDIsMTE1My45NiA5ODIuNTQ4LDExMjkuODND
+OTgyLjExMywxMTE4LjA3IDk4NC41ODksMTEwOC45OSA5ODUuMDU3LDExMDcuMjdDOTg1LjA2Mywx
+MTA3LjI1IDk4OC45MjYsMTA5Ni41NSA5ODguOTMxLDEwOTYuNTRDOTkwLjczMywxMDkzLjM5IDk5
+Mi4zMDgsMTA5MCA5OTQuMzM4LDEwODcuMTFDOTk2LjE2OSwxMDg0LjUgMTAwNi42LDEwNjkuNjQg
+MTAyNC45MSwxMDY4LjQ1QzEwMzMuODMsMTA2Ny44NiAxMDQwLjczLDEwNzEuMTEgMTA0Mi4wNCwx
+MDcxLjcyQzEwNDguOTksMTA3NC45OSAxMDQ4Ljc4LDEwNzUuNjEgMTA1NC44MywxMDgxLjE4QzEx
+MzEuNTQsMTE1MS43IDEyMDguNTYsMTEzNi42NSAxMzAwLjIsMTA0NS45OEMxMzIyLjYxLDEwMjMu
+ODEgMTM0MS45MywxMDAwLjk3IDEzNDIuNDEsMTAwMC41M0MxMzQ0LjMsOTk4Ljg0MiAxMzQ1Ljk3
+LDk5Ni42MzMgMTM0OC4wNyw5OTUuNDU4QzEzNTAuMSw5OTQuMzE4IDEzNTIuMzYsOTkzLjc0NCAx
+MzU0LjU3LDk5My43MjdDMTM2MS43Niw5OTMuNjczIDEzNjYuMTQsOTk5LjM3NSAxMzY2LjksMTAw
+MC4zNloiIHN0eWxlPSJmaWxsOndoaXRlO3N0cm9rZTp3aGl0ZTtzdHJva2Utd2lkdGg6Ny41NnB4
+OyIvPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+Cg==">
+                    </div>
+                    <div class="my-12 border-b text-center">
+                        <div
+                            class="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
+                            管理員登入</div>
+                    </div>
+                    <form id="loginForm" class="mx-auto max-w-xs">
+                        <input
+                            class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                            type="email" name="email" placeholder="電子信箱" required />
+                        <input
+                            class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                            type="password" name="password" placeholder="密碼" required />
+                        <button type="submit"
+                            class="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
+                            <span class="ml-3">登入</span>
+                        </button>
+                    </form>
+                    <div id="errorMessage" class="mt-4 text-red-500 text-center hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.onload = function () {
+            var isLoggedOut = /*[[${param.logout}]]*/ false;
+            if (isLoggedOut) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '已成功登出',
+                    text: '您已成功登出系統！',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        };
+
+
+        /*<![CDATA[*/
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const email = document.querySelector('input[name="email"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+
+            axios.post(/*[[@{/admin/api/login}]]*/ '/admin/api/login', null, {
+                params: {
+                    email: email,
+                    password: password
+                }
+            })
+                .then(function (response) {
+                    // 登入成功
+                    window.location.href = /*[[@{/admin/dashboard}]]*/ '/admin/dashboard';
+                })
+                .catch(function (error) {
+                    // 登入失敗
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = error.response.data || '登入失敗，請重試';
+                    errorMessage.classList.remove('hidden');
+                });
+        });
+        /*]]>*/
+    </script>
+</body>
+
+</html>
