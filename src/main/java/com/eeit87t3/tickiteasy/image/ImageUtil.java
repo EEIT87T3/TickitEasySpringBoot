@@ -13,7 +13,14 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * 與檔案系統中的圖片互動。
+ * 
  * @author Chuan
+ */
+/*
+ * 設計時，可選擇設計為——
+ * 1. static method：較為單純。
+ * 2. Spring Bean：如果本身有使用到其他 Spring Bean，則一定要自身是 Spring Bean。
  */
 @Component
 public class ImageUtil {
@@ -43,7 +50,7 @@ public class ImageUtil {
 	
 	/**
 	 * 將圖片從檔案系統裡刪除。<br><br>
-	 * 注意：時間間隔太短，可能導致刪除失敗；目前尚未找到解決方法，請稍後再試。
+	 * 注意：目前偶發刪除失敗，尚未找到原因與解決方法；因此暫時保留 console 輸出執行結果。
 	 * 
 	 * @param pathString String：資料庫儲存的路徑字串。
 	 * @return result - Boolean：<code>true</code> 表示此檔案已不存在、<code>false</code> 表示刪除失敗。
@@ -57,8 +64,13 @@ public class ImageUtil {
 			File imageFile = resource.getFile();
 			imageFile.delete();
 			result = !imageFile.exists();
-			System.out.println("result: " + !imageFile.exists());
 		}
+		
+		// TODO 測試用
+		System.out.println("===== 執行刪除圖片 =====");
+		System.out.println("圖片路徑字串：" + pathString);
+		System.out.println("執行結果：" + result);
+		
 		return result;
 	}
 	
