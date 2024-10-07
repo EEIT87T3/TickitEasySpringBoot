@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css">
     <style>
         :root {
-            --primary-color: #007bff;
+            --primary-color: #5F46E8;
             --text-light-color: #ffffff;
             --navbar-height: 60px;
         }
@@ -60,11 +60,7 @@
 <body class="bg-gray-100 flex flex-col min-h-screen">
      <!-- 固定在頂部的導航欄 -->
     <nav class="navbar navbar-expand-lg fixed-top">
-        <div class="container-fluid">
-            <!-- 側邊欄收起按鈕 -->
-            <button type="button" id="sidebarCollapse" class="btn">
-                <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
-            </button>
+        <div class="container-fluid ms-5">
            <a class="navbar-brand ms-3 d-flex align-items-center" href="#">
     <img th:src="@{/logo/LogoWhite.svg}" alt="logo" width=34px class="me-2">
     <span>TickitEasy 管理系統</span>
