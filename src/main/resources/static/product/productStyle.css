@@ -176,30 +176,17 @@ table.display .btn {
     border-color: #ddd;
 }
 
-/*調整按鈕*/
+/* 確保按鈕在同一行顯示且不影響表格佈局 */
+td.action-buttons {
+    text-align: center;  /* 按鈕在欄位內居中對齊 */
+    vertical-align: middle;  /* 垂直居中 */
+    white-space: nowrap;  /* 禁止換行，確保按鈕不會分行 */
+}
 
-.action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-        }
-        .action-buttons form {
-            display: inline-block;
-        }
-        .btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .btn btn-primary {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            color: #fff;
-        }
+td.action-buttons form {
+    display: inline-block;  /* 將表單設置為行內區塊，確保按鈕在同一行 */
+    margin: 0 5px;  /* 設置表單之間的間距 */
+}
+
 
 
