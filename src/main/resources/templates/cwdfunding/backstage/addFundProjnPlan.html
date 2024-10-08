@@ -1,21 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
   <head>
+    <meta th:replace="~{commons/adminHead}" />
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新增募資專案 - TickitEasy 管理系統</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css"
     />
-    <link rel="stylesheet" href="css/multi-step-form.css" />
-    <title>Test</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/nice-forms.css@0.1.7/dist/nice-forms.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/TickitEasy/cwdfunding/css/multi-step-form.css"
+    />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/multi-step-form.js"></script>
+    <script src="/TickitEasy/cwdfunding/js/multi-step-form.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
   </head>
+
   <body>
+    <div th:replace="~{commons/adminHeader}"></div>
+    <!--  這裡是網頁內容 >-->
     <div class="container">
-      <form id="msform">
+      <form id="msform" method="post" enctype="multipart/form-data">
         <div class="row">
           <div class="col col-2 m-3">
             <ul id="progressbar">
@@ -27,11 +37,13 @@
           </div>
           <div class="col col-8 m-3">
             <fieldset class="fieldset">
-              <div class="row">
-                <div class="col">
-                  <p class="fw-bolder text-start p-2">新增募資活動</p>
-                </div>
-              </div>
+              <tr>
+                <td class="col-2">
+                  <div class="fieldlabels fw-medium p-2 text-start text-dark">
+                    新增募資活動
+                  </div>
+                </td>
+              </tr>
               <table class="table table-borderless custom-table">
                 <tbody style="background-color: black">
                   <tr>
@@ -42,6 +54,12 @@
                         placeholder="活動名稱"
                         id="title"
                         class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0"
+                        required
+                      />
+                      <input
+                        type="hidden"
+                        name="projectID"
+                        th:value="${projectID}"
                       />
                     </td>
                   </tr>
@@ -51,15 +69,40 @@
                     </td>
                     <td class="col-8">
                       <select
-                        class="form-select form-select-sm w-25"
+                        class="form-select form-select-sm w-25 text-end"
                         aria-label="Default select example"
-                        name="category"
-                        id="category"
+                        name="categoryID"
+                        id="categoryID"
                       >
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Two</option>
+                        <option selected></option>
+                        <th:block th:each=" aCategory : ${categories}">
+                          <option
+                            th:value="${aCategory.categoryID}"
+                            th:text="${aCategory.categoryName}"
+                          ></option>
+                        </th:block>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr></tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">標籤</div>
+                    </td>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select-sm w-25 text-end"
+                        aria-label="Default select example"
+                        name="tagID"
+                        id="tagID"
+                      >
+                        <option selected></option>
+                        <th:block th:each=" aTag : ${tags}">
+                          <option
+                            th:value="${aTag.tagID}"
+                            th:text="${aTag.tagName}"
+                          ></option>
+                        </th:block>
                       </select>
                     </td>
                   </tr>
@@ -69,9 +112,11 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="targetAmount"
                         type="number"
                         name="targetAmount"
-                        class="form-control w-25"
+                        class="form-control w-25 text-end"
+                        min="0"
                       />
                     </td>
                   </tr>
@@ -81,12 +126,13 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="currentAmount"
                         type="number"
-                        name="currentAmount"
                         placeholder="0"
-                        class="form-control w-25"
+                        class="form-control w-25 text-end"
                         disabled
                       />
+                      <input type="hidden" name="currentAmount" value="0" />
                     </td>
                   </tr>
                   <tr>
@@ -95,6 +141,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="startDate"
                         type="datetime-local"
                         name="startDate"
                         class="form-control w-50"
@@ -107,6 +154,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="endDate"
                         type="datetime-local"
                         name="endDate"
                         class="form-control w-50"
@@ -118,13 +166,16 @@
                       <div class="fieldlabels fw-medium">展延門檻</div>
                     </td>
                     <td class="col-8">
+                      <span id="valBox"></span>
                       <input
+                        id="threshold"
                         type="range"
                         name="threshold"
                         class="form-range borderhidden float-start w-50"
                         min="0"
                         max="1"
                         step="0.1"
+                        oninput="showVal(this.value)"
                       />
                     </td>
                   </tr>
@@ -134,6 +185,7 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="postponeDate"
                         type="datetime-local"
                         name="postponeDate"
                         class="form-control w-50"
@@ -146,8 +198,9 @@
                     </td>
                     <td class="col-8">
                       <input
+                        id="image"
                         type="file"
-                        name="postponeDate"
+                        name="image"
                         class="form-control w-50"
                       />
                     </td>
@@ -160,6 +213,7 @@
                   <tr>
                     <td class="col-2" colspan="2">
                       <textarea
+                        id="description"
                         rows="5"
                         name="description"
                         maxlength="150"
@@ -169,6 +223,7 @@
                   </tr>
                 </tbody>
               </table>
+              <!-- <button id="autofillBtnProj">一鍵填入</button> -->
               <input
                 type="button"
                 name="next"
@@ -213,113 +268,11 @@
                 value="Previous"
               />
             </fieldset>
-            <fieldset>
-              <div id="outputBlock"></div>
-              <input
-                type="button"
-                name="next"
-                class="next action-button btn"
-                value="Next"
-              />
-              <input
-                type="button"
-                name="previous"
-                class="previous action-button-previous btn"
-                value="Previous"
-              />
-            </fieldset>
             <fieldset class="fieldset">
-              <div class="row">
-                <div class="col">
-                  <p class="fw-bolder text-start p-2">《方案一》</p>
-                </div>
-              </div>
-              <table class="table table-borderless custom-table">
-                <tbody style="background-color: black">
-                  <tr>
-                    <td class="col-2">
-                      <div class="fieldlabels fw-medium">方案名稱</div>
-                    </td>
-                    <td class="col-8">
-                      <input
-                        type="text"
-                        name="title"
-                        id="title"
-                        class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0 w-50"
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="col-2">
-                      <div class="fieldlabels fw-medium">單價</div>
-                    </td>
-                    <td class="col-8">
-                      <input
-                        type="number"
-                        name="targetAmount"
-                        class="form-control w-25 text-end"
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="col-2">
-                      <div class="fieldlabels fw-medium">總數量</div>
-                    </td>
-                    <td class="col-8">
-                      <input
-                        type="number"
-                        name="currentAmount"
-                        placeholder="0"
-                        class="form-control w-25 text-end"
-                        disabled
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="col-2">
-                      <div class="fieldlabels fw-medium">已購數量</div>
-                    </td>
-                    <td class="col-8">
-                      <input
-                        type="number"
-                        name="startDate"
-                        class="form-control w-25 text-end"
-                        placeholder="0"
-                        disabled
-                      />
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td class="col-2">
-                      <div class="fieldlabels fw-medium">圖片</div>
-                    </td>
-                    <td class="col-8">
-                      <input
-                        type="file"
-                        name="postponeDate"
-                        class="form-control w-50"
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="col-2">
-                      <div class="fieldlabels fw-medium">內容</div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="col-2" colspan="2">
-                      <textarea
-                        rows="2"
-                        name="description"
-                        maxlength="50"
-                        class="form-control bg-light-subtle w-75"
-                      ></textarea>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div id="outputBlock"></div>
+              <!-- <button id="autofillBtnPlan">一鍵填入</button> -->
               <input
+                id="submit-btn"
                 type="button"
                 name="next"
                 class="next action-button btn"
@@ -334,35 +287,18 @@
             </fieldset>
             <fieldset class="fieldset">
               <div class="form-card">
-                <div class="row">
-                  <div class="col-7">
-                    <h2 class="fs-title">Finish:</h2>
-                  </div>
-                  <div class="col-5">
-                    <h2 class="steps">Step 4 - 4</h2>
-                  </div>
-                </div>
                 <br /><br />
                 <h2 class="purple-text text-center">
-                  <strong>SUCCESS !</strong>
+                  <div id="resultBlock"></div>
                 </h2>
                 <br />
-                <div class="row justify-content-center">
-                  <div class="col-3"></div>
-                </div>
                 <br /><br />
-                <div class="row justify-content-center">
-                  <div class="col-7 text-center">
-                    <h5 class="purple-text text-center">
-                      You Have Successfully Signed Up
-                    </h5>
-                  </div>
-                </div>
               </div>
             </fieldset>
           </div>
         </div>
       </form>
     </div>
+    <div th:replace="~{commons/adminFooter}"></div>
   </body>
 </html>
