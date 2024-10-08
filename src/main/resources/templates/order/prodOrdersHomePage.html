@@ -141,15 +141,18 @@
 									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/delete">
 										<input type="hidden" name="prodOrderID" th:value="${prodOrders.prodOrderID}">
 										<button type="submit" class="btn btn-danger" name="button" value="delete">
-											<i class="fas fa-trash-alt mr-1"></i>刪除</button>
+										<i class="fas fa-trash-alt mr-1"></i>刪除</button>
 									</form>
 									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/update">
 										<input type="hidden" name="prodOrderID" th:value="${prodOrders.prodOrderID}">
 										<button type="submit" class="btn btn-success" name="button" value="update">
-											<i class="fas fa-edit mr-1"></i>修改</button>
+										<i class="fas fa-edit mr-1"></i>修改</button>
 									</form>
-									<button type="submit" class="btn btn-secondary" name="button">
+									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/prodOrderDetails">
+										<input type="hidden" name="prodOrderID" th:value="${prodOrders.prodOrderID}">
+										<button type="submit" class="btn btn-secondary" name="button">
 										<i class="fas fa-search mr-1"></i>檢查詳細</button>
+									</form>
 								</td>
 							</tr>
 						</th:block>
@@ -242,14 +245,18 @@
 							<form method="get" action="http://localhost:8080/TickitEasy/admin/order/delete">
 								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
 								<button type="submit" class="btn btn-danger" name="button" value="delete">
-									<i class="fas fa-trash-alt mr-1"></i>刪除</button>
+								<i class="fas fa-trash-alt mr-1"></i>刪除</button>
 							</form>
 							<form method="post" action="http://localhost:8080/TickitEasy/admin/order/update">
 								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
 								<button type="submit" class="btn btn-success" name="button" value="update">
-									<i class="fas fa-edit mr-1"></i>修改</button>
+								<i class="fas fa-edit mr-1"></i>修改</button>
 							</form>
-							<button type="submit" class="btn btn-secondary" name="button"><i class="fas fa-search mr-1"></i>檢查詳細</button>
+							<form method="post" action="http://localhost:8080/TickitEasy/admin/order/prodOrderDetails">
+								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
+								<button type="submit" class="btn btn-secondary" name="button">
+								<i class="fas fa-search mr-1"></i>檢查詳細</button>
+							</form>
 						</td>
 					</tr>
 					`
