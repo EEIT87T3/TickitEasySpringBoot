@@ -1,7 +1,6 @@
 package com.eeit87t3.tickiteasy.order.entity;
 
 import java.sql.Date;
-import java.sql.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -47,10 +46,10 @@ public class ProdOrders {
 	@Column(name = "phone")
 	private String phone;
 	
-    @OneToMany(mappedBy = "prodOrderID", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<ProdOrders> prodOrderDetailsBean;
+    @OneToMany(mappedBy = "prodOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProdOrderDetails> prodOrderDetailsBean;
 
-	public ProdOrders(Integer prodOrderID,int memberID, Date orderDate, String payments, String paymenInfo, String status,
+	public ProdOrders(Integer prodOrderID,int memberID, Date orderDate, String payments, String paymentInfo, String status,
 			int totalAmount, String shippingStatus, int shippingID, String recipientName, String address,
 			String phone) {
 		super();
@@ -58,7 +57,7 @@ public class ProdOrders {
 		this.memberID = memberID;
 		this.orderDate = orderDate;
 		this.payments = payments;
-		this.paymenInfo = paymenInfo;
+		this.paymenInfo = paymentInfo;
 		this.status = status;
 		this.totalAmount = totalAmount;
 		this.shippingStatus = shippingStatus;
@@ -73,7 +72,7 @@ public class ProdOrders {
 	public Integer getProdOrderID() {
 		return prodOrderID;
 	}
-	public void setProdOrderID(int prodOrderID) {
+	public void setProdOrderID(Integer prodOrderID) {
 		this.prodOrderID = prodOrderID;
 	}
 	public int getMemberID() {
@@ -144,7 +143,7 @@ public class ProdOrders {
 	}
 	@Override
 	public String toString() {
-		return "ProductOrderBean [prodOrderID=" + prodOrderID + ", memberID=" + memberID + ", orderDate=" + orderDate
+		return "ProdOrders  [prodOrderID=" + prodOrderID + ", memberID=" + memberID + ", orderDate=" + orderDate
 				+ ", payments=" + payments + ", paymenInfo=" + paymenInfo + ", status=" + status + ", totalAmount="
 				+ totalAmount + ", shippingStatus=" + shippingStatus + ", shippingID=" + shippingID + ", recipientName="
 				+ recipientName + ", address=" + address + ", phone=" + phone + "]" + "\n";
