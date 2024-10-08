@@ -20,7 +20,7 @@ td {
 
 #heading {
   text-transform: uppercase;
-  color: #673ab7;
+  color: #5f46e8;
   font-weight: normal;
 }
 
@@ -58,13 +58,13 @@ td {
   -moz-box-shadow: none !important;
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
-  border: 1px solid #673ab7;
+  border: 1px solid #5f46e8;
   outline-width: 0;
 }
 
 #msform .action-button {
   width: 100px;
-  background: #673ab7;
+  background: #5f46e8;
   font-weight: bold;
   color: white;
   border: 0 none;
@@ -124,7 +124,7 @@ td {
 
 .fs-title {
   font-size: 18px;
-  color: #673ab7;
+  color: #5f46e8;
   font-weight: bold;
   margin-bottom: 15px;
   font-weight: normal;
@@ -132,7 +132,7 @@ td {
 }
 
 .purple-text {
-  color: #673ab7;
+  color: #5f46e8;
   font-weight: normal;
 }
 
@@ -172,7 +172,7 @@ td {
 }
 
 #progressbar .active {
-  color: #673ab7;
+  color: #5f46e8;
 }
 
 #progressbar li {
@@ -218,7 +218,7 @@ td {
 
 #progressbar li.active:before,
 #progressbar li.active:after {
-  background: #673ab7;
+  background: #5f46e8;
 }
 #progressbar li:last-child:after {
   content: none; /* 最後一個步驟不需要連接線 */
@@ -228,7 +228,7 @@ td {
 }
 
 .progress-bar {
-  background-color: #673ab7;
+  background-color: #5f46e8;
 }
 
 .fit-image {

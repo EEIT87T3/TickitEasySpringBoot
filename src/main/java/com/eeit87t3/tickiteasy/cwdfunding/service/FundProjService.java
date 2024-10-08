@@ -124,6 +124,7 @@ public class FundProjService {
 		newFundPlan.setPlanImage(image);
 		newFundPlan.setPlanContent(content);
 		
+		System.out.println("savePlann is here");
 		return fundPlanRepo.save(newFundPlan);
 	}
 	

@@ -68,7 +68,7 @@ public class FundProjController {
 		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
 		model.addAttribute("page", page);
 
-		return "backstage/cwdfunding/showFundProj";
+		return "cwdfunding/backstage/showFundProj";
 	}
 	
 	/* [頁面] 查詢單筆募資活動by ID */
@@ -80,7 +80,7 @@ public class FundProjController {
 		
 		model.addAttribute("projectDTO",fundProjDTO);
 		model.addAttribute("plans",fundPlans);
-		return "backstage/cwdfunding/showOneFundProj";
+		return "cwdfunding/backstage/showOneFundProj";
 	}
 	
 	/* [頁面] 新增募資活動 */
@@ -93,7 +93,7 @@ public class FundProjController {
 		model.addAttribute("projectID", topProject);
 		model.addAttribute("categories", categories);
 		model.addAttribute("tags", tags);
-		return "backstage/cwdfunding/addFundProjnPlan";
+		return "cwdfunding/backstage/addFundProjnPlan";
 	}
 	
 	/* [頁面] 修改單筆募資活動by ID */
@@ -109,7 +109,7 @@ public class FundProjController {
 		model.addAttribute("categories", categories);
 		model.addAttribute("tags", tags);
 		model.addAttribute("plans",fundPlans);
-		return "backstage/cwdfunding/editOneFundProj";
+		return "cwdfunding/backstage/editOneFundProj";
 	}
 	
 	/* [API] 查詢所有募資活動*/
