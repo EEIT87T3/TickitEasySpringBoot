@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta th:replace="~{commons/adminHead}">
+    <title>TickitEasy 會員管理列表</title>
+
+    <!-- 引入 DataTable 與 Bootstrap 的樣式 -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- 引入 SweetAlert2 的樣式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.9/dist/sweetalert2.min.css">
+
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+        }
+
+        /* 調整表格寬度 */
+        #memberTable_wrapper {
+            width: 100%;
+        }
+
+        /* 為表格增加寬度限制 */
+        table.dataTable {
+            width: 100% !important;
+        }
+
+        /* 置中表格的內容 */
+        /* 強制垂直置中 */
+        th,
+        td {
+            text-align: center !important;
+            vertical-align: middle !important;
+            height: 60px !important;
+        }
+
+
+        /* 調整按鈕居中 */
+        #memberTable.btn {
+            display: block;
+            margin: 5px auto;
+        }
+
+        /* 確保下拉選單顯示箭頭 */
+        select.form-control {
+            -webkit-appearance: none;
+            /* For Chrome & Safari */
+            -moz-appearance: none;
+            /* For Firefox */
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path fill="black" d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px 16px;
+        }
+
+        /* 調整下拉選單箭頭寬度 */
+        select {
+            padding-right: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{commons/adminHeader}"></div>
+
+    <h1>會員列表</h1>
+    <table id="memberTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>頭像</th>
+                <th>名稱</th>
+                <th>暱稱</th>
+                <th>電子郵件</th>
+                <th>電話</th>
+                <th>註冊日期</th>
+                <th>狀態</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- 模態框 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" class="modal-image" src="" alt="放大的頭像">
+        </div>
+    </div>
+
+    <div th:replace="~{commons/adminFooter}"></div>
+
+    <!-- 引入必要的 JS 庫 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 引入 SweetAlert2 的 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.9/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // 初始化 DataTable
+            var table = $('#memberTable').DataTable({
+                ajax: {
+                    url: '/TickitEasy/admin/member/api',
+                    dataSrc: ''
+                },
+                columns: [
+                    { data: 'memberID' },
+                    {
+                        data: 'profilePic',
+                        render: function (data, type, row) {
+                            if (!data || data.trim() === '') {
+                                data = '/TickitEasy/images/member/default-avatar.png'; // 預設頭貼
+                            } else {
+                                data = '/TickitEasy' + data; // 確保圖片路徑正確
+                            }
+                            return '<img src="' + data + '" class="img-thumbnail" style="width: 50px; cursor: pointer;" onclick="openModal(\'' + data + '\')">';
+                        }
+
+                    },
+                    { data: 'name' },
+                    { data: 'nickname' },
+                    { data: 'email' },
+                    { data: 'phone' },
+                    { data: 'registerDate' },
+                    {
+                        data: 'status',
+                        render: function (data, type, row) {
+                            return `
+                            <select id="status_${row.memberID}" class="form-control">
+                                <option value="未驗證" ${data === '未驗證' ? 'selected' : ''}>未驗證</option>
+                                <option value="已驗證" ${data === '已驗證' ? 'selected' : ''}>已驗證</option>
+                                <option value="討論區停權" ${data === '討論區停權' ? 'selected' : ''}>討論區停權</option>
+                            </select>
+                        `;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                            <button class="btn btn-sm btn-success" onclick="updateMemberStatus(${row.memberID})">更新狀態</button>
+                            <button class="btn btn-sm btn-danger" onclick="removeProfilePic(${row.memberID})">移除頭貼</button>
+                        `;
+                        }
+                    }
+                ],
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true,
+                language: {
+                    url: "/TickitEasy/admin/Chinese-traditional.json"
+                }
+            });
+        });
+
+        // 更新會員狀態
+        function updateMemberStatus(memberID) {
+            var newStatus = document.getElementById('status_' + memberID).value;
+            axios.put('/TickitEasy/admin/member/api/' + memberID + '/status', { status: newStatus })
+                .then(response => {
+                    Swal.fire('成功', '會員狀態已更新', 'success');
+                    $('#memberTable').DataTable().ajax.reload(null, false); // 保留當前頁面
+                })
+                .catch(error => {
+                    Swal.fire('錯誤', '更改會員狀態失敗', 'error');
+                    console.error(error);
+                });
+        }
+
+        // 移除會員頭貼
+        function removeProfilePic(memberID) {
+            Swal.fire({
+                title: '確定要移除頭貼嗎？',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '是的，移除！',
+                cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete('/TickitEasy/admin/member/api/' + memberID + '/profile-pic')
+                        .then(response => {
+                            Swal.fire('成功', '頭貼已移除', 'success');
+                            $('#memberTable').DataTable().ajax.reload(null, false); // 保留當前頁面
+                        })
+                        .catch(error => {
+                            Swal.fire('錯誤', '移除頭貼失敗', 'error');
+                            console.error(error);
+                        });
+                }
+            });
+        }
+
+        // 修改會員資料
+        function editMember(memberID) {
+            window.location.href = '/TickitEasy/admin/member/' + memberID + '/edit';
+        }
+
+        // 顯示圖片的模態框
+        function openModal(src) {
+            var modal = document.getElementById("imageModal");
+            var modalImg = document.getElementById("modalImage");
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
+
+        // 關閉模態框
+        var span = document.getElementsByClassName("close")[0];
+        span.onclick = function () {
+            document.getElementById("imageModal").style.display = "none";
+        }
+    </script>
+
+</body>
+
+</html>

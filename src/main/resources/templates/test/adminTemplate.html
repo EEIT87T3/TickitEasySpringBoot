@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
-  <head>
-    <meta charset="UTF-8" />
-    <title>網頁標題</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script>
-      $(document).ready(function () {
-        // 這裡是 JavaScript 內容
-      });
-    </script>
-  </head>
 
 <head>
+	
+	<!-- 在這裡放要引入的 CSS 與 JS library -->
+
     <meta th:replace="~{commons/adminHead}">
 	<title>網頁標題</title>
 	<script>
@@ -23,9 +16,13 @@
 	</script>
 </head>
 
-    <!--  這裡是網頁內容 >-->
-    <h1>網頁標題</h1>
+<body>
+	<div th:replace="~{commons/adminHeader}"></div>
+    
+	<!--  這裡是網頁內容 >-->
+	<h1>網頁標題</h1>
 
-    <div th:replace="~{commons/adminFooter}"></div>
-  </body>
+   <div th:replace="~{commons/adminFooter}"></div>
+</body>
+
 </html>

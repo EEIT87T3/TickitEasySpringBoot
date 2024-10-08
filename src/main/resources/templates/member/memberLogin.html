@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TickitEasy 會員登入</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .login-container {
+            margin-top: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-card {
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 400px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo img {
+            width: 150px;
+        }
+        .login-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #5F46E8; /* 調整標題顏色 */
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- TickitEasy 會員登入標題 -->
+            <div class="login-title">TickitEasy 會員登入</div>
+
+            <!-- Logo -->
+            <div class="logo">
+               <img alt="TickitEasy Logo" th:src="@{/logo/LogoColor.svg}">
+            </div>
+
+           <!-- 登入表單 -->
+            <form th:action="@{/member/login}" th:object="${memberForm}" method="post">
+                <div class="form-group">
+                    <label for="email">電子郵件</label>
+                    <!-- 使用 th:field 來自動綁定表單數據到後端 -->
+                    <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="輸入電子郵件" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密碼</label>
+                    <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="輸入密碼" required>
+                </div>
+                <!-- 登入錯誤信息 -->
+                <div th:if="${error}" class="alert alert-danger">
+                    <p th:text="${error}"></p>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">登入</button>
+                <div class="text-center mt-3">
+                    <a th:href="@{/member/register}">還沒有帳號？註冊</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -29,7 +29,7 @@ import com.eeit87t3.tickiteasy.order.service.Impl.ProdOrdersServiceImpl;
 import io.micrometer.common.util.StringUtils;
 
 @Controller
-@RequestMapping("order")
+@RequestMapping("admin/order")
 public class ProdOrdersController {
 	
 	@Autowired
@@ -69,7 +69,7 @@ public class ProdOrdersController {
 				prodOrdersService.saveOrder(prodOrdersBean);
 				Integer prodOrderID1 = 1;
 				model.addAttribute("prodOrderID",prodOrderID1);
-				return "redirect:/order";
+				return "redirect:/admin/order";
 			}
 			ProdOrders latestProdOrder = prodOrdersService.findLatestProdOrder();
 			model.addAttribute("prodOrderId",latestProdOrder.getProdOrderID());
@@ -80,7 +80,7 @@ public class ProdOrdersController {
 		public String prodOrdersDelete(@RequestParam int prodOrderID, Model model) {
 
 			prodOrdersService.deleteOrderById(prodOrderID);
-			return "redirect:/order";
+			return "redirect:/admin/order";
 		}
 
 		@PostMapping("update")
@@ -107,7 +107,7 @@ public class ProdOrdersController {
 			ProdOrders prodOrdersBean = new ProdOrders(prodOrderID, memberID, orderDate, payments, paymentInfo,
 					status, totalAmount, shippingStatus, shippingID, recipientName, address, phone);
 			prodOrdersService.updateOrder(prodOrdersBean);
-			return "redirect:/order";
+			return "redirect:/admin/order";
 		}
 		
 		@GetMapping("page")

@@ -13,7 +13,7 @@
     <script>
         // 獲取所有貼文的函數
         function fetchAllPosts() {
-            const url = "/TickitEasy/admin/api/post"; // 使用相對路徑，確保你的 API 路徑正確
+            const url = "/TickitEasy/admin/api/post/GET/"; // 使用相對路徑，確保你的 API 路徑正確
             
             axios.get(url)
                 .then(response => {
@@ -56,7 +56,7 @@
             // 新增貼文==================================
             $('.add-post').on('click', function() {
                 const postId = $(this).data('id'); // 獲取 postID
-                window.location.href = `/TickitEasy/admin/api/post/create`; 
+                window.location.href = `/TickitEasy/admin/post/create`; 
             });
 
             
@@ -64,14 +64,14 @@
             // $('.view-comments').on('click', function() {
             $('#postsTable tbody').on('click', '.view-comments', function() {// 使用事件委派來處理按鈕點擊事件
                 const postId = $(this).data('id'); // 獲取 postID
-                window.location.href = `/TickitEasy/admin/api/post/comments/${postId}`; // 跳轉到留言頁面
+                window.location.href = `/TickitEasy/admin/post/comments/${postId}`; // 跳轉到留言頁面
             });
             
             // 刪除貼文==================================
             $('#postsTable tbody').on('click', '.delete-post', function() {
                 const postId = $(this).data('id'); // 獲取 postID
                 if (confirm('確定要刪除此貼文嗎？')) {
-                    axios.delete(`/TickitEasy/admin/api/post/delete?postID=${postId}`)
+                    axios.delete(`/TickitEasy/admin/api/post/DELETE/${postId}`)
                     .then(response => {
                         alert("刪除成功！");
                         fetchAllPosts(); // 刪除後重新加載貼文列表
@@ -88,12 +88,12 @@
                 const postId = $(this).data('id'); // 獲取 postID
 
                 // 先獲取貼文數據
-                axios.get(`/TickitEasy/admin/api/post/update?postID=${postId}`)
+                axios.get(`/TickitEasy/admin/api/post/GET/${postId}`)
                     .then(response => {
                         // 確保獲取成功後再進行跳轉
                         if (response.status === 200) {
                             // 可以在這裡進行其他操作，像是儲存狀態等等
-                            window.location.href = `/TickitEasy/admin/api/post/GetUpdate?postID=${postId}`;
+                            window.location.href = `/TickitEasy/admin/post/${postId}/edit`;
                         } else {
                             console.error('Failed to load post data:', response.status);
                         }

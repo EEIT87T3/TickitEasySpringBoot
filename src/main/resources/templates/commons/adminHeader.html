@@ -9,7 +9,7 @@
             <button type="button" id="sidebarCollapse" class="btn">
                 <i class="fa-solid fa-bars" style="color: #ffffff;"></i>
             </button>
-            <a class="navbar-brand ms-3" href="#">
+            <a class="navbar-brand ms-3" th:href="@{/admin/dashboard}">
                 <!-- 替換瑋芳 logo 的位置 -->
                 <!-- <i class="fas fa-ticket-alt me-2"></i> -->
                 <img th:src="@{/logo/LogoWhite.svg}" alt="logo" width=34px class="me-2">
@@ -18,7 +18,7 @@
             <!-- 登出按鈕，始終顯示在右側 -->
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> 登出</a>
+                    <a class="nav-link" th:href="@{/admin/logout}"><i class="fas fa-sign-out-alt"></i> 登出</a>
                 </li>
             </ul>
         </div>
@@ -29,7 +29,7 @@
         <nav id="sidebar">
             <ul class="list-unstyled">
                 <li>
-                    <a href="#" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> 後台管理首頁</a>
+                    <a th:href="@{/admin/dashboard}" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> 後台管理首頁</a>
                 </li>
                 <li>
                     <a href="#memberSubmenu" data-bs-toggle="collapse" aria-expanded="false"
@@ -38,10 +38,10 @@
                     </a>
                     <ul class="collapse list-unstyled submenu" id="memberSubmenu">
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-user-friends"></i> 會員列表</a>
+                            <a th:href="@{/admin/member}" class="sidebar-link"><i class="fas fa-user-friends"></i> 會員列表</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-chart-line"></i> 會員統計分析</a>
+                            <a th:href="@{/admin/member/analytics}" class="sidebar-link"><i class="fas fa-chart-line"></i> 會員統計分析</a>
                         </li>
                     </ul>
                 </li>
@@ -68,13 +68,13 @@
                         <i class="fas fa-shopping-bag"></i> 商品管理</a>
                     <ul class="collapse list-unstyled submenu" id="produuctSubmenu">
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-boxes"></i> 商品列表</a>
+                            <a th:href="@{/admin/product}" class="sidebar-link"><i class="fas fa-boxes"></i> 商品列表</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-plus-circle"></i> 新增商品</a>
+                            <a th:href="@{/admin/product/create}" class="sidebar-link"><i class="fas fa-plus-circle"></i> 新增商品</a>
                         </li>
                         <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 商品訂單列表</a>
+                            <a th:href="@{/admin/order}" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 商品訂單列表</a>
                         </li>
                     </ul>
                 </li>
@@ -96,12 +96,13 @@
                         <i class="fas fa-comments"></i> 討論區管理</a>
                     <ul class="collapse list-unstyled submenu" id="postSubmenu">
                         <li>
-                            <a href="/TickitEasy/admin/api/post/posts" class="sidebar-link"><i class="fas fa-list-alt"></i> 貼文列表</a>
+                            <a href="/TickitEasy/admin/post" class="sidebar-link"><i class="fas fa-list-alt"></i> 貼文列表</a>
                         </li>
                     </ul>
                 </li>
-
+				<li>
                     <a href="#" class="sidebar-link">前台首頁</a>
+                </li>
             </ul>
         </nav>
     </div>

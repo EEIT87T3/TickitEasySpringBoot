@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>管理員首頁 - TickitEasy</title>
+        <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css">
+    <style>
+        :root {
+            --primary-color: #5F46E8;
+            --text-light-color: #ffffff;
+            --navbar-height: 60px;
+        }
+
+        body {
+            padding-top: var(--navbar-height);
+        }
+
+        .navbar {
+            height: var(--navbar-height);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+            background-color: var(--primary-color);
+            --bs-navbar-color: var(--text-light-color);
+            --bs-navbar-hover-color: var(--text-light-color);
+            --bs-navbar-active-color: var(--text-light-color);
+            --bs-navbar-brand-color: var(--text-light-color);
+            --bs-navbar-brand-hover-color: var(--text-light-color);
+        }
+
+        .navbar-brand img {
+            font-size: 1.3em;
+            color: var(--text-light-color);
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover img {
+            transform: rotate(-15deg);
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex flex-col min-h-screen">
+     <!-- 固定在頂部的導航欄 -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid ms-5">
+           <a class="navbar-brand ms-3 d-flex align-items-center" href="#">
+    <img th:src="@{/logo/LogoWhite.svg}" alt="logo" width=34px class="me-2">
+    <span>TickitEasy 管理系統</span>
+</a>
+            <!-- 登出按鈕，始終顯示在右側 -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/logout}"><i class="fas fa-sign-out-alt"></i> 登出</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="content container mx-auto mt-14 px-4">
+        <h1 class="text-3xl font-bold mb-8">後台管理首頁</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 會員管理 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">會員管理</h2>
+                <p class="mb-4">管理網站會員，查看會員訊息，更改會員狀態。</p>
+                <a th:href="@{/admin/member}"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    進入會員管理
+                </a>
+            </div>
+
+            <!-- 活動管理 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">活動管理</h2>
+                <p class="mb-4">創建和管理活動，設置票種和場次，查看票券訂單。</p>
+                <a th:href="@{/admin/event}"
+                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    進入活動管理
+                </a>
+            </div>
+
+            <!-- 募資活動管理 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">募資活動管理</h2>
+                <p class="mb-4">創建和管理募資活動。</p>
+                <a th:href="@{/admin/fundproject}"
+                    class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                    進入募資活動管理
+                </a>
+            </div>
+
+            <!-- 商城管理 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">周邊商品管理</h2>
+                <p class="mb-4">上架和管理商品，設置商品種類，查看商品訂單。</p>
+                <a th:href="@{/admin/product}"
+                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    進入商品管理
+                </a>
+            </div>
+
+            <!-- 討論區管理 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">討論區管理</h2>
+                <p class="mb-4">管理討論區文章和回覆。</p>
+                <a th:href="@{/admin/post}"
+                    class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded">
+                    進入討論區管理
+                </a>
+            </div>
+
+            <!-- 前台主頁 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">前台首頁</h2>
+                <p class="mb-4">TickitEasy首頁。</p>
+                <a href="#"
+                    class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                    進入TickitEasy前台首頁
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto">
+        <div class="container">
+            &copy; 2024 TickitEasy. 版權所有.
+        </div>
+    </footer>
+
+</body>
+
+</html>
