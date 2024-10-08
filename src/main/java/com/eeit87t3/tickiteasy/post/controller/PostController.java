@@ -36,7 +36,7 @@ import com.eeit87t3.tickiteasy.post.service.PostService;
 // 前臺路徑:/user/post
 //目前都是後台
 @Controller
-@RequestMapping("/admin/api/post")
+@RequestMapping("/admin/post")
 public class PostController {
 	
 	@Autowired
@@ -58,12 +58,12 @@ public class PostController {
 	
 ///////////////////////////////////////     頁面跳轉    //////////////////////////////////////
 	//所有貼文頁面
-	 @GetMapping("/posts")
+	 @GetMapping
 	    public String showPostsPage(Model model) {
 	        return "post/postList"; 
 	    }
 	 //更新貼文頁面
-	 @GetMapping("/GetUpdate")
+	 @GetMapping("/{postID}/edit")
 	 public String showUpdateForm() {
 		 return "/post/editPost"; 
 	 }
@@ -81,143 +81,8 @@ public class PostController {
 	    }
 	//////////////////////////////////////////////////////////////////////////////////////////
 
-	//取得更新貼文內容
-	@GetMapping("/update")
-	public ResponseEntity<PostEntity> editPost(@RequestParam("postID") Integer postID) {
-	    PostEntity post = postService.findById(postID);
-	    if (post == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-	    }
-	    return ResponseEntity.ok(post);
-	}
-	//取得所有貼文
-	@GetMapping
-	public ResponseEntity<List<PostEntity>> getAllPosts() {
-	    List<PostEntity> posts = postService.findAll(); // 獲取所有貼文
-	    return ResponseEntity.ok(posts);
-	}
+	
 
-	//根據id取得單一貼文
-	@GetMapping("/{postID}")
-	public ResponseEntity<PostEntity> getPostById(@PathVariable("postID") Integer postID) {
-	    try {
-	        PostEntity post = postService.findById(postID);
-	        return ResponseEntity.ok(post);
-	    } catch (NoSuchElementException e) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-	    }
-	}
-
- 	//根據類別取得多筆貼文 *未完成*
- 	@GetMapping("/category")
- 	public ResponseEntity<List<PostEntity>> getPostsByCategory(@RequestParam("categoryID") Integer categoryID) {
- 	    // 根據 categoryID 查詢 CategoryEntity
- 	    Optional<CategoryEntity> optionalCategory = categoryRepo.findById(categoryID);
- 	    
- 	    if (optionalCategory.isPresent()) {
- 	        // 如果類別存在，則查詢相關貼文
- 	        List<PostEntity> posts = postService.findByCategory(optionalCategory.get());
- 	        return ResponseEntity.ok(posts);  // 回傳 200 OK 和結果
- 	    }
- 	    
- 	    // 如果類別不存在，回傳 404 Not Found
- 	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
- 	}
- 	
- 	//根據貼文id取得多筆留言
- 	@GetMapping("/comment")
- 	public ResponseEntity<List<CommentEntity>> findCommentByPostId(@RequestParam("postID") Integer postID) {
- 
- 		Optional<PostEntity> optionalPost = postRepo.findById(postID);
- 		
- 		if (optionalPost.isPresent()) {
- 			// 如果貼文存在，則查詢貼文的留言
- 			List<CommentEntity> comments = commentService.findById(postID);
- 			return ResponseEntity.ok(comments);  // 回傳 200 OK 和結果
- 		}
- 		
- 		// 如果類別不存在，回傳 404 Not Found
- 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
- 	}
- 	
-
- 	//新增單筆貼文
- 	@PostMapping("/create")
- 	public ResponseEntity<String> createPost(@RequestParam("postTitle") String title, 
- 	                                         @RequestParam("postContent") String content,
- 	                                         @RequestParam("categoryID") Integer categoryID,
- 	                                         @RequestParam("memberID") Integer memberID,
- 	                                         @RequestParam("status") Integer status,
- 	                                         @RequestParam("tagID") Integer tagID) {
- 		System.out.println(categoryID);
- 		System.out.println(tagID);
- 	    PostEntity post = new PostEntity();
- 	    post.setPostTitle(title);
- 	    post.setPostContent(content);
- 	    post.setMemberID(memberID);
- 	    post.setStatus(status);
- 	    
- 	    TagEntity tag= tagService.findProductTagById(tagID);
- 	    CategoryEntity category= categoryService.findProductCategoryById(categoryID);
- 	    post.setPostCategory(category);
- 	    post.setPostTag(tag);
- 	   System.out.println(category!=null);
-		System.out.println(tag!=null);
-// 	   Optional<CategoryEntity> categoryOpt = categoryRepo.findById(categoryID);
-// 	   if (!categoryOpt.isPresent()) {
-// 		   throw new IllegalArgumentException("該分類不存在");
-// 	   }
-// 	   CategoryEntity category = categoryOpt.get();
-// 	   
-// 	   Optional<TagEntity> tagOpt = tagRepo.findById(tagID);
-// 	   if (!tagOpt.isPresent()) {
-// 		   throw new IllegalArgumentException("該標籤不存在");
-// 	   }
-// 	  TagEntity tag = tagOpt.get();
- 	    
- 	     
-// 	    post.setPostCategory(category);
-// 	    post.setPostTag(tag);
- 	    
- 	    postService.insert(post);
- 	    
- 	    return ResponseEntity.ok("Post created successfully");
- 	}
- 	
- 	//更新單筆貼文
- 	 @PutMapping("/{postID}")
-     public ResponseEntity<PostEntity> updatePost(
-             @PathVariable("postID") Integer postID,
-             @RequestBody PostEntity post) {
-
-         try {
-             PostEntity updatedPost = postService.update(postID, post);
-             return ResponseEntity.ok(updatedPost); // 返回更新後的 JSON 數據
-         } catch (Exception e) {
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                     .body(null); // 發生錯誤時回傳 HTTP 400 狀態
-         }
-     }
- 	//刪除單筆貼文
- 	@DeleteMapping("/delete")
- 	public String delete(@RequestParam("postID") Integer postID) {
- 		postService.delete(postID);
- 		
- 		return "post/postComment";	
- 	}
- 	
- 	//取得類別列表
- 	@GetMapping("/categories")
- 	public ResponseEntity<List<CategoryEntity>> getAllCategories() {
- 	    List<CategoryEntity> categories = categoryService.findPostCategoryList();
- 	    return ResponseEntity.ok(categories);
- 	}
- 	//取得標籤列表
- 	@GetMapping("/tags")
- 	public ResponseEntity<List<TagEntity>> getAllTags() {
- 	    List<TagEntity> tags = tagService.findPostTagList();
- 	    return ResponseEntity.ok(tags);
- 	}
  	
 	//更新貼文
 //	@GetMapping("/update/{postID}")

@@ -210,18 +210,18 @@ $(document).ready(function () {
   }
 
   // 一鍵輸入：募資活動頁面
-  document
-    .getElementById("autofillBtnProj")
-    .addEventListener("click", function () {
-      document.getElementById("title").value = "test";
-      document.getElementById("category").value = "6";
-      document.getElementById("tag").value = "4";
-      document.getElementById("targetAmount").value = "50000";
-      document.getElementById("currentAmount").value = "0";
-      document.getElementById("threshold").value = "0.5";
-      document.getElementById("image").value = "test.jpg";
-      document.getElementById("description").value = "test測試測試";
-    });
+  // document
+  //   .getElementById("autofillBtnProj")
+  //   .addEventListener("click", function () {
+  //     document.getElementById("title").value = "test";
+  //     document.getElementById("category").value = "6";
+  //     document.getElementById("tag").value = "4";
+  //     document.getElementById("targetAmount").value = "50000";
+  //     document.getElementById("currentAmount").value = "0";
+  //     document.getElementById("threshold").value = "0.5";
+  //     document.getElementById("image").value = "test.jpg";
+  //     document.getElementById("description").value = "test測試測試";
+  //   });
 
   // 監聽送出按鈕
   submitBtn.addEventListener("click", function () {
