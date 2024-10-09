@@ -50,6 +50,10 @@ public class PostEntity {
 	@CreationTimestamp
 	@Column(name = "postTime")
 	private Timestamp postTime;
+//	gpt建議的如下:
+//	@Column(name = "createdAt", updatable = false)
+//	@CreationTimestamp
+//	private LocalDateTime createdAt;
 	
 	@Column(name = "likesCount")
 	private Integer likesCount;
