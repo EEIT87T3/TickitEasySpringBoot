@@ -39,7 +39,7 @@ public class MemberController {
             session.setAttribute("member", member.get());
             return "redirect:/member/profile"; // 登入成功後跳轉至會員頁面
         } else {
-            model.addAttribute("error", "Invalid email or password");
+            model.addAttribute("error", "錯誤的電子郵件或密碼");
             return "member/memberLogin"; // 返回登入頁面，並顯示錯誤信息
         }
     }

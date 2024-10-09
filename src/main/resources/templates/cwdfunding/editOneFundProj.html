@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+  	<meta th:replace="~{commons/adminHead}">
+    <meta charset="UTF-8" />
+    <title>修改募資專案 - TickitEasy 管理系統</title>
+    <link
+      rel="stylesheet"
+      href="/TickitEasy/cwdfunding/css/multi-step-form.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/TickitEasy/cwdfunding/js/editOneFundProj.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/adminHeader}"></div>
+
+    <!--  這裡是網頁內容 >-->
+    <div class="container">
+      <form id="msform" method="post" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col col-2 m-3">
+            <ul id="progressbar">
+              <li class="active" id="project"><strong>募資活動</strong></li>
+              <li><strong>方案內容</strong></li>
+              <li><strong>完成</strong></li>
+            </ul>
+          </div>
+          <div class="col col-8 m-3">
+            <fieldset class="fieldset">
+              <tr>
+                <td class="col-2">
+                  <div class="fieldlabels fw-medium p-2 text-start text-dark">
+                    編輯募資活動
+                  </div>
+                </td>
+              </tr>
+              <table class="table table-borderless custom-table">
+                <tbody style="background-color: black">
+                  <tr>
+                    <td colspan="2" class="col-5">
+                      <input
+                        type="text"
+                        name="title"
+                        placeholder="活動名稱"
+                        id="title"
+                        class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0 w-50"
+                        th:value="${projectDTO.title}"
+                      />
+                      <input
+                        type="hidden"
+                        name="projectID"
+                        th:value="${projectID}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">類別</div>
+                    </td>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select-sm w-25 text-end"
+                        aria-label="Default select example"
+                        name="categoryID"
+                        id="categoryID"
+                      >
+                        <option
+                          th:value="${projectDTO.categoryID}"
+                          th:text="${projectDTO.categoryName}"
+                          selected
+                        ></option>
+                        <th:block th:each=" aCategory : ${categories}">
+                          <option
+                            th:value="${aCategory.categoryID}"
+                            th:text="${aCategory.categoryName}"
+                          ></option>
+                        </th:block>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">標籤</div>
+                    </td>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select-sm w-25 text-end"
+                        aria-label="Default select example"
+                        name="tagID"
+                        id="tagID"
+                      >
+                        <option
+                          th:value="${projectDTO.tagID}"
+                          th:text="${projectDTO.tagName}"
+                          selected
+                        ></option>
+                        <th:block th:each=" aTag : ${tags}">
+                          <option
+                            th:value="${aTag.tagID}"
+                            th:text="${aTag.tagName}"
+                          ></option>
+                        </th:block>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">目標金額</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="targetAmount"
+                        type="number"
+                        name="targetAmount"
+                        class="form-control w-25 text-end"
+                        min="0"
+                        th:value="${projectDTO.targetAmount}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">目前金額</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="currentAmount"
+                        type="number"
+                        class="form-control w-25 text-end"
+                        disabled
+                        th:value="${projectDTO.currentAmount}"
+                      />
+                      <input
+                        type="hidden"
+                        name="currentAmount"
+                        th:value="${projectDTO.currentAmount}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">開始日期</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="startDate"
+                        type="datetime-local"
+                        name="startDate"
+                        class="form-control w-50"
+                        th:value="${projectDTO.startDate}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">結束日期</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="endDate"
+                        type="datetime-local"
+                        name="endDate"
+                        class="form-control w-50"
+                        th:value="${projectDTO.endDate}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">展延門檻</div>
+                    </td>
+                    <td class="col-8">
+                      <span
+                        id="valBox"
+                        th:text="${projectDTO.threshold}"
+                      ></span>
+                      <input
+                        id="threshold"
+                        type="range"
+                        name="threshold"
+                        class="form-range borderhidden float-start w-50"
+                        min="0"
+                        max="1"
+                        step="0.1"
+                        th:value="${projectDTO.threshold}"
+                        oninput="showVal(this.value)"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">展延日期</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="postponeDate"
+                        type="datetime-local"
+                        name="postponeDate"
+                        class="form-control w-50"
+                        th:value="${projectDTO.postponeDate}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">封面</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="image"
+                        type="file"
+                        name="image"
+                        class="form-control w-50"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2"></td>
+                    <td class="col-8 text-start">
+                      <img
+                        class="col-3"
+                        th:src="'/TickitEasy'+${projectDTO.image}"
+                        width="150px"
+                      />
+                      <input
+                        type="hidden"
+                        id="old-image"
+                        name="old-image"
+                        th:value="${projectDTO.image}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">敘述</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2" colspan="2">
+                      <textarea
+                        id="description"
+                        rows="5"
+                        name="description"
+                        maxlength="150"
+                        class="form-control bg-light-subtle w-75"
+                        th:text="${projectDTO.description}"
+                      ></textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <input
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <!-- -------------------------------------------------------------->
+              <th:block th:each="plan, iterStat : ${plans}">
+                <div class="row">
+                  <div class="col">
+                    <p
+                      class="fw-bold text-start p-3 fs-5"
+                      th:text="'《方案 ' + ${(iterStat.index + 1)} + '》'"
+                    ></p>
+                  </div>
+                </div>
+                <!-- -------------以上完成------------------------------------------------->
+                <table class="table table-borderless custom-table">
+                  <tbody>
+                    <tr>
+                      <td class="col-2">
+                        <div class="fieldlabels fw-medium">方案名稱</div>
+                      </td>
+                      <td class="col-8">
+                        <input
+                          type="text"
+                          name="planTitles"
+                          id="title"
+                          class="form-control borderhidden bg-light-subtle text-start m-0 p-0 w-25"
+                          th:value="${plan.planTitle}"
+                        />
+                        <input
+                          type="hidden"
+                          name="planIDs"
+                          th:value="${plan.planID}"
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="col-2">
+                        <div class="fieldlabels fw-medium">單價</div>
+                      </td>
+                      <td class="col-8">
+                        <input
+                          type="number"
+                          name="planUnitPrices"
+                          class="form-control w-25 text-start"
+                          min="0"
+                          th:value="${plan.planUnitPrice}"
+                        />
+                      </td>
+                    </tr>
+                    <!-- -------------以上完成------------------------------------------------->
+                    <tr>
+                      <td class="col-2">
+                        <div class="fieldlabels fw-medium">總數量</div>
+                      </td>
+                      <td class="col-8">
+                        <input
+                          type="number"
+                          name="planTotalAmounts"
+                          class="form-control w-25 text-start"
+                          min="0"
+                          th:value="${plan.planTotalAmount}"
+                        />
+                      </td>
+                    </tr>
+                    <!-- -------------以上完成------------------------------------------------->
+                    <tr>
+                      <td class="col-2">
+                        <div class="fieldlabels fw-medium">已購數量</div>
+                      </td>
+                      <td class="col-8">
+                        <input
+                          type="number"
+                          name="planBuyAmounts"
+                          class="form-control w-25 text-start"
+                          min="0"
+                          th:value="${plan.planBuyAmount}"
+                        />
+                      </td>
+                    </tr>
+                    <!-- -------------以上完成------------------------------------------------->
+                    <tr>
+                      <td class="col-2">
+                        <div class="fieldlabels fw-medium">圖片</div>
+                      </td>
+                      <td class="col-8">
+                        <input
+                          type="file"
+                          name="planImages"
+                          class="form-control w-50"
+                        />
+                        <tr>
+                          <td class="col-2"></td>
+                          <td class="col-8 text-start">
+                            <img
+                              class="col-3"
+                              th:src="'/TickitEasy'+${plan.planImage}"
+                              width="120px"
+                            />
+                            <input
+                              type="hidden"
+                              id="old-planImage"
+                              name="old-planImage"
+                              th:value="${plan.planImage}"
+                            />
+                          </td>
+                        </tr>
+                      </td>
+                    </tr>
+                    <!-- -------------以上完成------------------------------------------------->
+                    <tr>
+                      <td class="col-2">
+                        <div class="fieldlabels fw-medium">內容</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="col-2" colspan="2">
+                        <textarea
+                          rows="2"
+                          name="planContents"
+                          maxlength="50"
+                          class="form-control bg-light-subtle w-75"
+                          th:text="${plan.planContent}"
+                        ></textarea>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </th:block>
+              <!-- -------------------------------------------------------------->
+              <input
+                id="submit-btn"
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+              <input
+                type="button"
+                name="previous"
+                class="previous action-button-previous btn"
+                value="Previous"
+              />
+            </fieldset>
+            <fieldset class="fieldset">
+              <div class="form-card">
+                <br /><br />
+                <h2 class="purple-text text-center">
+                  <div id="resultBlock"></div>
+                </h2>
+                <br />
+                <br /><br />
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div th:replace="~{commons/adminFooter}"></div>
+  </body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <meta th:replace="~{commons/adminHead}" />
+    <meta charset="UTF-8" />
+    <title>新增募資專案 - TickitEasy 管理系統</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/nice-forms.css@0.1.7/dist/nice-forms.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/TickitEasy/cwdfunding/css/multi-step-form.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/TickitEasy/cwdfunding/js/multi-step-form.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/adminHeader}"></div>
+    <!--  這裡是網頁內容 >-->
+    <div class="container">
+      <form id="msform" method="post" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col col-2 m-3">
+            <ul id="progressbar">
+              <li class="active" id="project"><strong>募資活動</strong></li>
+              <li><strong>方案總數</strong></li>
+              <li><strong>方案內容</strong></li>
+              <li><strong>完成</strong></li>
+            </ul>
+          </div>
+          <div class="col col-8 m-3">
+            <fieldset class="fieldset">
+              <tr>
+                <td class="col-2">
+                  <div class="fieldlabels fw-medium p-2 text-start text-dark">
+                    新增募資活動
+                  </div>
+                </td>
+              </tr>
+              <table class="table table-borderless custom-table">
+                <tbody style="background-color: black">
+                  <tr>
+                    <td>
+                      <input
+                        type="text"
+                        name="title"
+                        placeholder="活動名稱"
+                        id="title"
+                        class="form-control fw-bold borderhidden bg-light-subtle fs-4 text-start m-0 p-0"
+                        required
+                      />
+                      <input
+                        type="hidden"
+                        name="projectID"
+                        th:value="${projectID}"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">類別</div>
+                    </td>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select-sm w-25 text-end"
+                        aria-label="Default select example"
+                        name="categoryID"
+                        id="categoryID"
+                      >
+                        <option selected></option>
+                        <th:block th:each=" aCategory : ${categories}">
+                          <option
+                            th:value="${aCategory.categoryID}"
+                            th:text="${aCategory.categoryName}"
+                          ></option>
+                        </th:block>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr></tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">標籤</div>
+                    </td>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select-sm w-25 text-end"
+                        aria-label="Default select example"
+                        name="tagID"
+                        id="tagID"
+                      >
+                        <option selected></option>
+                        <th:block th:each=" aTag : ${tags}">
+                          <option
+                            th:value="${aTag.tagID}"
+                            th:text="${aTag.tagName}"
+                          ></option>
+                        </th:block>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">目標金額</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="targetAmount"
+                        type="number"
+                        name="targetAmount"
+                        class="form-control w-25 text-end"
+                        min="0"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">目前金額</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="currentAmount"
+                        type="number"
+                        placeholder="0"
+                        class="form-control w-25 text-end"
+                        disabled
+                      />
+                      <input type="hidden" name="currentAmount" value="0" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">開始日期</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="startDate"
+                        type="datetime-local"
+                        name="startDate"
+                        class="form-control w-50"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">結束日期</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="endDate"
+                        type="datetime-local"
+                        name="endDate"
+                        class="form-control w-50"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">展延門檻</div>
+                    </td>
+                    <td class="col-8">
+                      <span id="valBox"></span>
+                      <input
+                        id="threshold"
+                        type="range"
+                        name="threshold"
+                        class="form-range borderhidden float-start w-50"
+                        min="0"
+                        max="1"
+                        step="0.1"
+                        oninput="showVal(this.value)"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">展延日期</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="postponeDate"
+                        type="datetime-local"
+                        name="postponeDate"
+                        class="form-control w-50"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">封面</div>
+                    </td>
+                    <td class="col-8">
+                      <input
+                        id="image"
+                        type="file"
+                        name="image"
+                        class="form-control w-50"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">敘述</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-2" colspan="2">
+                      <textarea
+                        id="description"
+                        rows="5"
+                        name="description"
+                        maxlength="150"
+                        class="form-control bg-light-subtle w-75"
+                      ></textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- <button id="autofillBtnProj">一鍵填入</button> -->
+              <input
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+            </fieldset>
+            <fieldset class="fieldset">
+              <table class="table table-borderless custom-table">
+                <tbody style="background-color: black">
+                  <tr>
+                    <td class="col-2">
+                      <div class="fieldlabels fw-medium">請選取方案總數量</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="col-8">
+                      <select
+                        class="form-select form-select w-25"
+                        aria-label="Default planAmount"
+                        name="planAmount"
+                        id="planAmountSelect"
+                      >
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <input
+                id="planAmount-btn"
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+              <input
+                type="button"
+                name="previous"
+                class="previous action-button-previous btn"
+                value="Previous"
+              />
+            </fieldset>
+            <fieldset class="fieldset">
+              <div id="outputBlock"></div>
+              <!-- <button id="autofillBtnPlan">一鍵填入</button> -->
+              <input
+                id="submit-btn"
+                type="button"
+                name="next"
+                class="next action-button btn"
+                value="Next"
+              />
+              <input
+                type="button"
+                name="previous"
+                class="previous action-button-previous btn"
+                value="Previous"
+              />
+            </fieldset>
+            <fieldset class="fieldset">
+              <div class="form-card">
+                <br /><br />
+                <h2 class="purple-text text-center">
+                  <div id="resultBlock"></div>
+                </h2>
+                <br />
+                <br /><br />
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div th:replace="~{commons/adminFooter}"></div>
+  </body>
+</html>

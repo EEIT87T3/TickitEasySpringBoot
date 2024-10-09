@@ -56,17 +56,29 @@
                 <div class="form-group">
                     <label for="password">密碼</label>
                     <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="輸入密碼" required>
+                      <span class="absolute inset-y-0 right-0 flex items-center pr-3 pt-6 cursor-pointer" id="togglePassword">
+        <i class="fas fa-eye text-gray-500"></i>
+    </span>
                 </div>
                 <!-- 登入錯誤信息 -->
                 <div th:if="${error}" class="alert alert-danger">
                     <p th:text="${error}"></p>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">登入</button>
+                 <button type="button" class="btn btn-secondary btn-block" id="fillDemo">一鍵填入</button>
                 <div class="text-center mt-3">
                     <a th:href="@{/member/register}">還沒有帳號？註冊</a>
                 </div>
             </form>
         </div>
     </div>
+     <script>
+        document.getElementById('fillDemo').addEventListener('click', function() {
+            document.getElementById('email').value = 'test88@example.com';
+            document.getElementById('password').value = 'Demo1234';
+        });
+        
+        
+     </script>
 </body>
 </html>
