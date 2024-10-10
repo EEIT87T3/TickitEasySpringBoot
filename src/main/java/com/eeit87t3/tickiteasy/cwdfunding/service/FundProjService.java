@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.TagRepository;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -124,6 +127,7 @@ public class FundProjService {
 		newFundPlan.setPlanImage(image);
 		newFundPlan.setPlanContent(content);
 		
+		System.out.println("savePlann is here");
 		return fundPlanRepo.save(newFundPlan);
 	}
 	
@@ -193,27 +197,38 @@ public class FundProjService {
 	}
 	
 	
-	/* 刪除 */
+	/* 刪除 
+	 * 1. 刪除FundProject的同時會一併刪除該對應的plan
+	 * 	  因為在FundProj entity中有[cascade = CascadeType.ALL]
+	 * 2. 使用ImageUtil將圖片從系統檔案夾刪除 
+	 * */
 	public boolean deleteFundProjById(Integer id) {
-		FundProjDTO exist = new FundProjDTO();
-		exist = findFundProjDTOById(id);
-		String imagePath = exist.getImage();
-
-		// 使用getProjectID判斷專案是否存在
-		if (exist.getProjectID() != null) {
+		// 1. 以projectID 找出fundProj和fundPlan兩資料表中是否存在對應物件
+		FundProjDTO existProj = new FundProjDTO();
+		existProj = findFundProjDTOById(id);
+		List<FundPlan> existPlans = fundPlanRepo.findByProjectID(id);
+		
+		// 2. 將project和plan圖片欄位取出
+		String imagePath = existProj.getImage();
+		List<String> imagePathPlans = new ArrayList<>();
+		
+		for (FundPlan existPlan : existPlans) {
+			imagePathPlans.add(existPlan.getPlanImage());
+		}
+		
+		// 3. 執行刪除(包含從檔案夾中刪除圖片)
 			fundProjRepo.deleteById(id);
-			//try{}catch{}：順便把/images/cwdfunding/內的
+			//try{}catch{}：刪除/images/cwdfunding/內圖片
 			try {
 				imageUtil.deleteImage(imagePath);
+				for (String imagePathPlan : imagePathPlans) {
+					imageUtil.deleteImage(imagePathPlan);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println(id+" project exists");
 			return true;
-		}else {
-			System.out.println("project not found");
-			return false;
-		}
+
 	}
 	
 	/* 編輯募資活動 (尚未寫完)*/

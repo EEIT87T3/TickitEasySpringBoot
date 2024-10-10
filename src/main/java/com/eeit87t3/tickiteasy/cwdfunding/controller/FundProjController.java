@@ -62,20 +62,13 @@ public class FundProjController {
 	@Autowired
 	private FileService fileService;
 
-	/* 查詢所有募資活動頁面, api */
+	/* [頁面] 查詢所有募資活動*/
 	@GetMapping("/fundproject")
 	public String showProjPage(@RequestParam(value = "p", defaultValue = "1") Integer pageNumber, Model model) {
 		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
 		model.addAttribute("page", page);
 
 		return "cwdfunding/showFundProj";
-	}
-
-	@ResponseBody
-	@GetMapping("/api/fundproject")
-	public Page<FundProjDTO> findByPageApi(@RequestParam Integer pageNumber, Model model) {
-		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
-		return page;
 	}
 	
 	/* [頁面] 查詢單筆募資活動by ID */
@@ -89,6 +82,43 @@ public class FundProjController {
 		model.addAttribute("plans",fundPlans);
 		return "cwdfunding/showOneFundProj";
 	}
+	
+	/* [頁面] 新增募資活動 */
+	@GetMapping("/fundproject/create")
+	public String addProjPage(Model model) {
+		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
+		List<Tag> tags = tagServiceTemp.findFundProjTagList();
+		String topProject = projService.findTopProject();
+
+		model.addAttribute("projectID", topProject);
+		model.addAttribute("categories", categories);
+		model.addAttribute("tags", tags);
+		return "cwdfunding/addFundProjnPlan";
+	}
+	
+	/* [頁面] 修改單筆募資活動by ID */
+	@GetMapping("/fundproject/{projectID}/edit")
+	public String showEditProjPageByID(@PathVariable Integer projectID, Model model) {
+		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
+		FundProj fundProj = projService.findFundProjById(projectID);
+		List<FundPlan> fundPlans = fundProj.getFundPlan();
+		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
+		List<Tag> tags = tagServiceTemp.findFundProjTagList();
+		
+		model.addAttribute("projectDTO",fundProjDTO);
+		model.addAttribute("categories", categories);
+		model.addAttribute("tags", tags);
+		model.addAttribute("plans",fundPlans);
+		return "cwdfunding/editOneFundProj";
+	}
+	
+	/* [API] 查詢所有募資活動*/
+	@ResponseBody
+	@GetMapping("/api/fundproject")
+	public Page<FundProjDTO> findByPageApi(@RequestParam Integer pageNumber, Model model) {
+		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
+		return page;
+	}
 
 	/* [API] 查詢單筆募資活動by ID */
 	@ResponseBody
@@ -96,15 +126,6 @@ public class FundProjController {
 	public FundProjDTO findByID(@PathVariable Integer projectID) {
 		return projService.findFundProjDTOById(projectID);
 	}
-	
-//	/* [API] 查詢單筆募資活動方案 by project ID */
-//	@ResponseBody
-//	@GetMapping("/api/fundproject/planID/{projectID}")
-//	public List<FundPlan> findPlanByProjID(@PathVariable Integer projectID){
-//		FundProj fundProj = projService.findFundProjById(projectID);
-//		List<FundPlan> fundPlans = fundProj.getFundPlan();
-//		return fundPlans;
-//	}
 
 	/* [API] 刪除募資活動by ID */
 	@ResponseBody
@@ -125,36 +146,6 @@ public class FundProjController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
 		}
 	}
-	
-	/* [頁面] 修改單筆募資活動by ID */
-	@GetMapping("/fundproject/{projectID}/edit")
-	public String showEditProjPageByID(@PathVariable Integer projectID, Model model) {
-		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
-		FundProj fundProj = projService.findFundProjById(projectID);
-		List<FundPlan> fundPlans = fundProj.getFundPlan();
-		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
-		List<Tag> tags = tagServiceTemp.findFundProjTagList();
-		
-		model.addAttribute("projectDTO",fundProjDTO);
-		model.addAttribute("categories", categories);
-		model.addAttribute("tags", tags);
-		model.addAttribute("plans",fundPlans);
-		return "cwdfunding/editOneFundProj";
-	}
-
-	/* [頁面] 新增募資活動 */
-	@GetMapping("/fundproject/create")
-	public String addProjPage(Model model) {
-		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
-		List<Tag> tags = tagServiceTemp.findFundProjTagList();
-		String topProject = projService.findTopProject();
-
-		model.addAttribute("projectID", topProject);
-		model.addAttribute("categories", categories);
-		model.addAttribute("tags", tags);
-		return "cwdfunding/addFundProjnPlan";
-	}
-	
 
 	/* [API] 新增募資活動（含方案） */
 	@ResponseBody
