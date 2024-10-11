@@ -28,10 +28,10 @@ public class CommentService {
 	    return commentRepo.findByPostPostID(postID);
 	}
 
-	
 	//根據貼文ID新增留言
-    void insert(CommentEntity post) {
-    	
+	@Transactional
+	public CommentEntity insert(CommentEntity comment) {
+		return  commentRepo.save(comment);
     }
     //根據貼文ID更新留言
     void update(CommentEntity post) {

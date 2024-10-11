@@ -39,13 +39,15 @@
                     data: posts,
                     columns: [
                         { data: 'postID' },
+                        { data: 'nickname' },
                         { data: 'postTitle' },
                         { data: 'postContent' },
                         { data: 'postCategory.categoryName', defaultContent: 'N/A' },
                         { data: 'postTag.tagName', defaultContent: 'N/A' },
-                        { data: 'postTag.postImgUrl', defaultContent: 'N/A' },
-                        { data: 'postTag.memberID', defaultContent: 'N/A' },
-                        { data: 'postTag.status', defaultContent: 'N/A' },
+                        { data: 'postImgUrl', defaultContent: 'N/A' },
+                       
+                        { data: 'status', defaultContent: 'N/A' },
+                        { data: 'postTime', defaultContent: 'N/A' },
                         {
                             data: null,
                             render: function (data, type, row) {
@@ -201,14 +203,15 @@
     <table id="postsTable" class="display">
         <thead>
             <tr>
-                <th>Post ID</th>
-                <th>memberID</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Tag</th>
-                <th>Content</th>
-                <th>postImgUrl</th>
-                <th>status</th>
+                <th>貼文ID</th>
+                <th>會員暱稱</th>
+                <th>標題</th>
+                <th>內容</th>
+                <th>活動類別</th>
+                <th>標籤</th>
+                <th>圖片</th>
+                <th>狀態</th>
+                <th>發布時間</th>
                 <th>動作</th>
                 
             </tr>
