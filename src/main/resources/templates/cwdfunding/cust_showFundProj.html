@@ -44,6 +44,15 @@
           const nowProgress =
             (parseInt(currentAmount) / parseInt(targetAmount)) * 100;
           element.style.width = nowProgress + "%";
+
+          // 找到與該進度條相鄰的 small 標籤，並設置其文本為當前進度百分比
+          const progressText = element
+            .closest(".row")
+            .querySelector(".progressText");
+          console.log(progressText);
+          if (progressText) {
+            progressText.textContent = nowProgress + "%"; // 保留兩位小數
+          }
         });
 
         // 監聽category選項，change時跳轉頁面
@@ -51,11 +60,11 @@
           selectedValue = this.value.trim();
 
           if (selectedValue == 0) {
-            window.location.href = "/TickitEasy/member/fundproject";
+            window.location.href = "/TickitEasy/customer/fundproject";
             console.log("全部");
           } else {
             window.location.href =
-              "/TickitEasy/member/fundproject?categoryID=" + selectedValue;
+              "/TickitEasy/customer/fundproject?categoryID=" + selectedValue;
           }
         });
       });
@@ -106,20 +115,23 @@
               </div>
               <div class="card-footer bg-transparent border-0 mt-2">
                 <div class="row">
-                  <div class="col-12">
+                  <div class="col-10 d-flex align-items-center">
                     <div
-                      class="progress mb-2"
+                      class="progress"
                       role="progressbar"
                       aria-label="Success example"
                       aria-valuemin="0"
                       aria-valuemax="100"
                     >
                       <div
-                        class="progress-bar"
+                        class="progress-bar text-start"
                         th:data-currentamount="${aFundProj.currentAmount}"
                         th:data-targetamount="${aFundProj.targetAmount}"
                       ></div>
                     </div>
+                  </div>
+                  <div class="col-2 text-end custom-small-text purple-text">
+                    <small class="progressText"></small>
                   </div>
                 </div>
                 <div class="d-flex justify-content-between">
@@ -160,23 +172,26 @@
       <div id="pageBlock" class="d-flex justify-content-center mt-3">
         <ul th:if="${page.totalPages != 0}" class="pagination">
           <!-- 上一頁 -->
+
           <th:block th:switch="${page.number + 1 == 1}">
             <li th:case="${false}" class="page-item">
               <a
                 class="page-link"
-                th:href="@{/member/fundproject(p=${page.number})}"
+                th:href="|/customer/fundproject?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&laquo;'"
               ></a>
             </li>
             <li th:case="${true}" class="page-item disabled">
               <a
                 class="page-link"
-                th:href="@{/member/fundproject(p=${page.number})}"
+                th:href="|/customer/fundproject?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&laquo;'"
               ></a>
             </li>
           </th:block>
           <!-- 頁數 -->
+          <!-- th:href="|/customer/fundproject(p=${page.number})${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|" -->
+
           <th:block
             th:each=" aNumber : ${#numbers.sequence(1, page.totalPages)}"
           >
@@ -187,7 +202,7 @@
               <li th:case="${false}" class="page-item">
                 <a
                   class="page-link"
-                  th:href="@{/member/fundproject(p=${aNumber})}"
+                  th:href="|/TickitEasy/customer/fundproject?p=${aNumber}${selectedCategory != 0 ? ',categoryID=' + selectedCategory : ''}|"
                   th:text="${aNumber}"
                 ></a>
               </li>
@@ -198,14 +213,14 @@
             <li th:case="${true}" class="page-item disabled">
               <a
                 class="page-link"
-                th:href="@{/member/fundproject(p=${page.number+2})}"
+                th:href="|/TickitEasy/customer/fundproject?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&raquo;'"
               ></a>
             </li>
             <li th:case="${false}" class="page-item">
               <a
                 class="page-link"
-                th:href="@{/member/fundproject(p=${page.number+2})}"
+                th:href="|/TickitEasy/customer/fundproject?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&raquo;'"
               ></a>
             </li>

@@ -18,7 +18,7 @@ import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 
 @Controller
-@RequestMapping("/member")
+@RequestMapping("/customer")
 public class MemberFundProjViewController {
 
 	@Autowired

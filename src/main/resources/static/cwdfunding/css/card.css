@@ -17,21 +17,32 @@
 
 .progress {
   height: 8px;
-  width: 85%;
+  width: 100%;
 }
 
 .progress-bar {
   background: #000;
 }
 
+.purple-text {
+  color: #5f46e8;
+}
+/* .progressSpan {
+  right: 0;
+  transform: translateX(100%); 
+} */
+
 .custom-title-text {
   font-size: 1.2rem;
 }
 
 .custom-small-text {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
+.extra-small {
+  font-size: 0.75rem;
+}
 /* 更改分頁按鈕的顏色 */
 .pagination .page-item .page-link {
   border: none;

@@ -178,10 +178,10 @@ public class FundProjService {
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
 			dto.setThreshold(fundProj.getThreshold());
 			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
-			dto.setCategoryID(fundProj.getFundCategory().getCategoryId());
+			dto.setCategoryId(fundProj.getFundCategory().getCategoryId());
 			dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
 			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
-			dto.setTagID(fundProj.getFundTag().getTagId());
+			dto.setTagId(fundProj.getFundTag().getTagId());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
 			return dto;
