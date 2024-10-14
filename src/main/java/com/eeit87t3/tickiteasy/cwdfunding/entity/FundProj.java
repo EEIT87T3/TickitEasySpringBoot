@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -63,22 +65,20 @@ public class FundProj{
 	
 	
 	/*
-	 * [JoinColumn]告訴spring容器FundProj資料表的"categoryID"欄位，會參考到Category的資料表"categoryID"欄位
+	 * [JoinColumn]告訴spring容器FundProj類別的"categoryID"屬性，會參考到CategoryEntity的類別"categoryId"屬性
 	 * [JsonIgnore]和其他類別存在雙向關聯性，避免循環依賴的annotation
 	 */
-	@JsonIgnore
 	@ManyToOne
-	@JoinColumn( name = "categoryID", referencedColumnName = "categoryID")
-	private Category category;
+	@JoinColumn( name = "categoryID", referencedColumnName = "categoryId")
+	private CategoryEntity fundCategory;
 	
 	/*
-	 * [JoinColumn]告訴spring容器FundProj資料表的"tagID"欄位，會參考到Tag的資料表"tagID"欄位
+	 * [JoinColumn]告訴spring容器FundProj類別的"tagID"屬性，會參考到TagEntity的類別"tagId"屬性
 	 * [JsonIgnore]和其他類別存在雙向關聯性，避免循環依賴的annotation
 	 */
-	@JsonIgnore
 	@ManyToOne
-	@JoinColumn( name = "tagID", referencedColumnName = "tagID")
-	private Tag tag;
+	@JoinColumn( name = "tagID", referencedColumnName = "tagId")
+	private TagEntity fundTag;
 	
 	/*
 	 * Fundproj沒有和FundProjPhoto有關的欄位
@@ -92,7 +92,7 @@ public class FundProj{
 	/*
 	 * Fundproj沒有和FundPlan有關的欄位
 	 * [ mappedBy = "fundProj" ] : 
-	 * 		告訴spring容器Fundproj資料表會被FundPlan資料表參考，參考欄位為fundPlan的"projectID"屬性
+	 * 		告訴spring容器Fundproj類別會被FundPlan類別參考，參考欄位為fundPlan的"fundProj"屬性
 	 */
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "fundProj")
@@ -164,23 +164,27 @@ public class FundProj{
 		this.postponeDate = postponeDate;
 	}
 
-	public Category getCategory() {
-		return category;
-	}
 
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-	
-	
-	public Tag getTag() {
-		return tag;
+
+	public CategoryEntity getFundCategory() {
+		return fundCategory;
 	}
 
 
-	public void setTag(Tag tag) {
-		this.tag = tag;
+	public void setFundCategory(CategoryEntity fundCategory) {
+		this.fundCategory = fundCategory;
 	}
+
+
+	public TagEntity getFundTag() {
+		return fundTag;
+	}
+
+
+	public void setFundTag(TagEntity fundTag) {
+		this.fundTag = fundTag;
+	}
+
 
 	public List<FundProjPhoto> getFundProjPhotos() {
 		return fundProjPhotos;

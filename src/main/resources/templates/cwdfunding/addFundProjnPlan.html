@@ -77,7 +77,7 @@
                         <option selected></option>
                         <th:block th:each=" aCategory : ${categories}">
                           <option
-                            th:value="${aCategory.categoryID}"
+                            th:value="${aCategory.categoryId}"
                             th:text="${aCategory.categoryName}"
                           ></option>
                         </th:block>
@@ -99,7 +99,7 @@
                         <option selected></option>
                         <th:block th:each=" aTag : ${tags}">
                           <option
-                            th:value="${aTag.tagID}"
+                            th:value="${aTag.tagId}"
                             th:text="${aTag.tagName}"
                           ></option>
                         </th:block>

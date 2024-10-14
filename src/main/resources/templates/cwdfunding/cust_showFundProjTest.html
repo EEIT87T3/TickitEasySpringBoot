@@ -18,25 +18,26 @@
     <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
     <script>
       $(document).ready(function () {
+        let currentPage = 1;
         let output = document.getElementById("outputBlock");
+        let spinnerBlock = document.getElementById("spinnerBlock");
         let progressBars = document.querySelectorAll(".progress-bar");
-        let daysLefts = document.querySelectorAll("[data-startdate]");
-        let categorySelector = document.getElementById("categoryID");
 
-        // 動態填入 1.剩餘天數 2.募資進度
-        daysLefts.forEach(function (element) {
-          const startDate = new Date(
-            element.getAttribute("data-startdate").replace(" ", "T")
-          );
-          const endDate = new Date(
-            element.getAttribute("data-enddate").replace(" ", "T")
-          );
+        document
+          .querySelectorAll("[data-startdate]")
+          .forEach(function (element) {
+            const startDate = new Date(
+              element.getAttribute("data-startdate").replace(" ", "T")
+            );
+            const endDate = new Date(
+              element.getAttribute("data-enddate").replace(" ", "T")
+            );
 
-          const timeDiff = endDate - startDate;
-          const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            const timeDiff = endDate - startDate;
+            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-          element.textContent = daysDiff + " 天";
-        });
+            element.textContent = daysDiff + " 天";
+          });
 
         progressBars.forEach(function (element) {
           const targetAmount = element.getAttribute("data-targetamount");
@@ -44,19 +45,6 @@
           const nowProgress =
             (parseInt(currentAmount) / parseInt(targetAmount)) * 100;
           element.style.width = nowProgress + "%";
-        });
-
-        // 監聽category選項，change時跳轉頁面
-        categorySelector.addEventListener("change", function () {
-          selectedValue = this.value.trim();
-
-          if (selectedValue == 0) {
-            window.location.href = "/TickitEasy/member/fundproject";
-            console.log("全部");
-          } else {
-            window.location.href =
-              "/TickitEasy/member/fundproject?categoryID=" + selectedValue;
-          }
         });
       });
     </script>
@@ -70,19 +58,15 @@
       <div class="row row-cols-1 mb-4 ms-5 me-5 ps-2">
         <div class="col-4">
           <select
-            class="categories form-select w-50"
+            class="categories form-select w-25"
             aria-label="Default select example"
             name="categoryID"
             id="categoryID"
           >
-            <option disabled>主題分類</option>
-            <option value="0" th:selected="${selectedCategory == 0}">
-              全部
-            </option>
+            <option selected></option>
             <th:block th:each=" aCategory : ${categories}">
               <option
                 th:value="${aCategory.categoryId}"
-                th:selected="${selectedCategory == aCategory.categoryId }"
                 th:text="${aCategory.categoryName}"
               ></option>
             </th:block>
@@ -157,26 +141,15 @@
           </div>
         </th:block>
       </div>
+      <div id="spinnerBlock"></div>
       <div id="pageBlock" class="d-flex justify-content-center mt-3">
         <ul th:if="${page.totalPages != 0}" class="pagination">
-          <!-- 上一頁 -->
-          <th:block th:switch="${page.number + 1 == 1}">
-            <li th:case="${false}" class="page-item">
-              <a
-                class="page-link"
-                th:href="@{/member/fundproject(p=${page.number})}"
-                th:text="'&laquo;'"
-              ></a>
-            </li>
-            <li th:case="${true}" class="page-item disabled">
-              <a
-                class="page-link"
-                th:href="@{/member/fundproject(p=${page.number})}"
-                th:text="'&laquo;'"
-              ></a>
-            </li>
-          </th:block>
-          <!-- 頁數 -->
+        <!-- 上一頁 -->
+	  <th:block th:switch="${page.number + 1 == 1}">
+	      <li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/member/fundproject(p=${page.number})}" th:text="'&laquo;'"></a></li>
+	      <li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/member/fundproject(p=${page.number})}" th:text="'&laquo;'"></a></li>
+	  </th:block>
+        <!-- 頁數 -->
           <th:block
             th:each=" aNumber : ${#numbers.sequence(1, page.totalPages)}"
           >
@@ -193,23 +166,11 @@
               </li>
             </th:block>
           </th:block>
-          <!-- 下一頁 -->
-          <th:block th:switch="${page.number + 1 == page.totalPages}">
-            <li th:case="${true}" class="page-item disabled">
-              <a
-                class="page-link"
-                th:href="@{/member/fundproject(p=${page.number+2})}"
-                th:text="'&raquo;'"
-              ></a>
-            </li>
-            <li th:case="${false}" class="page-item">
-              <a
-                class="page-link"
-                th:href="@{/member/fundproject(p=${page.number+2})}"
-                th:text="'&raquo;'"
-              ></a>
-            </li>
-          </th:block>
+            <!-- 下一頁 -->
+	  <th:block th:switch="${page.number + 1 == page.totalPages}">
+	     <li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/member/fundproject(p=${page.number+2})}" th:text="'&raquo;'"></a></li>
+	     <li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/member/fundproject(p=${page.number+2})}" th:text="'&raquo;'"></a></li>
+	  </th:block>
         </ul>
       </div>
     </div>

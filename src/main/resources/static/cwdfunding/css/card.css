@@ -24,29 +24,33 @@
   background: #000;
 }
 
-    .custom-title-text {
-        font-size: 1.2rem;
-    }
+.custom-title-text {
+  font-size: 1.2rem;
+}
 
-    .custom-small-text {
-        font-size: 0.75rem; 
-    }
-    
-    /* 更改分頁按鈕的顏色 */
-    .pagination .page-item .page-link {
-        color: gray; /* 修改為您希望的顏色 */
-    }
+.custom-small-text {
+  font-size: 0.75rem;
+}
 
-    /* 鼠標懸停時的顏色 */
-/*     .pagination .page-item .page-link:hover {
-        color: #5f46e8; 
-        background-color: transparent; 
-    }
- */
-    /* 當前頁面的顏色 */
-    .pagination .page-item.active .page-link {
-        color: #fff; /* 當前頁面按鈕文字顏色 */
-        background-color: #5f46e8; /* 當前頁面按鈕背景顏色 */
-        /* border-color: #007bff; */ /* 當前頁面按鈕邊框顏色 */
-    }
-    
+/* 更改分頁按鈕的顏色 */
+.pagination .page-item .page-link {
+  border: none;
+  background-color: none;
+  border-radius: 50%;
+  color: black;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+
+.pagination .page-link {
+  padding: 3px 10px; /* 增加內部間距 */
+}
+
+/* 當前頁面的顏色 */
+.pagination .page-item.active .page-link {
+  color: #fff;
+  background-color: #5f46e8;
+  border-radius: 50%;
+  border-width: 0.5rem;
+  box-shadow: none;
+}

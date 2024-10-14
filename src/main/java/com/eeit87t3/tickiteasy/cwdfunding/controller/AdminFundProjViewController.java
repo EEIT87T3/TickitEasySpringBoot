@@ -13,17 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.eeit87t3.tickiteasy.cwdfunding.entity.Category;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
+import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.Tag;
-import com.eeit87t3.tickiteasy.cwdfunding.service.CategoryServiceTemp;
-import com.eeit87t3.tickiteasy.cwdfunding.service.FileService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
-import com.eeit87t3.tickiteasy.cwdfunding.service.TagServiceTemp;
-import com.eeit87t3.tickiteasy.image.ImageUtil;
-import com.eeit87t3.tickiteasy.test.TestImagesRepo;
 
 @Controller
 @RequestMapping("/admin/fundproject")
@@ -33,10 +30,10 @@ public class AdminFundProjViewController {
 	private FundProjService projService;
 
 	@Autowired
-	private CategoryServiceTemp categoryServiceTemp;
+	private CategoryService categoryService;
 
 	@Autowired
-	private TagServiceTemp tagServiceTemp;
+	private TagService tagService;
 
 
 	/* [頁面] 查詢所有募資活動*/
@@ -64,8 +61,8 @@ public class AdminFundProjViewController {
 	/* [頁面] 新增募資活動 */
 	@GetMapping("/create")
 	public String addProjPage(Model model) {
-		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
-		List<Tag> tags = tagServiceTemp.findFundProjTagList();
+		List<CategoryEntity> categories = categoryService.findFundProjCategoryList();
+		List<TagEntity> tags = tagService.findFundProjTagList();
 		String topProject = projService.findTopProject();
 
 		model.addAttribute("projectID", topProject);
@@ -80,8 +77,8 @@ public class AdminFundProjViewController {
 		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
 		FundProj fundProj = projService.findFundProjById(projectID);
 		List<FundPlan> fundPlans = fundProj.getFundPlan();
-		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
-		List<Tag> tags = tagServiceTemp.findFundProjTagList();
+		List<CategoryEntity> categories = categoryService.findFundProjCategoryList();
+		List<TagEntity> tags = tagService.findFundProjTagList();
 		
 		model.addAttribute("projectDTO",fundProjDTO);
 		model.addAttribute("categories", categories);
