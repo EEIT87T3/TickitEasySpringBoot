@@ -132,10 +132,16 @@ public class FundProjService {
 	}
 	
 
-	/* 查詢全部（id升冪）：分頁 */
-	public Page<FundProjDTO> findFundProjByPage(Integer pageNumber){
-		Pageable pgb = PageRequest.of(pageNumber-1, 10,Sort.Direction.ASC,"projectID");
-		Page<FundProj> fundProjPage = fundProjRepo.findAll(pgb);
+	/* 查詢全部（id升冪、以category搜索）：分頁 */
+	public Page<FundProjDTO> findFundProjByPage(Integer pageNumber, Integer size, Integer categoryID){
+		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"projectID");
+		Page<FundProj> fundProjPage = null;
+		
+		if ( categoryID != null) {
+			fundProjPage = fundProjRepo.findProjectByCategory(categoryID, pgb);
+		}else {
+			fundProjPage = fundProjRepo.findAll(pgb);
+		}
 		//Page內建map()方法，可將A實體轉換成B實體
 		Page<FundProjDTO> dtoPage= fundProjPage.map(fundProj ->{
 			FundProjDTO dto = new FundProjDTO();
