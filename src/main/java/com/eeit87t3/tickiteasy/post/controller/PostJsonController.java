@@ -112,14 +112,14 @@ public class PostJsonController {
  	}
  	
  	//根據貼文id取得多筆留言
- 	@GetMapping("/comment")
+ 	@GetMapping("/comments")
  	public ResponseEntity<List<CommentEntity>> findCommentByPostId(@RequestParam("postID") Integer postID) {
  
  		Optional<PostEntity> optionalPost = postRepo.findById(postID);
  		
  		if (optionalPost.isPresent()) {
  			// 如果貼文存在，則查詢貼文的留言
- 			List<CommentEntity> comments = commentService.findById(postID);
+ 			List<CommentEntity> comments = commentService.findByPostId(postID);
  			return ResponseEntity.ok(comments);  // 回傳 200 OK 和結果
  		}
  		

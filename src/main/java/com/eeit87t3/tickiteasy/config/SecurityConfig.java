@@ -16,18 +16,18 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     
-    @Bean
-    public FilterRegistrationBean<AdminFilter> adminAuthFilter() {
-        FilterRegistrationBean<AdminFilter> registrationBean = new FilterRegistrationBean<>();
-        
-        registrationBean.setFilter(new AdminFilter());
-        // 添加 Filter 的 URL 模式
-        registrationBean.addUrlPatterns("/admin/*");
-        // 設置 Filter 的順序
-        registrationBean.setOrder(1);
-  
-        return registrationBean;
-    }
+//    @Bean
+//    public FilterRegistrationBean<AdminFilter> adminAuthFilter() {
+//        FilterRegistrationBean<AdminFilter> registrationBean = new FilterRegistrationBean<>();
+//        
+//        registrationBean.setFilter(new AdminFilter());
+//        // 添加 Filter 的 URL 模式
+//        registrationBean.addUrlPatterns("/admin/*");
+//        // 設置 Filter 的順序
+//        registrationBean.setOrder(1);
+//  
+//        return registrationBean;
+//    }
     
     
     
