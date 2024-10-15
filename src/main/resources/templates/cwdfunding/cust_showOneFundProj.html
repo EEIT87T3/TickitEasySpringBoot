@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css"
+    />
+    <style>
+      .custom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+      .image-container {
+        width: 731px;
+        height: 411px;
+      }
+
+      .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+      .text-container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        flex: 1;
+        flex-direction: column;
+      }
+      .extra-small {
+        font-size: 0.8rem; /* 或更小的尺寸 */
+        color: #646464;
+      }
+      .custom-small-text {
+        font-size: 0.75rem;
+        color: #646464;
+      }
+      .custom-small-text2 {
+        font-size: 0.9rem;
+      }
+      .img-plan {
+        max-width: 80%;
+        height: auto;
+        border-radius: 25px;
+      }
+      .custom-letter-spacing {
+        letter-spacing: 1.25px; /* 您可以根據需要調整此值 */
+      }
+      .hr-thick {
+        position: relative;
+        z-index: 1; /* 增加層級以確保顯示 */
+        width: 100%;
+      }
+      .hr-thin {
+        height: 1px; /* 設定較細的線條 */
+        background-color: gray; /* 設定線條顏色 */
+        border: none; /* 移除預設邊框 */
+      }
+
+      .btn-like {
+        border: 10px;
+        border-color: #b197fc;
+      }
+      .btn-buy {
+        border: 1px solid;
+        border-color: #ffb44d;
+        background-color: #ffb44d;
+        color: #fff;
+        transition: transform 0.3s ease; /* 添加平滑的過渡效果 */
+      }
+
+      .purple-text {
+        color: #b197fc;
+      }
+      .orange-text {
+        color: #ffb44d;
+      }
+      .btn-like:hover {
+        background-color: #b197fc; /* 懸停時背景色 */
+        color: #fff; /* 懸停時字體顏色 */
+      }
+      .btn-like:active {
+        background-color: #b197fc; /* 懸停時背景色 */
+        color: #fff; /* 懸停時字體顏色 */
+      }
+      .btn-buy:hover {
+        border: 1px solid;
+        border-color: #ffb44d;
+        background-color: #ffb44d;
+        color: #fff;
+        transform: scale(1.15); /* 讓按鈕放大 10% */
+      }
+      .btn-buy:active {
+        background-color: black;
+        color: #fff;
+      }
+
+      canvas {
+        max-width: 75px;
+        margin: 20px auto;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 添加陰影 */
+        border-radius: 50%; /* 如果您希望圓形圖表外框也是圓形的 */
+      }
+    </style>
+    <meta th:replace="~{commons/userHead}" />
+    <title>TickitEasy|</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/TickitEasy/cwdfunding/js/doughnut.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/userHeader}"></div>
+
+    <div class="container py-5">
+      <div class="row custom-row px-5">
+        <!-- Image Section -->
+        <div class="col-md-7 image-container ps-4 ms-2">
+          <img
+            src="/TickitEasy/images/cwdfunding/06f1bd17-c766-4896-b40a-961dad99792e.jpg"
+            alt="Image"
+          />
+        </div>
+
+        <!-- Text Section -->
+        <div class="col-md-4 text-container d-flex align-items-start">
+          <div class="custom-letter-spacing pt-3 extra-small">
+            <a
+              th:text="|群眾集資 \ ${fundProjDTO.categoryName}|"
+              th:href="|/TickitEasy/fundprojects?categoryID=${fundProjDTO.categoryId}|"
+            ></a>
+          </div>
+          <div
+            class="custom-letter-spacing fs-5 fw-medium py-4"
+            th:text="${fundProjDTO.title}"
+          ></div>
+          <div class="d-flex justify-content-evenly align-items-center mb-2">
+            <div>
+              <canvas id="myDoughnutChart"></canvas>
+            </div>
+            <div class="ps-4">
+              <div class="extra-small">目標 NT$ 100,000</div>
+              <div class="fs-4 fw-bolder">NT$ 2,422,550</div>
+              <div>
+                <small class="custom-small-text2"
+                  ><i class="fa-solid fa-user" style="color: #797a7c"></i
+                ></small>
+                <small class="custom-small-text2 me-2 fw-semibold"
+                  >8,628 人
+                </small>
+                <small>
+                  <i
+                    class="fa-solid fa-hourglass-start"
+                    style="color: #797a7c"
+                  ></i
+                ></small>
+                <small class="custom-small-text2 fw-semibold">12 天 </small>
+              </div>
+            </div>
+          </div>
+          <!-- <small class="custom-letter-spacing extra-small mb-3">
+				挑戰 -
+				最小！最薄！最能收！雙面感應不可少！滿足最多「想要」的證件套～識別證、門禁卡、交通卡，感應最俐落
+				× 名片、證件、行事曆，口袋收納更方便：）
+			  </small> -->
+          <hr class="hr-thick" />
+          <small class="custom-small-text mt-2"
+            >募資期間 2024/07/09 11:55 – 2024/10/16 23:59</small
+          >
+          <button
+            type="button"
+            class="btn border fw-bolder my-5 btn-like purple-text"
+          >
+            <i class="fa-regular fa-heart btn-like-heart"></i> 收藏
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row custom-row px-5 pt-3 pb-5 mb-5">
+        <!-- Content Section -->
+        <div class="col-md-7 ps-4 ms-2 mt-2">
+          <p>
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita
+            sequi qui perferendis, rerum, officiis pariatur ut vero amet nostrum
+            eum rem perspiciatis iusto cumque at aliquid, ullam veritatis
+            reiciendis? Laborum.
+          </p>
+        </div>
+
+        <!-- Plan  -->
+        <div class="col-md-4 text-container d-flex align-items-start pe-5 me-2">
+          <div class="row row-cols-1 row-cols-md-1 g-5">
+            <div class="col">
+              <div class="card border border-2">
+                <img
+                  src="/TickitEasy/images/cwdfunding/06f1bd17-c766-4896-b40a-961dad99792e.jpg"
+                  class="card-img-top img-plan d-block mx-auto py-3"
+                  alt="..."
+                />
+                <div class="card-body mx-3">
+                  <h5 class="card-title">Card title</h5>
+                  <p class="card-text">
+                    This is a wider card with supporting text below as a natural
+                    lead-in to additional content. This content is a little bit
+                    longer.
+                  </p>
+                </div>
+                <div
+                  class="card-footer text-center py-3 bg-transparent border border-0"
+                >
+                  <hr class="hr-thin" />
+                  <small class="custom-small-text">預計2025年二月實現</small>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card border border-2">
+                <img
+                  src="/TickitEasy/images/cwdfunding/06f1bd17-c766-4896-b40a-961dad99792e.jpg"
+                  class="card-img-top img-plan d-block mx-auto py-3"
+                  alt="..."
+                />
+                <div class="card-body mx-3 pb-0">
+                  <p
+                    class="card-text custom-letter-spacing custom-small-text2 text-light-emphasis fw-medium"
+                  >
+                    獨家早鳥｜贈日本製實用禮
+                  </p>
+                  <h5 class="card-title fw-bolder pb-1">NT$ 5,990</h5>
+                  <p class="card-text custom-letter-spacing custom-small-text2">
+                    超早鳥｜HAL昭釜八式無水鍋 嘖嘖獨賣價 $5990 未來市價
+                    $10000，現省 $4010
+                  </p>
+                  <button
+                    type="button"
+                    class="btn fw-medium pt-1 btn-buy custom-letter-spacing"
+                  >
+                    贊助
+                  </button>
+                </div>
+                <div
+                  class="card-footer text-center py-3 bg-transparent border border-0"
+                >
+                  <hr class="hr-thin" />
+                  <small class="custom-small-text">預計2025年二月實現</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{commons/userFooter}"></div>
+  </body>
+</html>

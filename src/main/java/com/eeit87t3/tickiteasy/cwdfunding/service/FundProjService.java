@@ -184,6 +184,7 @@ public class FundProjService {
 			dto.setTagId(fundProj.getFundTag().getTagId());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
+			dto.setFundplanList(fundProj.getFundPlan());
 			return dto;
 		});
 		return dto;

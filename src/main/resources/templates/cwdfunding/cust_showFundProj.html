@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css"
@@ -12,10 +11,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css"
     />
+    <meta th:replace="~{commons/userHead}" />
     <title>募資專案</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
     <script>
       $(document).ready(function () {
         let output = document.getElementById("outputBlock");
@@ -60,17 +59,20 @@
           selectedValue = this.value.trim();
 
           if (selectedValue == 0) {
-            window.location.href = "/TickitEasy/fundproject";
+            window.location.href = "/TickitEasy/fundprojects";
             console.log("全部");
           } else {
             window.location.href =
-              "/TickitEasy/fundproject?categoryID=" + selectedValue;
+              "/TickitEasy/fundprojects?categoryID=" + selectedValue;
           }
         });
       });
     </script>
   </head>
+
   <body>
+    <div th:replace="~{commons/userHeader}"></div>
+
     <div class="container">
       <div class="row row-cols-12 my-4 mx-5 ps-2">
         <div id="carouselExampleIndicators" class="carousel slide">
@@ -183,7 +185,10 @@
       <div id="outputBlock" class="row row-cols-1 row-cols-md-3 g-4 ms-5 me-5">
         <th:block th:each=" aFundProj : ${page.content}">
           <div class="col d-flex justify-content-center mb-3">
-            <a href="#" class="card h-100 custom-card">
+            <a
+              th:href="|/TickitEasy/fundprojects/${aFundProj.projectID}|"
+              class="card h-100 custom-card"
+            >
               <img
                 th:src="@{${aFundProj.image}}"
                 class="card-img-top"
@@ -259,20 +264,20 @@
             <li th:case="${false}" class="page-item">
               <a
                 class="page-link"
-                th:href="|/TickitEasy/fundproject?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:href="|/TickitEasy/fundprojects?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&laquo;'"
               ></a>
             </li>
             <li th:case="${true}" class="page-item disabled">
               <a
                 class="page-link"
-                th:href="|/TickitEasy/fundproject?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:href="|/TickitEasy/fundprojects?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&laquo;'"
               ></a>
             </li>
           </th:block>
           <!-- 頁數 -->
-          <!-- th:href="|/fundproject(p=${page.number})${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|" -->
+          <!-- th:href="|/fundprojects(p=${page.number})${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|" -->
 
           <th:block
             th:each=" aNumber : ${#numbers.sequence(1, page.totalPages)}"
@@ -284,7 +289,7 @@
               <li th:case="${false}" class="page-item">
                 <a
                   class="page-link"
-                  th:href="|/TickitEasy/fundproject?p=${aNumber}${selectedCategory != 0 ? ',categoryID=' + selectedCategory : ''}|"
+                  th:href="|/TickitEasy/fundprojects?p=${aNumber}${selectedCategory != 0 ? ',categoryID=' + selectedCategory : ''}|"
                   th:text="${aNumber}"
                 ></a>
               </li>
@@ -295,14 +300,14 @@
             <li th:case="${true}" class="page-item disabled">
               <a
                 class="page-link"
-                th:href="|/TickitEasy/fundproject?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:href="|/TickitEasy/fundprojects?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&raquo;'"
               ></a>
             </li>
             <li th:case="${false}" class="page-item">
               <a
                 class="page-link"
-                th:href="|/TickitEasy/fundproject?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:href="|/TickitEasy/fundprojects?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
                 th:text="'&raquo;'"
               ></a>
             </li>
@@ -310,5 +315,7 @@
         </ul>
       </div>
     </div>
+
+    <div th:replace="~{commons/userFooter}"></div>
   </body>
 </html>

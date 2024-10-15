@@ -23,7 +23,7 @@
 }
 
 .progress {
-  height: 8px;
+  --bs-progress-height: 0.6rem !important; /* 覆蓋 Bootstrap 的進度條高度 */
   width: 100%;
 }
 
