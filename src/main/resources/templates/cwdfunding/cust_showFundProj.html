@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css"
+    />
+    <link rel="stylesheet" href="/TickitEasy/cwdfunding/css/card.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css"
+    />
+    <title>募資專案</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+    <script>
+      $(document).ready(function () {
+        let output = document.getElementById("outputBlock");
+        let progressBars = document.querySelectorAll(".progress-bar");
+        let daysLefts = document.querySelectorAll("[data-startdate]");
+        let categorySelector = document.getElementById("categoryID");
+
+        // 動態填入 1.剩餘天數 2.募資進度
+        daysLefts.forEach(function (element) {
+          const startDate = new Date(
+            element.getAttribute("data-startdate").replace(" ", "T")
+          );
+          const endDate = new Date(
+            element.getAttribute("data-enddate").replace(" ", "T")
+          );
+
+          const timeDiff = endDate - startDate;
+          const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+          element.textContent = daysDiff + " 天";
+        });
+
+        progressBars.forEach(function (element) {
+          const targetAmount = element.getAttribute("data-targetamount");
+          const currentAmount = element.getAttribute("data-currentamount");
+          const nowProgress =
+            (parseInt(currentAmount) / parseInt(targetAmount)) * 100;
+          element.style.width = nowProgress + "%";
+
+          // 找到與該進度條相鄰的 small 標籤，並設置其文本為當前進度百分比
+          const progressText = element
+            .closest(".row")
+            .querySelector(".progressText");
+          console.log(progressText);
+          if (progressText) {
+            progressText.textContent = nowProgress + "%"; // 保留兩位小數
+          }
+        });
+
+        // 監聽category選項，change時跳轉頁面
+        categorySelector.addEventListener("change", function () {
+          selectedValue = this.value.trim();
+
+          if (selectedValue == 0) {
+            window.location.href = "/TickitEasy/customer/fundproject";
+            console.log("全部");
+          } else {
+            window.location.href =
+              "/TickitEasy/customer/fundproject?categoryID=" + selectedValue;
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="text-center mb-4 ms-5 me-5">
+        <h1>Bootstrap card tiled layout</h1>
+      </div>
+
+      <div class="row row-cols-1 mb-4 ms-5 me-5 ps-2">
+        <div class="col-4">
+          <select
+            class="categories form-select w-50"
+            aria-label="Default select example"
+            name="categoryID"
+            id="categoryID"
+          >
+            <option disabled>主題分類</option>
+            <option value="0" th:selected="${selectedCategory == 0}">
+              全部
+            </option>
+            <th:block th:each=" aCategory : ${categories}">
+              <option
+                th:value="${aCategory.categoryId}"
+                th:selected="${selectedCategory == aCategory.categoryId }"
+                th:text="${aCategory.categoryName}"
+              ></option>
+            </th:block>
+          </select>
+        </div>
+      </div>
+      <div id="outputBlock" class="row row-cols-1 row-cols-md-3 g-4 ms-5 me-5">
+        <th:block th:each=" aFundProj : ${page.content}">
+          <div class="col d-flex justify-content-center mb-3">
+            <a href="#" class="card h-100 custom-card">
+              <img
+                th:src="@{${aFundProj.image}}"
+                class="card-img-top"
+                alt="..."
+              />
+              <div class="card-body">
+                <div
+                  class="card-title fw-semibold custom-title-text"
+                  th:text="${aFundProj.title}"
+                ></div>
+              </div>
+              <div class="card-footer bg-transparent border-0 mt-2">
+                <div class="row">
+                  <div class="col-10 d-flex align-items-center">
+                    <div
+                      class="progress"
+                      role="progressbar"
+                      aria-label="Success example"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      <div
+                        class="progress-bar text-start"
+                        th:data-currentamount="${aFundProj.currentAmount}"
+                        th:data-targetamount="${aFundProj.targetAmount}"
+                      ></div>
+                    </div>
+                  </div>
+                  <div class="col-2 text-end custom-small-text purple-text">
+                    <small class="progressText"></small>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <div class="text-start">
+                    <small
+                      class="fw-semibold custom-small-text"
+                      th:text="'NT$ '+${aFundProj.currentAmount}"
+                    ></small>
+                  </div>
+                  <div class="text-end">
+                    <small class="text-end custom-small-text"
+                      ><i class="fa-solid fa-user" style="color: #797a7c"></i
+                    ></small>
+                    <small class="me-2 fw-semibold custom-small-text"
+                      >8,628 人
+                    </small>
+                    <small class="text-end custom-small-text">
+                      <i
+                        class="fa-solid fa-hourglass-start"
+                        style="color: #797a7c"
+                      ></i
+                    ></small>
+                    <small
+                      class="text-end fw-semibold custom-small-text"
+                      th:data-startdate="${aFundProj.startDate}"
+                      th:data-enddate="${aFundProj.endDate}"
+                      id="daysLeft"
+                    >
+                      0 天
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </th:block>
+      </div>
+      <div id="pageBlock" class="d-flex justify-content-center mt-3">
+        <ul th:if="${page.totalPages != 0}" class="pagination">
+          <!-- 上一頁 -->
+
+          <th:block th:switch="${page.number + 1 == 1}">
+            <li th:case="${false}" class="page-item">
+              <a
+                class="page-link"
+                th:href="|/customer/fundproject?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:text="'&laquo;'"
+              ></a>
+            </li>
+            <li th:case="${true}" class="page-item disabled">
+              <a
+                class="page-link"
+                th:href="|/customer/fundproject?p=${page.number}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:text="'&laquo;'"
+              ></a>
+            </li>
+          </th:block>
+          <!-- 頁數 -->
+          <!-- th:href="|/customer/fundproject(p=${page.number})${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|" -->
+
+          <th:block
+            th:each=" aNumber : ${#numbers.sequence(1, page.totalPages)}"
+          >
+            <th:block th:switch="${page.number + 1 == aNumber}">
+              <li th:case="${true}" class="page-item active">
+                <a class="page-link"><span th:text="${aNumber}"></span></a>
+              </li>
+              <li th:case="${false}" class="page-item">
+                <a
+                  class="page-link"
+                  th:href="|/TickitEasy/customer/fundproject?p=${aNumber}${selectedCategory != 0 ? ',categoryID=' + selectedCategory : ''}|"
+                  th:text="${aNumber}"
+                ></a>
+              </li>
+            </th:block>
+          </th:block>
+          <!-- 下一頁 -->
+          <th:block th:switch="${page.number + 1 == page.totalPages}">
+            <li th:case="${true}" class="page-item disabled">
+              <a
+                class="page-link"
+                th:href="|/TickitEasy/customer/fundproject?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:text="'&raquo;'"
+              ></a>
+            </li>
+            <li th:case="${false}" class="page-item">
+              <a
+                class="page-link"
+                th:href="|/TickitEasy/customer/fundproject?p=${page.number + 2}${selectedCategory != 0 ? ', categoryID=' + selectedCategory : ''}|"
+                th:text="'&raquo;'"
+              ></a>
+            </li>
+          </th:block>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
