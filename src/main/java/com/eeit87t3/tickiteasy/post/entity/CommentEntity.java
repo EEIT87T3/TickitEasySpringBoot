@@ -3,7 +3,10 @@ package com.eeit87t3.tickiteasy.post.entity;
 
 import java.sql.Timestamp;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +37,8 @@ public class CommentEntity implements java.io.Serializable  {
 	@Column(name = "content")
 	private String content;
 	
+	@CreationTimestamp
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
 	@Column(name = "commentDate")
 	private Timestamp commentDate;
 	
