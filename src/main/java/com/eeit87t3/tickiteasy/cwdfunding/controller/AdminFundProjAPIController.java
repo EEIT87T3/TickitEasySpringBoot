@@ -1,9 +1,7 @@
 package com.eeit87t3.tickiteasy.cwdfunding.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -22,101 +20,32 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.Category;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.Tag;
-import com.eeit87t3.tickiteasy.cwdfunding.service.CategoryServiceTemp;
-import com.eeit87t3.tickiteasy.cwdfunding.service.FileService;
+
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
-import com.eeit87t3.tickiteasy.cwdfunding.service.TagServiceTemp;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
-import com.eeit87t3.tickiteasy.test.TestImagesEntity;
-import com.eeit87t3.tickiteasy.test.TestImagesRepo;
 
 @Controller
 @RequestMapping("/admin")
-public class FundProjController {
+public class AdminFundProjAPIController {
 
 	@Autowired
 	private FundProjService projService;
 
-	@Autowired
-	private CategoryServiceTemp categoryServiceTemp;
-
-	@Autowired
-	private TagServiceTemp tagServiceTemp;
 	
 	@Autowired
 	private ImageUtil imageUtil;
 	
-	@Autowired
-	private TestImagesRepo testImagesRepo;
-	
-	@Autowired
-	private FileService fileService;
-
-	/* [頁面] 查詢所有募資活動*/
-	@GetMapping("/fundproject")
-	public String showProjPage(@RequestParam(value = "p", defaultValue = "1") Integer pageNumber, Model model) {
-		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
-		model.addAttribute("page", page);
-
-		return "cwdfunding/showFundProj";
-	}
-	
-	/* [頁面] 查詢單筆募資活動by ID */
-	@GetMapping("/fundproject/{projectID}")
-	public String showProjPageByID(@PathVariable Integer projectID, Model model) {
-		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
-		FundProj fundProj = projService.findFundProjById(projectID);
-		List<FundPlan> fundPlans = fundProj.getFundPlan();
-		
-		model.addAttribute("projectDTO",fundProjDTO);
-		model.addAttribute("plans",fundPlans);
-		return "cwdfunding/showOneFundProj";
-	}
-	
-	/* [頁面] 新增募資活動 */
-	@GetMapping("/fundproject/create")
-	public String addProjPage(Model model) {
-		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
-		List<Tag> tags = tagServiceTemp.findFundProjTagList();
-		String topProject = projService.findTopProject();
-
-		model.addAttribute("projectID", topProject);
-		model.addAttribute("categories", categories);
-		model.addAttribute("tags", tags);
-		return "cwdfunding/addFundProjnPlan";
-	}
-	
-	/* [頁面] 修改單筆募資活動by ID */
-	@GetMapping("/fundproject/{projectID}/edit")
-	public String showEditProjPageByID(@PathVariable Integer projectID, Model model) {
-		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
-		FundProj fundProj = projService.findFundProjById(projectID);
-		List<FundPlan> fundPlans = fundProj.getFundPlan();
-		List<Category> categories = categoryServiceTemp.findFundProjCategoryList();
-		List<Tag> tags = tagServiceTemp.findFundProjTagList();
-		
-		model.addAttribute("projectDTO",fundProjDTO);
-		model.addAttribute("categories", categories);
-		model.addAttribute("tags", tags);
-		model.addAttribute("plans",fundPlans);
-		return "cwdfunding/editOneFundProj";
-	}
 	
 	/* [API] 查詢所有募資活動*/
 	@ResponseBody
 	@GetMapping("/api/fundproject")
-	public Page<FundProjDTO> findByPageApi(@RequestParam Integer pageNumber, Model model) {
-		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber);
+	public Page<FundProjDTO> findByPageApi(@RequestParam Integer pageNumber, @RequestParam(required = false) Integer categoryID, Model model) {
+		Integer pageSize = 10;
+		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber,pageSize,categoryID);
 		return page;
 	}
 

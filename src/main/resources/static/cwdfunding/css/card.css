@@ -1,0 +1,67 @@
+.custom-card {
+  width: 360px;
+  height: 322px;
+  text-decoration: none; /* 去除超連結下劃線 */
+  transition: box-shadow 0.3s ease; /* 添加過渡效果 */
+}
+
+.custom-card:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* 減輕的懸停陰影效果 */
+}
+
+.card-img-top {
+  width: 100%;
+  height: 200px; /* 可根據需要調整圖片的高度 */
+  object-fit: cover; /* 確保圖片縮放時保持比例並填滿容器 */
+}
+
+.progress {
+  height: 8px;
+  width: 100%;
+}
+
+.progress-bar {
+  background: #000;
+}
+
+.purple-text {
+  color: #5f46e8;
+}
+/* .progressSpan {
+  right: 0;
+  transform: translateX(100%); 
+} */
+
+.custom-title-text {
+  font-size: 1.2rem;
+}
+
+.custom-small-text {
+  font-size: 0.8rem;
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}
+/* 更改分頁按鈕的顏色 */
+.pagination .page-item .page-link {
+  border: none;
+  background-color: none;
+  border-radius: 50%;
+  color: black;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+
+.pagination .page-link {
+  padding: 3px 10px; /* 增加內部間距 */
+}
+
+/* 當前頁面的顏色 */
+.pagination .page-item.active .page-link {
+  color: #fff;
+  background-color: #5f46e8;
+  border-radius: 50%;
+  border-width: 0.5rem;
+  box-shadow: none;
+}
