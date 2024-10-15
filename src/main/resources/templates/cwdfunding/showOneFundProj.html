@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymprojectDTOeaf.org/">
+  <head>
+    <meta charset="UTF-8" />
+        <meta th:replace="~{commons/adminHead}">
+    <title>募資管理 - TickitEasy 管理系統</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // 這裡是 JavaScript 內容
+      });
+    </script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/adminHeader}"></div>
+    <!--  這裡是網頁內容 >-->
+
+    <div class="container">
+      <div class="row">
+        <div class="col mb-4 ml-3">
+          <span
+            class="fw-bold fs-4 text-start"
+            th:text="${projectDTO.title}"
+          ></span>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">類別</label>
+        </div>
+        <div class="col-3 text-start">
+          <span th:text="${projectDTO.categoryName}"></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">標籤</label>
+        </div>
+        <div class="col-3 text-start">
+          <span th:text="${projectDTO.tagName}"></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">目標金額</label>
+        </div>
+        <div class="col-3 text-start">
+          <span
+            th:text="${#numbers.formatInteger(projectDTO.targetAmount, 1, 'COMMA')}"
+          ></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">目前金額</label>
+        </div>
+        <div class="col-3 text-start">
+          <span
+            th:text="${#numbers.formatInteger(projectDTO.currentAmount, 1, 'COMMA')}"
+          ></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">開始日期</label>
+        </div>
+        <div class="col-3 text-start">
+          <span th:text="${projectDTO.startDate}"></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">結束日期</label>
+        </div>
+        <div class="col-3 text-start">
+          <span th:text="${projectDTO.endDate}"></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">展延門檻</label>
+        </div>
+        <div class="col-3 text-start">
+          <span th:text="${projectDTO.threshold}"></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">展延日期</label>
+        </div>
+        <div class="col-3 text-start">
+          <span th:text="${projectDTO.postponeDate}"></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">封面</label>
+        </div>
+        <div class="col-3 text-start">
+          <!-- <span th:text="${projectDTO.image}"></span> -->
+          <img th:src="'/TickitEasy'+${projectDTO.image}" width="250px" />
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-1 text-end">
+          <label class="fw-medium">敘述</label>
+        </div>
+        <div class="col-3">
+          <span
+            th:text="${projectDTO.description}"
+            style="display: block; max-height: 200px; overflow-y: auto"
+          ></span>
+        </div>
+        <div class="col-8"></div>
+      </div>
+
+      <th:block th:each="plan, iterStat : ${plans}">
+        <div class="row">
+          <div class="col">
+            <p
+              class="fw-bold text-start p-3 fs-5"
+              th:text="'《方案 ' + ${(iterStat.index + 1)} + '》'"
+            ></p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-1 text-end">
+            <label class="fw-medium">名稱</label>
+          </div>
+          <div class="col-md-3">
+            <span th:text="${plan.planTitle}"></span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-1 text-end">
+            <label class="fw-medium">單價</label>
+          </div>
+          <div class="col-md-3">
+            <span th:text="${plan.planUnitPrice}"></span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-1 text-end">
+            <label class="fw-medium">總數量</label>
+          </div>
+          <div class="col-md-3">
+            <span th:text="${plan.planTotalAmount}"></span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-1 text-end">
+            <label class="fw-medium">已購數量</label>
+          </div>
+          <div class="col-md-3">
+            <span th:text="${plan.planBuyAmount}"></span>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-1 text-end">
+            <label class="fw-medium">圖片</label>
+          </div>
+          <div class="col-md-3">
+            <img th:src="'/TickitEasy'+${plan.planImage}" width="250px" />
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-1 text-end">
+            <label class="fw-medium">內容</label>
+          </div>
+          <div class="col-md-3">
+            <span th:text="${plan.planContent}"></span>
+          </div>
+        </div>
+      </th:block>
+    </div>
+
+    <div id="outputBlock"></div>
+    <div th:replace="~{commons/adminFooter}"></div>
+  </body>
+</html>

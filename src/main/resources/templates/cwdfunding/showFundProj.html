@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <meta charset="UTF-8" />
+    <meta th:replace="~{commons/adminHead}" />
+    <title>募資管理 - TickitEasy 管理系統</title>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+    <script>
+      $(document).ready(function () {
+        let currentPage = 1;
+        let output = document.getElementById("outputBlock");
+        let spinnerBlock = document.getElementById("spinnerBlock");
+        loadThatPage(1);
+
+        // 拿到 pageNumber 輸出 json 資料
+        function loadThatPage(pageNum) {
+          currentPage = pageNum;
+          spinner();
+          axios
+            .get("http://localhost:8080/TickitEasy/admin/api/fundproject", {
+              params: {
+                pageNumber: pageNum,
+              },
+            })
+            .then((res) => {
+              console.log(res.data);
+              htmlMaker(res.data);
+            });
+        }
+
+        function spinner() {
+          output.innerHTML = "";
+          spinnerBlock.innerHTML = "";
+          spinnerBlock.innerHTML = `<div class="d-flex m-5 justify-content-center">
+             <div class="spinner-border" role="status">
+               <span class="visually-hidden">Loading...</span>
+             </div>
+           </div>`;
+        }
+
+        function htmlMaker(pageData) {
+          let output = document.getElementById("outputBlock");
+          let pageBtnBlock = document.getElementById("pageBtnBlock");
+          let elementBlock = document.getElementById("totalElementsBlock");
+
+          output.innerHTML = "";
+          spinnerBlock.innerHTML = "";
+          pageBtnBlock.innerHTML = "";
+          elementBlock.innerHTML = "";
+
+          pageData.content.forEach((el) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td> ${el.projectID} </td>
+             <td nowrap> <a href="/TickitEasy/admin/fundproject/${el.projectID}">${el.title}</a></td>
+             <!-- <td class="text-truncate" style="max-width: 150px; nowrap"> ${el.description}</td> -->
+             <!-- <td> ${el.image} </td> -->
+             <td> ${el.startDate} </td>
+             <td> ${el.endDate} </td>
+             <td class="text-end"> ${el.targetAmount} </td>
+             <td class="text-end"> ${el.currentAmount} </td>
+             <td> ${el.threshold} </td>
+             <td> ${el.postponeDate} </td>
+             <td> ${el.categoryName} </td>
+             <td> <a href="/TickitEasy/admin/fundproject/${el.projectID}/edit"><button class="btn btn-edit" data-projectID="${el.projectID}"><i class="fa-solid fa-pen-to-square" style="color: #64d93a;"></i></button></a>
+             <button class="btn btn-delete" data-projectID="${el.projectID}"><i class="fa-solid fa-trash" style="color: #ff5c5c;"></i></button> </td>`;
+            output.append(tr);
+          });
+          // 印頁數 (pageData.totalPages)
+          for (let i = 1; i <= pageData.totalPages; i++) {
+            pageBtnBlock.innerHTML += ` <button class="btn pageBtn active" data-pagebtn="${i}" >${i}</button>`;
+          }
+
+          let pageBtns = document.getElementsByClassName("pageBtn");
+
+          for (let i = 0; i < pageBtns.length; i++) {
+            pageBtns[i].addEventListener("click", function (e) {
+              let pageID = this.getAttribute("data-pagebtn");
+              console.log("pageID: " + pageID);
+              loadThatPage(pageID);
+            });
+          }
+
+          //監聽刪除按鈕
+          let deleteBtns = document.getElementsByClassName("btn-delete");
+          console.log(deleteBtns.length);
+          for (let i = 0; i < deleteBtns.length; i++) {
+            deleteBtns[i].addEventListener("click", function (e) {
+              let projectID = this.getAttribute("data-projectID");
+              console.log(projectID);
+              swal({
+                title: "確定刪除？",
+                icon: "warning",
+                buttons: {
+                  cancel: {
+                    text: "取消",
+                    visible: true,
+                  },
+                  confirm: {
+                    text: "刪除",
+                    visible: true,
+                  },
+                },
+                dangerMode: true,
+              }).then((willDelete) => {
+                if (willDelete) {
+                  deleteProjByID(projectID);
+                }
+              });
+            });
+          }
+
+          //重新塞入page.totalElements總數
+          elementBlock.innerHTML = `總共有 <span>${pageData.totalElements}筆</span> `;
+        }
+
+        function deleteProjByID(id) {
+          console.log(id);
+          axios
+            .delete(
+              `http://localhost:8080/TickitEasy/admin/api/fundproject/${id}`
+            )
+            .then((res) => {
+              if (res.status === 204) {
+                // 刪除成功，重新加載當前頁面
+                swal({
+                  title: "刪除成功！",
+                  icon: "success",
+                  buttons: {
+                    confirm: {
+                      text: "確定",
+                      visible: true,
+                    },
+                  },
+                }).then((ok) => {
+                  if (ok) {
+                    console.log("ok");
+                    loadThatPage(currentPage); // 使用當前頁面號碼重新加載
+                  }
+                });
+              }
+            })
+            .catch((err) => {
+              if (err.response.status === 404) {
+                alert("Project not found.");
+              } else {
+                console.error(err);
+                alert("An error occurred while deleting the project.");
+              }
+            });
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/adminHeader}"></div>
+    <!--  這裡是網頁內容 >-->
+    <div class="container">
+      <table class="table table-hover text-center">
+        <thead>
+          <th scope="col">#</th>
+          <th scope="col">名稱</th>
+          <!-- <th scope="col">敘述</th> -->
+          <!-- <th scope="col">封面</th> -->
+          <th scope="col">開始時間</th>
+          <th scope="col">結束時間</th>
+          <th scope="col">目標金額</th>
+          <th scope="col">目前金額</th>
+          <th scope="col">門檻</th>
+          <th scope="col">展延日期</th>
+          <th scope="col">分類</th>
+          <th scope="col">操作</th>
+        </thead>
+        <tbody id="outputBlock"></tbody>
+      </table>
+      <div id="spinnerBlock"></div>
+      <div class="text-end" id="pageBtnBlock"></div>
+      <br />
+      <div id="totalElementsBlock"></div>
+    </div>
+    <div th:replace="~{commons/adminFooter}"></div>
+  </body>
+</html>
