@@ -18,8 +18,8 @@ import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 
 @Controller
-@RequestMapping("/customer")
-public class MemberFundProjViewController {
+@RequestMapping("/fundprojects")
+public class UserFundProjViewController {
 
 	@Autowired
 	private FundProjService projService;
@@ -30,7 +30,7 @@ public class MemberFundProjViewController {
 	@Autowired
 	private TagService tagService;
 	
-	@GetMapping("/fundproject")
+	@GetMapping()
 	public String showProjPage(@RequestParam(value = "p", defaultValue = "1") Integer pageNumber, @RequestParam(required = false) Integer categoryID, Model model) {
 		Integer pageSize = 9;
 		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber, pageSize, categoryID);

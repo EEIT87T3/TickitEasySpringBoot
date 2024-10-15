@@ -31,7 +31,7 @@ import com.eeit87t3.tickiteasy.image.ImageUtil;
 
 @RestController
 @RequestMapping("/member")
-public class MemberFundProjAPIController {
+public class UserFundProjAPIController {
 
 	@Autowired
 	private FundProjService projService;
