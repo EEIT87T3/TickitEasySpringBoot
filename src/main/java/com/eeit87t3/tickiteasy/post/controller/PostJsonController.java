@@ -1,6 +1,8 @@
 package com.eeit87t3.tickiteasy.post.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
@@ -25,6 +29,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
+import com.eeit87t3.tickiteasy.post.dto.CreatePostDTO;
 import com.eeit87t3.tickiteasy.post.entity.CommentEntity;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.repository.CommentRepo;
@@ -35,7 +40,7 @@ import com.eeit87t3.tickiteasy.post.service.PostService;
 // 後臺路徑:/admin/api/post
 // 前臺路徑:/user/post
 //目前都是後台
-@Controller
+@RestController
 @RequestMapping("/admin/api/post")
 public class PostJsonController {
 	
@@ -59,6 +64,7 @@ public class PostJsonController {
 
 	//取得所有貼文
 	@GetMapping("GET/")
+	@ResponseBody
 	public ResponseEntity<List<PostEntity>> getAllPosts() {
 	    List<PostEntity> posts = postService.findAll(); // 獲取所有貼文
 	    return ResponseEntity.ok(posts);
@@ -106,14 +112,14 @@ public class PostJsonController {
  	}
  	
  	//根據貼文id取得多筆留言
- 	@GetMapping("/comment")
+ 	@GetMapping("/comments")
  	public ResponseEntity<List<CommentEntity>> findCommentByPostId(@RequestParam("postID") Integer postID) {
  
  		Optional<PostEntity> optionalPost = postRepo.findById(postID);
  		
  		if (optionalPost.isPresent()) {
  			// 如果貼文存在，則查詢貼文的留言
- 			List<CommentEntity> comments = commentService.findById(postID);
+ 			List<CommentEntity> comments = commentService.findByPostId(postID);
  			return ResponseEntity.ok(comments);  // 回傳 200 OK 和結果
  		}
  		
@@ -124,45 +130,34 @@ public class PostJsonController {
 
  	//新增單筆貼文
  	@PostMapping("POST/")
- 	public ResponseEntity<String> createPost(@RequestParam("postTitle") String title, 
- 	                                         @RequestParam("postContent") String content,
- 	                                         @RequestParam("categoryID") Integer categoryID,
- 	                                         @RequestParam("memberID") Integer memberID,
- 	                                         @RequestParam("status") Integer status,
- 	                                         @RequestParam("tagID") Integer tagID) {
- 		System.out.println(categoryID);
- 		System.out.println(tagID);
+ 	public ResponseEntity<PostEntity> createPost(@RequestBody CreatePostDTO createPostDTO) {
+ 	    // 驗證必要字段
+ 	    if (createPostDTO.getPostTitle() == null || createPostDTO.getPostContent() == null) {
+ 	        return ResponseEntity.badRequest().body(null);
+ 	    }
+
  	    PostEntity post = new PostEntity();
- 	    post.setPostTitle(title);
- 	    post.setPostContent(content);
- 	    post.setMemberID(memberID);
- 	    post.setStatus(status);
+ 	    post.setPostTitle(createPostDTO.getPostTitle());
+ 	    post.setPostContent(createPostDTO.getPostContent());
+ 	    post.setPostImgUrl(createPostDTO.getPostImgUrl());
  	    
- 	    TagEntity tag= tagService.findProductTagById(tagID);
- 	    CategoryEntity category= categoryService.findProductCategoryById(categoryID);
- 	    post.setPostCategory(category);
- 	    post.setPostTag(tag);
- 	   System.out.println(category!=null);
-		System.out.println(tag!=null);
-// 	   Optional<CategoryEntity> categoryOpt = categoryRepo.findById(categoryID);
-// 	   if (!categoryOpt.isPresent()) {
-// 		   throw new IllegalArgumentException("該分類不存在");
-// 	   }
-// 	   CategoryEntity category = categoryOpt.get();
-// 	   
-// 	   Optional<TagEntity> tagOpt = tagRepo.findById(tagID);
-// 	   if (!tagOpt.isPresent()) {
-// 		   throw new IllegalArgumentException("該標籤不存在");
-// 	   }
-// 	  TagEntity tag = tagOpt.get();
- 	    
- 	     
-// 	    post.setPostCategory(category);
-// 	    post.setPostTag(tag);
- 	    
- 	    postService.insert(post);
- 	    
- 	    return ResponseEntity.ok("Post created successfully");
+ 	    // 設置分類和標籤
+ 	    if (createPostDTO.getCategoryID() != null) {
+ 	        CategoryEntity category = categoryService.findProductCategoryById(createPostDTO.getCategoryID());
+ 	        post.setPostCategory(category);
+ 	    }
+ 	    if (createPostDTO.getTagID() != null) {
+ 	        TagEntity tag = tagService.findProductTagById(createPostDTO.getTagID());
+ 	        post.setPostTag(tag);
+ 	    }
+
+ 	    // 設置默認值或從當前用戶會話中獲取
+// 	    post.setMemberID(getCurrentMemberId()); // 實現這個方法來獲取當前登錄用戶的ID
+ 	    post.setMemberID(1); // 實現這個方法來獲取當前登錄用戶的ID
+ 	    post.setStatus(1); // 假設 1 是默認狀態
+
+ 	    PostEntity createdPost = postService.insert(post);
+ 	    return ResponseEntity.ok(createdPost);
  	}
  	
  
@@ -181,21 +176,25 @@ public class PostJsonController {
  	
  	//刪除單筆貼文
  	@DeleteMapping("DELETE/{postID}")
- 	public ResponseEntity<?> delete(@PathVariable Integer postID) {
- 	    // 檢查 postID 是否為 null 或小於等於零
+ 	public ResponseEntity<Map<String, Object>> delete(@PathVariable Integer postID) {
  	    if (postID == null || postID <= 0) {
- 	        return ResponseEntity.badRequest().body("貼文ID無效");
+ 	        Map<String, Object> response = new HashMap<>();
+ 	        response.put("success", false);
+ 	        response.put("message", "貼文ID無效");
+ 	        return ResponseEntity.badRequest().body(response);
  	    }
 
- 	    // 調用服務層的刪除方法
  	    Boolean isDeleted = postService.delete(postID);
 
- 	    // 根據刪除結果返回響應
+ 	    Map<String, Object> response = new HashMap<>();
  	    if (isDeleted) {
- 	        return ResponseEntity.ok("貼文已成功刪除");
+ 	        response.put("success", true);
+ 	        response.put("message", "貼文已成功刪除");
+ 	        return ResponseEntity.ok(response);
  	    } else {
- 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
- 	                             .body("刪除失敗，請稍後再試");
+ 	        response.put("success", false);
+ 	        response.put("message", "刪除失敗，請稍後再試");
+ 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
  	    }
  	}
 

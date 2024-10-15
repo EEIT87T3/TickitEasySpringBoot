@@ -9,9 +9,12 @@ import org.springframework.stereotype.Component;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
+import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +23,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-//import member.bean.MemberBean;
 
 @Entity
 @Table(name = "post")
@@ -48,8 +50,13 @@ public class PostEntity {
 	private String postImgUrl;
 	
 	@CreationTimestamp
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
 	@Column(name = "postTime")
 	private Timestamp postTime;
+//	gpt建議的如下:
+//	@Column(name = "createdAt", updatable = false)
+//	@CreationTimestamp
+//	private LocalDateTime createdAt;
 	
 	@Column(name = "likesCount")
 	private Integer likesCount;
@@ -75,13 +82,13 @@ public class PostEntity {
 	@JoinColumn(name = "tagID", referencedColumnName = "tagID")
 	private TagEntity postTag; 
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post")//用到留言的時候再加載
     private Set<CommentEntity> comments;  // 使用 Set 來避免重複
 	
-	//  @ManyToOne 關聯到 Member 實體
-//	@ManyToOne
-//	@JoinColumn(name = "memberID", referencedColumnName = "memberID", insertable = false, updatable = false)//避免重複映射
-//	private MemberBean member;  
+	// @ManyToOne 關聯到 Member 實體
+	@ManyToOne
+	@JoinColumn(name = "memberID", referencedColumnName = "memberID", insertable = false, updatable = false)
+	private Member member;  
 	
 	@Transient
     private static final String DEFAULT_PROFILE_PIC = "/images/default-avatar.png"; // 預設頭貼路徑
@@ -102,23 +109,12 @@ public class PostEntity {
 	public Integer getStatus() {return status;}
 
 
-	public CategoryEntity getPostCategory() {
-		return postCategory;
-	}
-
-	public void setPostCategory(CategoryEntity postCategory) {
-		this.postCategory = postCategory;
-	}
+	public CategoryEntity getPostCategory() {return postCategory;}
+	public void setPostCategory(CategoryEntity postCategory) {this.postCategory = postCategory;}
 
 
-
-	public TagEntity getPostTag() {
-		return postTag;
-	}
-
-	public void setPostTag(TagEntity postTag) {
-		this.postTag = postTag;
-	}
+	public TagEntity getPostTag() {return postTag;}
+	public void setPostTag(TagEntity postTag) {this.postTag = postTag;}
 
 	public void setPostID(Integer postID) {this.postID = postID;}
 //	public void setThemeID(Integer themeID) {this.themeID = themeID;}
@@ -137,16 +133,19 @@ public class PostEntity {
 //	public void setThemeName(ThemeEntity theme) {
 //		this.theme = theme;
 //	}
-//	public MemberBean getMember() {
-//		return member;
-//	}
-//	public void setMember(MemberBean member) {
-//		this.member = member;
-//	}
+
+	public Member getMember() {
+		return member;
+	}
+	
+	public void setMember(Member member) {
+		this.member = member;
+	}
     
 	public Set<CommentEntity> getComments() {
 	        return comments;
 	}
+
 	public void setComments(Set<CommentEntity> comments) {
 	        this.comments = comments;
 	}
@@ -169,21 +168,21 @@ public class PostEntity {
 //			throw new IllegalStateException("MemberBean is not initialized.");
 //		}
 //	}
-//	public String getMemberNickname() {
-//		if (member != null) {
-//			return member.getNickname();
-//		}
-//		return null; // 或者返回一個預設值
-//	}
-//	
-//	public void setMemberNickname(String nickname) {
-//		if (member != null) {
-//			member.setNickname(nickname);
-//		} else {
-//			// 處理 member 為 null 的情況
-//			// 例如可以拋出異常或者設置一個默認值
-//			throw new IllegalStateException("MemberBean is not initialized.");
-//		}
-//	}
+	public String getNickname() {
+		if (member != null) {
+			return member.getNickname();
+		}
+		return null; // 或者返回一個預設值
+	}
+	
+	public void setNickname(String nickname) {
+		if (member != null) {
+			member.setNickname(nickname);
+		} else {
+			// 處理 member 為 null 的情況
+			// 例如可以拋出異常或者設置一個默認值
+			throw new IllegalStateException("MemberBean is not initialized.");
+		}
+	}
 	
 }
