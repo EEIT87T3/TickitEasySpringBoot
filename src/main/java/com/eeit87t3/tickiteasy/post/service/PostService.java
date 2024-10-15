@@ -3,6 +3,7 @@ package com.eeit87t3.tickiteasy.post.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
+import com.eeit87t3.tickiteasy.post.dto.ShowPostDTO;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.repository.PostRepo;
 
@@ -29,10 +31,28 @@ public class PostService {
 	private ImageUtil imageUtil;
 	
 	//取得所有貼文
-	@Transactional(readOnly = true)
-	public List<PostEntity> findAll(){
-		return postRepo.findAll();
-	}
+//	@Transactional(readOnly = true)
+//	public List<PostEntity> findAll(){
+//		return postRepo.findAll();
+//	}
+	public List<ShowPostDTO> getAllPosts() {
+        List<PostEntity> posts = postRepo.findAllPostsWithDetails();
+        
+        return posts.stream().map(post -> {
+        	ShowPostDTO dto = new ShowPostDTO();
+            dto.setPostID(post.getPostID()); // 假設ID是主鍵
+            dto.setNickname(post.getMember().getNickname());
+            dto.setPostTitle(post.getPostTitle());
+            dto.setPostContent(post.getPostContent());
+            dto.setCategoryName(post.getPostCategory() != null ? post.getPostCategory().getCategoryName() : "N/A");
+            dto.setTagName(post.getPostTag() != null ? post.getPostTag().getTagName() : "N/A");
+            dto.setPostImgUrl(post.getPostImgUrl() != null ? post.getPostImgUrl() : "N/A");
+            dto.setStatus(post.getStatus());
+            dto.setPostTime(post.getPostTime() != null ? post.getPostTime().toString() : "N/A"); // 根據需要格式化時間
+            
+            return dto;
+        }).collect(Collectors.toList());
+    }
 	
 	//根據貼文ID取得單筆貼文
     @Transactional(readOnly = true)

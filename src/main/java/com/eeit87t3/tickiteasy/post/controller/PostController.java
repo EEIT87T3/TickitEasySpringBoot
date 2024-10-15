@@ -56,7 +56,7 @@ public class PostController {
 	@Autowired
 	private CommentRepo commentRepo;
 	
-///////////////////////////////////////     頁面跳轉    //////////////////////////////////////
+///////////////////////////////////////     後台頁面跳轉    //////////////////////////////////////
 	//所有貼文頁面
 	 @GetMapping
 	    public String showPostsPage(Model model) {
@@ -79,9 +79,13 @@ public class PostController {
 		 	model.addAttribute("postID", postID);
 	        return "post/postComment"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
 	    }
-	//////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////    前台頁面跳轉    ////////////////////////////////
 
-	
+	//新增貼文頁面 *未完成*
+		@GetMapping("/test")
+		    public String testPage() {
+		        return "post/test";  
+		    }
 
  	
 	//更新貼文

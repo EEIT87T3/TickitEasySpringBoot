@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,8 @@ import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.post.dto.CreatePostDTO;
+import com.eeit87t3.tickiteasy.post.dto.ShowCommentDTO;
+import com.eeit87t3.tickiteasy.post.dto.ShowPostDTO;
 import com.eeit87t3.tickiteasy.post.entity.CommentEntity;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.repository.CommentRepo;
@@ -63,12 +66,16 @@ public class PostJsonController {
 	
 
 	//取得所有貼文
+	//改用DTO獲取必要資料
 	@GetMapping("GET/")
 	@ResponseBody
-	public ResponseEntity<List<PostEntity>> getAllPosts() {
-	    List<PostEntity> posts = postService.findAll(); // 獲取所有貼文
-	    return ResponseEntity.ok(posts);
-	}
+	 public List<ShowPostDTO> getAllPosts() {
+        return postService.getAllPosts();
+    }
+//	public ResponseEntity<List<PostEntity>> getAllPosts() {
+//	    List<PostEntity> posts = postService.findAll(); // 獲取所有貼文
+//	    return ResponseEntity.ok(posts);
+//	}
 
 	//根據id取得單一貼文
 	@GetMapping("GET/{postID}")
@@ -113,6 +120,9 @@ public class PostJsonController {
  	
  	//根據貼文id取得多筆留言
  	@GetMapping("/comments")
+// 	 public List<ShowCommentDTO> getCommentsByPostId(@RequestParam("postID") Integer postID) {
+//        return commentService.getCommentsByPostId(postID);
+//    }
  	public ResponseEntity<List<CommentEntity>> findCommentByPostId(@RequestParam("postID") Integer postID) {
  
  		Optional<PostEntity> optionalPost = postRepo.findById(postID);
