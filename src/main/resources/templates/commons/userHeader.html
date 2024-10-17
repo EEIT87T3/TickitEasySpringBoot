@@ -39,24 +39,67 @@
         </div>
         <!-- 登入前顯示會員圖標 -->
         <div class="d-flex align-items-center ms-4" id="logged-out-header">
-          <a href="#" class="icon-button text-main-bright-orange">
-            <i class="fas fa-user-circle"></i>
+          <a href="/TickitEasy/member/login" class="icon-button text-main-bright-orange">
+            <i class="fas fa-user-circle"></i> 
           </a>
         </div>
         <!-- 登入後的顯示 (預設隱藏) -->
         <div class="d-flex align-items-center ms-4 d-none" id="logged-in-header">
           <!-- 會員頭像 -->
           <img src="https://via.placeholder.com/40" alt="會員頭像" class="member-avatar">
-          <span class="ms-2 text-gray-700">會員名稱</span>
-          <a href="#" class="btn btn-outline-main-bright-orange ms-3">登出</a>
+          <span class="ms-2 text-gray-700" id="memberName">會員名稱</span>
+          <!-- 登出按鈕 -->
+          <button class="btn btn-outline-main-bright-orange ms-3" id="logoutButton">登出</button>
         </div>
       </div>
     </div>
   </nav>
 
-    <div class="content">
+  <div class="content">
+  </div>
 
-  
+    <!-- 引入 jQuery 和 Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
+
+    <!-- 模擬登入狀態的簡單 JavaScript -->
+    <script>
+      $(document).ready(function() {
+        // 檢查 localStorage 中是否有 JWT Token
+        const token = localStorage.getItem('jwtToken');
+
+        if (token) {
+          // 如果 token 存在，顯示已登入狀態
+          $('#logged-out-header').addClass('d-none');
+          $('#logged-in-header').removeClass('d-none');
+          // 設定會員名稱
+          const memberName = localStorage.getItem('memberName');
+          $('#memberName').text(memberName ? memberName : '會員');
+        } else {
+          // 如果沒有 token，顯示未登入狀態
+          $('#logged-out-header').removeClass('d-none');
+          $('#logged-in-header').addClass('d-none');
+        }
+
+        // 登出按鈕事件
+        $('#logoutButton').click(function() {
+          // 清除 localStorage 中的 JWT token 和會員名稱
+          localStorage.removeItem('jwtToken');
+          localStorage.removeItem('memberName');
+
+          // 顯示登出提示並跳轉回首頁
+          Swal.fire({
+            icon: 'success',
+            title: '已成功登出',
+            text: '即將跳轉到首頁...',
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = '/TickitEasy/member/logout';
+          });
+        });
+      });
+    </script>
+
 </body>
-
 </html>

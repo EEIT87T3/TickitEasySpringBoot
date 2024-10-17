@@ -16,6 +16,7 @@ import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.entity.Member.MemberStatus;
 import com.eeit87t3.tickiteasy.member.repository.MemberRepository;
+import com.eeit87t3.tickiteasy.util.JWTUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -30,6 +31,9 @@ public class MemberService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private JWTUtil jwtUtil;
 
     // 會員註冊
     @Transactional
@@ -68,8 +72,37 @@ public class MemberService {
         member.setVerificationToken(null);  // 清除 token
         memberRepository.save(member);
     }
+    
+ // 處理會員登入，驗證會員憑證並生成 JWT Token
+    @Transactional
+    public Optional<String> login(String email, String password) {
+        Member member = memberRepository.findByEmail(email);
+        
+        // 檢查會員是否存在
+        if (member == null) {
+            throw new IllegalArgumentException("該會員帳號不存在"); // 直接拋出例外，提供明確訊息
+        }
 
- // 更新會員基本資料，不包括圖片
+        // 檢查會員是否完成驗證
+        if (member.getStatus() != Member.MemberStatus.已驗證) {
+            throw new IllegalArgumentException("會員尚未驗證，請先完成驗證程序");
+        }
+
+        // 比對密碼
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            return Optional.empty();  // 密碼錯誤，返回空值，提示前端登入失敗
+        }
+
+        // 生成 JWT Token
+        String token = jwtUtil.generateToken(member.getEmail());
+        
+        return Optional.of(token);  // 登入成功，返回 JWT Token
+    }
+
+    
+
+
+    // 更新會員基本資料，不包括圖片
     @Transactional
     public void updateProfile(Member currentMember, Member updatedInfo) {
         currentMember.setName(updatedInfo.getName());
@@ -96,16 +129,6 @@ public class MemberService {
         }
     }
 
-
-    // 處理會員登入
-    public Optional<Member> login(String email, String password) {
-        Member member = memberRepository.findByEmail(email);
-        if (member != null && passwordEncoder.matches(password, member.getPassword())) {
-            return Optional.of(member);
-        }
-        return Optional.empty();
-    }
-    
     
     
     /**************後台*********************/
