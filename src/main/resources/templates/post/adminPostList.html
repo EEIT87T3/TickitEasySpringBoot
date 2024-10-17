@@ -54,6 +54,7 @@
                             data: null,
                             render: function (data, type, row) {
                                 return `
+                                    <button class="view-post bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">查看貼文</button>
                                     <button class="view-comments bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">查看留言</button>
                                     <button class="edit-post bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">編輯</button>
                                     <button class="delete-post bg-red-500 text-white px-2 py-2 rounded" data-id="${row.postID}">刪除</button>
@@ -122,15 +123,19 @@
             // 查看留言==================================
             // $('.view-comments').on('click', function() {
             $('#postsTable').on('click', '.view-comments', function () {// 使用事件委派來處理按鈕點擊事件
-                const postId = $(this).data('id'); // 獲取 postID
-                window.location.href = `/TickitEasy/admin/post/comments/${postId}`; // 跳轉到留言頁面
+                const postID = $(this).data('id'); // 獲取 postID
+                window.location.href = `/TickitEasy/admin/post/comments/${postID}`; // 跳轉到留言頁面
             });
-
+            // 查看貼文==================================
+            $('#postsTable').on('click', '.view-post', function () {
+                const postID = $(this).data('id'); // 獲取 postID
+                window.location.href = `/TickitEasy/admin/post/${postID}`; 
+            });
             // 刪除貼文==================================
             $('#postsTable').on('click', '.delete-post', function () {
-                const postId = $(this).data('id'); // 獲取 postID
+                const postID = $(this).data('id'); // 獲取 postID
                 if (confirm('確定要刪除此貼文嗎？')) {
-                    axios.delete(`/TickitEasy/admin/api/post/DELETE/${postId}`)
+                    axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
                         .then(response => {
                             alert("刪除成功！");
                             fetchAllPosts(); // 刪除後重新加載貼文列表
@@ -143,15 +148,15 @@
             });
             // 編輯貼文==================================
             $('#postsTable').on('click', '.edit-post', function () {
-                const postId = $(this).data('id'); // 獲取 postID
+                const postID = $(this).data('id'); // 獲取 postID
 
                 // 先獲取貼文數據
-                axios.get(`/TickitEasy/admin/api/post/GET/${postId}`)
+                axios.get(`/TickitEasy/admin/api/post/GET/${postID}`)
                     .then(response => {
                         // 確保獲取成功後再進行跳轉
                         if (response.status === 200) {
                             // 可以在這裡進行其他操作，像是儲存狀態等等
-                            window.location.href = `/TickitEasy/admin/post/${postId}/edit`;
+                            window.location.href = `/TickitEasy/admin/post/${postID}/edit`;
                         } else {
                             console.error('Failed to load post data:', response.status);
                         }

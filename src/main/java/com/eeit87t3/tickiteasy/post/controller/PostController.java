@@ -60,24 +60,29 @@ public class PostController {
 	//所有貼文頁面
 	 @GetMapping
 	    public String showPostsPage(Model model) {
-	        return "post/postList"; 
+	        return "post/adminPostList"; 
 	    }
+	 //單一貼文頁面
+	 @GetMapping("/{postID}")
+	 public String showPost(Model model) {
+		 return "post/adminShowPost"; 
+	 }
 	 //更新貼文頁面
 	 @GetMapping("/{postID}/edit")
 	 public String showUpdateForm() {
-		 return "/post/editPost"; 
+		 return "/post/adminEditPost"; 
 	 }
 	 
 	//新增貼文頁面 *未完成*
 	@GetMapping("/create")
 	    public String showInsertForm() {
-	        return "/post/addPost";  
+	        return "/post/adminAddPost";  
 	    }
 	//留言頁面
 	 @GetMapping("/comments/{postID}")
 	    public String showCommentsPage(@PathVariable Integer postID,Model model) {
 		 	model.addAttribute("postID", postID);
-	        return "post/postComment"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
+	        return "post/adminPostComment"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
 	    }
 	/////////////////////////////////////    前台頁面跳轉    ////////////////////////////////
 
@@ -86,6 +91,21 @@ public class PostController {
 		    public String testPage() {
 		        return "post/test";  
 		    }
+	//前台分類貼文列表 
+	@GetMapping("/PostList")
+	public String userThemePostList() {
+		return "post/userThemePostList";  
+	}
+	//前台分類貼文列表 
+	@GetMapping("/HomePage")
+	public String userHomePage() {
+		return "post/userPostHome";  
+	}
+	//前台單筆貼文
+	@GetMapping("Post/{postID}")
+	public String userPostPage() {
+		return "post/userPost";  
+	}
 
  	
 	//更新貼文

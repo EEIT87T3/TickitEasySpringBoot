@@ -47,6 +47,8 @@ public class PostService {
             dto.setCategoryName(post.getPostCategory() != null ? post.getPostCategory().getCategoryName() : "N/A");
             dto.setTagName(post.getPostTag() != null ? post.getPostTag().getTagName() : "N/A");
             dto.setPostImgUrl(post.getPostImgUrl() != null ? post.getPostImgUrl() : "N/A");
+            dto.setLikesCount(post.getLikesCount() );
+            dto.setViewCount(post.getViewCount() );
             dto.setStatus(post.getStatus());
             dto.setPostTime(post.getPostTime() != null ? post.getPostTime().toString() : "N/A"); // 根據需要格式化時間
             

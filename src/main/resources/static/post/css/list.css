@@ -12,27 +12,14 @@ body {
     padding: 0;
 }
 
-/* Header 樣式 */
-header {
-    background: #333;
-    color: #fff;
-    padding-top: 30px;
-    min-height: 70px;
-    border-bottom: #bbb 1px solid;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 24px;
-}
 
 /* 主要內容區域 */
-.container {
-    padding-top: 100px;
-    width: 60%;
+.containerList {
+    padding-top: 20px;
+    width: 68%;
     margin: auto;
     overflow: hidden;
+   
 }
 
 .article-list {
@@ -44,10 +31,11 @@ header h1 {
 }
 
 .article-item {
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-    display: flex;
-    align-items: flex-start;
+  display: flex; /* 使用 Flexbox */
+    justify-content: space-between; /* 將子元素推向兩邊 */
+    align-items: center; /* 垂直置中 */
+    border-bottom: 1px solid #ddd; /* 分隔線 */
+    padding: 10px 0; /* 上下內邊距 */
 }
 
 .article-item:last-child {
@@ -85,24 +73,36 @@ header h1 {
 .article-meta {
     font-size: 14px;
     color: #999;
-    align-items: center;
-    display: flex;
+       display: flex; /* 保持 Flexbox */
+    justify-content: space-between; /* 使左右元素分開 */
+    align-items: center; /* 垂直置中 */
 }
 
 .article-meta span {
     margin-right: 10px;
 }
-
+.meta-right {
+   display: flex; /* 使用 Flexbox */
+    align-items: center; /* 垂直置中 */
+    gap: 10px; /* 元素之間的間距 */
+    margin-left: auto; /* 推動到最右邊 */
+}
 /* 按鈕組樣式 */
 .button-group {
     margin-left: auto; /* 將按鈕組推到右邊 */
     display: flex; /* 使按鈕組內的按鈕並排 */
     gap: 10px; /* 兩個按鈕之間的間距 */
     margin-top: 10px; /* 根據需要調整上邊距 */
-   
-    
+  
+     
 }
-
+.button-group-nav{
+	 background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
 /* 功能按鈕組樣式 */
 .button-group.funtion {
 
@@ -173,7 +173,7 @@ header h1 {
 .button:hover {
     background-color: #555;
 }
-img{
+.postImg {
 	background-color:rgba(0,0,0,0.1);
 	
 }

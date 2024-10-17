@@ -1,0 +1,94 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    width: 70%;
+    padding: 20px;
+    margin: 0 auto; /* 置中 */
+}
+
+section {
+    background: #fff;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.board ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.board li {
+    margin: 5px 0;
+    padding: 10px;
+    background: #e7e7e7;
+    border-radius: 3px;
+}
+
+.articles {
+    display: flex;
+    flex-wrap: wrap; /* 允許換行 */
+    gap: 15px; /* 條目之間的間距 */
+}
+
+.articles article {
+    flex: 1 0 calc(33.33% - 15px); /* 每行三個文章 */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.articles article img {
+    width: 100px;
+    height: 75px;
+    object-fit: cover;
+    margin-right: 15px;
+    border-radius: 5px;
+}
+
+.articles article h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.articles article p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.meta {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #999;
+}
+
+.meta span {
+    margin-right: 15px;
+}
+
+footer {
+   
+    padding: 10px;
+    background: #333;
+    color: #fff;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* 主題看板區

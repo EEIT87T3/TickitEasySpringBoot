@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org/">
+<head>
+   <meta th:replace="~{commons/userHead}">
+ 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>論壇文章列表</title>
+   
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+   	<link rel="stylesheet" href="/TickitEasy/post/css/list.css">
+    
+    <style>
+        /* 你的 CSS 可以在這裡加入 */
+    </style>
+</head>
+<body>
+   <div th:replace="~{commons/userHeader}"></div>
+    <div class="containerList">
+        <h4>文章列表</h4>
+        
+        <div class="button-group-nav button-group function">
+            <form method="get" action="findByTheme">
+                <span>選擇主題:</span>
+                <select name="themeID" onchange="fetchPosts()">
+                    <option value="" selected>請選擇主題</option>
+                    <option value="0">所有主題</option>
+                    <option value="1">音樂</option>
+                    <option value="2">舞蹈</option>
+                    <option value="3">戲劇</option>
+                    <option value="4">音樂劇</option>
+                    <option value="5">親子</option>
+                    <option value="6">講座</option>
+                    <option value="7">展覽</option>
+                    <option value="8">電影</option>
+                    <option value="9">體育</option>
+                    <option value="10">旅遊</option>
+                    <option value="11">其他</option>
+                </select>
+            </form>
+
+            <div class="bor">
+                <form>
+                    <span>依條件排序:</span>
+                    <select id="sortCriteria" onchange="sortArticlesBySelect()">
+                        <option value="" selected>請選擇條件</option>
+                        <option value="date">按發佈日期新→舊</option>
+                        <option value="views">按瀏覽次數多→少</option>
+                        <option value="likes">按喜歡數量多→少</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="bor">
+                <form method="get" action="findByEnter">
+                    <span>搜尋:</span>
+                    <input type="text" name="enter" />
+                    <input class="button" type="submit" value="確定" />
+                </form>
+            </div>
+
+            <div class="bor">
+                <a class="button" href="showInsertForm">新增文章</a>
+            </div>
+        </div>
+
+        <div class="article-list" id="articleList">
+            <!-- 文章列表將在這裡填充 -->
+        </div>
+    </div>
+<div th:replace="~{commons/userFooter}"></div>
+    <script>
+    // 獲取文章的函數
+    function fetchPosts() {
+        const themeID = document.querySelector('select[name="themeID"]').value;
+        const url = `/TickitEasy/admin/api/post/GET/`; 
+
+        axios.get(url)
+            .then(response => {
+                const posts = response.data; // 獲取 JSON 數據
+                updateArticleList(posts); // 更新文章列表
+            })
+            .catch(error => {
+                console.error("Error fetching posts:", error);
+            });
+    }
+
+    // 更新文章列表的函數
+    function updateArticleList(posts) {
+    const container = document.getElementById('articleList');
+    container.innerHTML = ''; // 清空容器
+
+    if (posts.length === 0) {
+        container.innerHTML = `<div class="article-item"><h2>查無文章</h2></div>`;
+        return;
+    }
+
+    posts.forEach(post => {
+        console.log(post); // 查看每個貼文的數據
+        const articleItem = document.createElement('div');
+        articleItem.classList.add('article-item');
+        articleItem.innerHTML = `
+            <img class="postImg" src="${post.postImgUrl}" alt="文章縮略圖">
+            <div>
+                <span class="theme">${post.categoryName}</span>
+                <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
+                <a href="#" class="post-title">${post.postTitle}</a>
+                <p>${post.postContent}</p>
+                <div class="article-meta">
+                    <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
+                </div>
+            </div>
+            <div class="meta-right">
+                <span><i class="fas fa-thumbs-up"></i>${post.likesCount}</span>
+                <span><i class="fas fa-eye"></i>${post.viewCount}</span>
+            </div>
+        `;
+
+        // 添加 click 事件監聽器
+        articleItem.addEventListener('click', function() {
+    	  window.location.href = `/TickitEasy/admin/post/Post/${post.postID}`;
+         
+            
+        });
+
+        container.appendChild(articleItem);
+    });
+}
+
+    // 排序文章的函數
+    function sortArticlesBySelect() {
+        const criteria = document.getElementById('sortCriteria').value;
+        const articles = Array.from(document.querySelectorAll('.article-item'));
+
+        articles.sort((a, b) => {
+            switch (criteria) {
+                case 'date':
+                    return new Date(b.querySelector('.article-meta span:nth-child(3)').innerText) - new Date(a.querySelector('.article-meta span:nth-child(3)').innerText);
+                case 'views':
+                    return parseInt(b.querySelector('.meta-right span:nth-child(2)').innerText) - parseInt(a.querySelector('.meta-right span:nth-child(2)').innerText);
+                case 'likes':
+                    return parseInt(b.querySelector('.meta-right span:nth-child(1)').innerText) - parseInt(a.querySelector('.meta-right span:nth-child(1)').innerText);
+                default:
+                    return 0;
+            }
+        });
+
+        const container = document.getElementById('articleList');
+        container.innerHTML = ''; // 清空容器
+        articles.forEach(article => {
+            container.appendChild(article);
+        });
+    }
+
+    // 當頁面加載時獲取所有文章
+    document.addEventListener('DOMContentLoaded', fetchPosts);
+</script>
+
+</body>
+</html>

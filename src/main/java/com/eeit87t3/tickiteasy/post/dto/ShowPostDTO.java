@@ -11,6 +11,8 @@ public class ShowPostDTO {
     private String postImgUrl; // 文章圖片URL
     private Integer status; // 文章狀態
     private String postTime; // 文章時間
+    private Integer likesCount;
+    private Integer viewCount;
     
 	public Integer getPostID() {
 		return postID;
@@ -39,6 +41,14 @@ public class ShowPostDTO {
 	public String getPostTime() {
 		return postTime;
 	}
+	
+	public Integer getLikesCount() {
+		return likesCount;
+	}
+	public Integer getViewCount() {
+		return viewCount;
+	}
+
 	public void setPostID(Integer postID) {
 		this.postID = postID;
 	}
@@ -66,6 +76,11 @@ public class ShowPostDTO {
 	public void setPostTime(String postTime) {
 		this.postTime = postTime;
 	}
-    
+	public void setLikesCount(Integer likesCount) {
+		this.likesCount = likesCount;
+	}
+	public void setViewCount(Integer viewCount) {
+		this.viewCount = viewCount;
+	}
  
 }

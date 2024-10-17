@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta th:replace="~{commons/userHead}">
+    <link rel="stylesheet" href="/TickitEasy/post/css/post.css">
+    
+    <title>論壇</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body >
+<div th:replace="~{commons/userHeader}"></div>
+   <div class="post" >
+        <div class="posts" id="post-container">
+            <div  id="post">
+                <!-- 貼文內容會在這裡動態填充 -->
+            </div>
+        </div>
+
+        <div class="comments" id="comments-container">
+            <h3>回應</h3>
+            <!-- 回應會在這裡動態填充 -->
+        </div>
+
+        <div class="new-comment">
+            <h3>新增回應</h3>
+            <form id="comment-form">
+                <input type="hidden" name="postID" id="postID" value="" />
+                <textarea name="content" id="comment-content" style="resize:none;height:100px;"
+                    placeholder="輸入您的回應"></textarea>
+                <input type="submit" value="發表">
+            </form>
+        </div>
+ </div>
+ <div th:replace="~{commons/userFooter}"></div>
+    <script>
+         const postID = window.location.pathname.split("/")[5];
+
+        // 根據ID取得單一貼文
+        function fetchPost() {
+            axios.get(`/TickitEasy/admin/api/post/GET/${postID}`)
+                .then(response => {
+                    const post = response.data;
+                    document.getElementById('post').innerHTML = `
+                        <div class="title">
+                            <h1>${post.postTitle}</h1>
+                        </div>
+                        <div class="author">
+                            <img class="avatar" src="${post.member.profilePicPath}" alt="頭像">
+                            <ul>
+                                <li><div>${post.member.nickname}</div></li>
+                                <li><div>${new Date(post.postTime).toLocaleString()}</div></li>
+                            </ul>
+                        </div>
+                        <hr>
+                        <div>${post.postContent}</div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching post:', error);
+                    document.getElementById('post').innerHTML = '未找到相關帖子';
+                });
+        }
+
+        // 根據貼文ID取得多筆留言
+        function fetchComments() {
+            axios.get(`/TickitEasy/admin/api/post/comments?postID=${postID}`)
+                .then(response => {
+                    const comments = response.data;
+                    const commentsContainer = document.getElementById('comments-container');
+                    commentsContainer.innerHTML += comments.length ?
+                        comments.map(comment => `
+                            <div class="comment">
+                                <div class="author">
+                                    <img class="avatar" src="" alt="頭像">
+                                    <div class="name">${comment.nickname}</div>
+                                </div>
+                                <p>${comment.content}</p>
+                                <p>${new Date(comment.commentDate).toLocaleString()}</p>
+                            </div>
+                        `).join('') : '目前沒有回應';
+                })
+                .catch(error => {
+                    console.error('Error fetching comments:', error);
+                });
+        }
+
+        // 提交新回應
+        document.getElementById('comment-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const content = document.getElementById('comment-content').value;
+
+            axios.post('/api/comments', {
+                postID: postID,
+                memberID: 1, // 這裡可以根據實際情況更改
+                content: content
+            })
+                .then(response => {
+                    // 清空回應內容並重新加載留言
+                    document.getElementById('comment-content').value = '';
+                    fetchComments();
+                })
+                .catch(error => {
+                    console.error('Error posting comment:', error);
+                });
+        });
+
+        // 初始化函數
+        fetchPost();
+        fetchComments();
+    </script>
+</body>
+
+</html>
