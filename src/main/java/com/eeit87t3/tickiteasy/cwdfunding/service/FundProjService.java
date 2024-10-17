@@ -18,15 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.Category;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
+import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.Tag;
-import com.eeit87t3.tickiteasy.cwdfunding.repository.CategoryRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
-import com.eeit87t3.tickiteasy.cwdfunding.repository.TagRepository;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 
 import jakarta.persistence.CascadeType;
@@ -42,10 +41,10 @@ public class FundProjService {
 	private FundPlanRepository fundPlanRepo;
 	
 	@Autowired
-	private CategoryRepository categoryRepo;
+	private CategoryRepo categoryRepo;
 	
 	@Autowired
-	private TagRepository tagRepo;
+	private TagRepo tagRepo;
 	
 	@Autowired
 	private ImageUtil imageUtil;
@@ -71,11 +70,11 @@ public class FundProjService {
 		FundProj proj = new FundProj();
 		
 		//先用categoryID找出對應到的category實體，之後再塞進proj 
-		Optional<Category> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
-		Category category = coptional.get();
+		Optional<CategoryEntity> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
+		CategoryEntity category = coptional.get();
 		//先用tagID找出對應到的tag實體，之後再塞進proj 
-		Optional<Tag> toptional = tagRepo.findById(Integer.valueOf(tagID));
-		Tag tag = toptional.get();
+		Optional<TagEntity> toptional = tagRepo.findById(Integer.valueOf(tagID));
+		TagEntity tag = toptional.get();
 		
         // 將請求中的日期先格式化再轉換成LocalDateTime
         // 定義datetime-local格式
@@ -96,8 +95,8 @@ public class FundProjService {
         proj.setCurrentAmount(currentAmount);
         proj.setThreshold(threshold);
         proj.setPostponeDate(Timestamp.valueOf(postponeDateTime));
-        proj.setCategory(category);
-        proj.setTag(tag);
+        proj.setFundCategory(category);
+        proj.setFundTag(tag);
 		return fundProjRepo.save(proj);
 			
 	}
@@ -132,10 +131,16 @@ public class FundProjService {
 	}
 	
 
-	/* 查詢全部（id升冪）：分頁 */
-	public Page<FundProjDTO> findFundProjByPage(Integer pageNumber){
-		Pageable pgb = PageRequest.of(pageNumber-1, 10,Sort.Direction.ASC,"projectID");
-		Page<FundProj> fundProjPage = fundProjRepo.findAll(pgb);
+	/* 查詢全部（id升冪、以category搜索）：分頁 */
+	public Page<FundProjDTO> findFundProjByPage(Integer pageNumber, Integer size, Integer categoryID){
+		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"projectID");
+		Page<FundProj> fundProjPage = null;
+		
+		if ( categoryID != null) {
+			fundProjPage = fundProjRepo.findProjectByCategory(categoryID, pgb);
+		}else {
+			fundProjPage = fundProjRepo.findAll(pgb);
+		}
 		//Page內建map()方法，可將A實體轉換成B實體
 		Page<FundProjDTO> dtoPage= fundProjPage.map(fundProj ->{
 			FundProjDTO dto = new FundProjDTO();
@@ -149,14 +154,15 @@ public class FundProjService {
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
 			dto.setThreshold(fundProj.getThreshold());
 			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
-			dto.setCategoryString(fundProj.getCategory().getCategoryString());
-			dto.setCategoryName(fundProj.getCategory().getCategoryName());
-			dto.setTagString(fundProj.getTag().getTagString());
-			dto.setTagName(fundProj.getTag().getTagName());
+			dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
+			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
+			dto.setTagString(fundProj.getFundTag().getTagString());
+			dto.setTagName(fundProj.getFundTag().getTagName());
 			return dto;
 		});
 		return dtoPage;
 	}
+	
 	/* 查詢單筆fund proj DTO */
 	public FundProjDTO findFundProjDTOById(Integer projectID) {
 		Optional<FundProj> optional = fundProjRepo.findById(projectID);
@@ -172,12 +178,12 @@ public class FundProjService {
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
 			dto.setThreshold(fundProj.getThreshold());
 			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
-			dto.setCategoryID(fundProj.getCategory().getCategoryID());
-			dto.setCategoryString(fundProj.getCategory().getCategoryString());
-			dto.setCategoryName(fundProj.getCategory().getCategoryName());
-			dto.setTagID(fundProj.getTag().getTagID());
-			dto.setTagString(fundProj.getTag().getTagString());
-			dto.setTagName(fundProj.getTag().getTagName());
+			dto.setCategoryId(fundProj.getFundCategory().getCategoryId());
+			dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
+			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
+			dto.setTagId(fundProj.getFundTag().getTagId());
+			dto.setTagString(fundProj.getFundTag().getTagString());
+			dto.setTagName(fundProj.getFundTag().getTagName());
 			return dto;
 		});
 		return dto;
@@ -254,11 +260,11 @@ public class FundProjService {
 	    
 	    FundProj proj = optional.get();
 	    // 更新 category 和 tag
-	    Optional<Category> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
-	    proj.setCategory(coptional.orElse(null));
+	    Optional<CategoryEntity> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
+	    proj.setFundCategory(coptional.orElse(null));
 	    
-	    Optional<Tag> toptional = tagRepo.findById(Integer.valueOf(tagID));
-	    proj.setTag(toptional.orElse(null));
+	    Optional<TagEntity> toptional = tagRepo.findById(Integer.valueOf(tagID));
+	    proj.setFundTag(toptional.orElse(null));
 
 //	    proj.setTitle(title);
 	    proj.setDescription(description);

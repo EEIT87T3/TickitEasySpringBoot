@@ -33,13 +33,40 @@ public class MemberService {
 
     // 會員註冊
     @Transactional
-    public void register(String email, String password, String name, String nickname, LocalDate birthDate, String phone) {
+    public String register(String email, String password, String name, String nickname, LocalDate birthDate, String phone) {
         if (memberRepository.findByEmail(email) != null) {
             throw new IllegalArgumentException("該電子郵件已被註冊");
         }
+
+        // 生成驗證 token
+        String verificationToken = UUID.randomUUID().toString();
+
+        // 加密密碼
         String encodedPassword = passwordEncoder.encode(password);
-        Member newMember = new Member(email, encodedPassword, name, nickname, birthDate, phone, LocalDate.now(), MemberStatus.未驗證, null);
+        
+        // 創建新會員
+        Member newMember = new Member(email, encodedPassword, name, nickname, birthDate, phone, LocalDate.now(), Member.MemberStatus.未驗證, null);
+        newMember.setVerificationToken(verificationToken);
+
         memberRepository.save(newMember);
+
+        return verificationToken;
+    }
+
+    // 處理會員驗證
+    @Transactional
+    public void verifyMember(String token) {
+        Member member = memberRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("無效的驗證連結。"));
+
+        if (member.getStatus() == Member.MemberStatus.已驗證) {
+            throw new IllegalArgumentException("帳號已經被驗證過。");
+        }
+
+        // 更新會員狀態為已驗證，並清除驗證 token
+        member.setStatus(Member.MemberStatus.已驗證);
+        member.setVerificationToken(null);  // 清除 token
+        memberRepository.save(member);
     }
 
  // 更新會員基本資料，不包括圖片
@@ -78,6 +105,10 @@ public class MemberService {
         }
         return Optional.empty();
     }
+    
+    
+    
+    /**************後台*********************/
 
     // 取得所有會員列表
     public List<Member> getAllMembers() {

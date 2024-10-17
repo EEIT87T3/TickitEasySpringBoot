@@ -1,7 +1,8 @@
 package com.eeit87t3.tickiteasy.member.repository;
 
 import java.time.LocalDate;
-import java.util.List;	
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,6 +15,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     
 	 // 根據 email 查詢會員（用於登入）
     Member findByEmail(String email);
+    //根據token來查詢會員
+    Optional<Member> findByVerificationToken(String token);
 
     // 根據 status 查詢會員列表
     List<Member> findByStatus(Member.MemberStatus status);
