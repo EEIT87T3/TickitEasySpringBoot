@@ -18,4 +18,6 @@ public interface EventsRepo extends JpaRepository<EventsEntity, Integer>, JpaSpe
 	List<EventsEntity> findByEventTag(TagEntity eventTag);
 	
 	EventsEntity findByEventName(String eventName);
+	
+	List<EventsEntity> findByStatusIn(List<Integer> statuses);
 }

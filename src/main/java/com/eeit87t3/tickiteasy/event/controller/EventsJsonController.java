@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.event.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eeit87t3.tickiteasy.event.dto.EventWithTicketTypesDTO;
 import com.eeit87t3.tickiteasy.event.dto.EventsDTO;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.event.service.EventsService;
@@ -32,7 +34,7 @@ public class EventsJsonController {
 	@Autowired
 	private EventsService eventsService;
 
-	@GetMapping()
+	@GetMapping
 	public Page<EventsEntity> findByDynamic(
 			@RequestParam(value = "p", defaultValue = "1") Integer pageNumber,
 			@RequestParam(value = "category-string", required = false) String categoryString,
@@ -42,9 +44,14 @@ public class EventsJsonController {
 		return eventsService.findByDynamic(pageNumber, categoryString, tagString, searchingTime);
 	}
 	
+	@GetMapping("/listing")
+	public List<EventsEntity> findByListingAndOnsale() {
+		return eventsService.findByListingAndOnsale();
+	}
+	
 	@GetMapping("/{eventID}")
-	public EventsEntity findById(@PathVariable Integer eventID) {
-		return eventsService.findById(eventID);
+	public EventWithTicketTypesDTO findById(@PathVariable Integer eventID) {
+		return new EventWithTicketTypesDTO(eventsService.findById(eventID));
 	}
 	
 	@PostMapping
@@ -71,11 +78,24 @@ public class EventsJsonController {
 	public ResponseEntity<?> editStatus(@PathVariable Integer eventID,
 			@RequestBody Map<String, Object> requestBody) {
 		Short editStatus = ((Integer) requestBody.get("editStatus")).shortValue();
-		String validateEditStatus = eventsService.validateEditStatus(eventID, editStatus);
-		if ("輸入正確！".equals(validateEditStatus)) {
-			return new ResponseEntity<EventsEntity>(eventsService.editStatus(eventID, editStatus), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>(validateEditStatus, HttpStatus.BAD_REQUEST);
+		switch (editStatus) {
+			case 0:
+			case 1:
+				String validateEditStatus = eventsService.validateEditStatus(eventID, editStatus);
+				if ("輸入正確！".equals(validateEditStatus)) {
+					return new ResponseEntity<EventsEntity>(eventsService.editStatus(eventID, editStatus), HttpStatus.OK);
+				} else {
+					return new ResponseEntity<String>(validateEditStatus, HttpStatus.BAD_REQUEST);
+				}
+			case -1:
+				String validateDeleteInput = eventsService.validateDeleteInput(eventID);
+				if ("輸入正確！".equals(validateDeleteInput)) {
+					return new ResponseEntity<Boolean>(eventsService.delete(eventID), HttpStatus.OK);
+				} else {
+					return new ResponseEntity<String>(validateDeleteInput, HttpStatus.BAD_REQUEST);
+				}
+			default:
+				return new ResponseEntity<String>("輸入錯誤：狀態值錯誤。", HttpStatus.BAD_REQUEST);
 		}
 	}
 	
