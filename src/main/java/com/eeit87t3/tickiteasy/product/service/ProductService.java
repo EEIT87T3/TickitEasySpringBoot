@@ -3,6 +3,7 @@ package com.eeit87t3.tickiteasy.product.service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,7 +57,8 @@ public class ProductService {
         ProductEntity savedProduct = productRepo.save(product);
         
         if (imageFile != null && !imageFile.isEmpty()) {
-            String imagePath = imageUtil.saveImage(ImageDirectory.PRODUCT, imageFile, "product_" + savedProduct.getProductID());
+            String baseName = UUID.randomUUID().toString();
+            String imagePath = imageUtil.saveImage(ImageDirectory.PRODUCT, imageFile, baseName);
             savedProduct.setProductPic(imagePath);
             savedProduct = productRepo.save(savedProduct);
         }
@@ -71,17 +73,17 @@ public class ProductService {
         if(optional.isPresent()) {
             ProductEntity product = optional.get();
 
-            // 更新圖片
+         // 更新圖片
             if (imageFile != null && !imageFile.isEmpty()) {
                 if (product.getProductPic() != null) {
                     imageUtil.deleteImage(product.getProductPic());
                 }
-                String imagePath = imageUtil.saveImage(ImageDirectory.PRODUCT, imageFile, "product_" + productID);
+                String baseName = UUID.randomUUID().toString();
+                String imagePath = imageUtil.saveImage(ImageDirectory.PRODUCT, imageFile, baseName);
                 product.setProductPic(imagePath);
             } else if (newProduct.getProductPic() != null) {
                 product.setProductPic(newProduct.getProductPic());
             }
-
             // 更新分類和標籤
             CategoryEntity category = categoryService.findProductCategoryById(categoryId);
             TagEntity tag = tagService.findProductTagById(tagId);
