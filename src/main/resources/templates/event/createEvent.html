@@ -7,7 +7,7 @@
 	<title>新增活動</title>
 	<style>
 		table>tbody>tr>th {
-			width: 100px;
+			width: 120px;
 			text-align: right;
 			vertical-align: middle;
 		}
@@ -81,6 +81,13 @@
 				document.getElementsByName("eventDesc")[0].value = "示範輸入活動介紹";
 				document.getElementsByName("categoryString")[0].value = "other";
 				document.getElementsByName("tagString")[0].value = "";
+				document.getElementsByName("place")[0].value = "聖德基督學院";
+				document.getElementsByName("address")[0].value = "桃園市中壢區新生路二段421號";
+				document.getElementsByName("eventStartTime")[0].value = "2024-11-20T11:00";
+				document.getElementsByName("eventEndTime")[0].value = "2024-11-20T12:00";
+				document.getElementsByName("startEntryTime")[0].value = "2024-11-20T10:30";
+				document.getElementsByName("endEntryTime")[0].value = "2024-11-20T11:30";
+				document.getElementsByName("quantityTotalAvailable")[0].value = "100";
 			})
 		});
 	</script>
@@ -133,6 +140,48 @@
 						<th>活動介紹</th>
 						<td>
 							<textarea class="form-control" name="eventDesc" placeholder="活動介紹"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<th>地點</th>
+						<td>
+							<input type="text" class="form-control" name="place" placeholder="地點">
+						</td>
+					</tr>
+					<tr>
+						<th><span class="mustMark">*</span>地址</th>
+						<td>
+							<input type="text" class="form-control" name="address" placeholder="地址">
+						</td>
+					</tr>
+					<tr>
+						<th><span class="mustMark">*</span>活動開始時間</th>
+						<td>
+							<input type="datetime-local" class="form-control" name="eventStartTime" placeholder="活動開始時間">
+						</td>
+					</tr>
+					<tr>
+						<th><span class="mustMark">*</span>活動結束時間</th>
+						<td>
+							<input type="datetime-local" class="form-control" name="eventEndTime" placeholder="活動結束時間">
+						</td>
+					</tr>
+					<tr>
+						<th><span class="mustMark">*</span>開始入場時間</th>
+						<td>
+							<input type="datetime-local" class="form-control" name="startEntryTime" placeholder="開始入場時間">
+						</td>
+					</tr>
+					<tr>
+						<th><span class="mustMark">*</span>結束入場時間</th>
+						<td>
+							<input type="datetime-local" class="form-control" name="endEntryTime" placeholder="結束入場時間">
+						</td>
+					</tr>
+					<tr>
+						<th><span class="mustMark">*</span>可購買總數</th>
+						<td>
+							<input type="number" class="form-control" name="quantityTotalAvailable" placeholder="可購買總數">
 						</td>
 					</tr>
 				</tbody>

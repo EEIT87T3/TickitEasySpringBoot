@@ -7,7 +7,7 @@
 	<title>活動詳情</title>
 	<style>
 		table>tbody>tr>th {
-			width: 100px;
+			width: 120px;
 			text-align: right;
 			vertical-align: middle;
 		}
@@ -15,6 +15,9 @@
 			text-align: left;
 			vertical-align: middle;
 		}
+		.mustMark {
+            color: red;
+        }
 	</style>
 	<script>
 		$(document).ready(function () {
@@ -23,86 +26,250 @@
 
 			const contextPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
 			const currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
-			
+			const eventID = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+			const editStatusUrl = `${contextPath}/admin/api/event/${eventID}/edit-status`;
+			function dateFormat(datetimeString) {
+				const dateObject = new Date(datetimeString);
+				const options = {
+					year: 'numeric',
+					month: 'long', // long：會顯示完整的月份名稱
+					day: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit',
+				};
+				return dateObject.toLocaleString('zh-TW', options);
+			}
 
-			// 改變 status 的 button
-			const eventID = document.getElementById("event-id").innerText;
-			const statusTd = document.getElementById("statusTd");
-			const statusSpan = document.getElementById("status");
-			function statusButtonMaker() {
-				const status = statusSpan.getAttribute("data-status");
-				switch (status) {  // String 型態
-					case "0":
+			// status-button maker
+			function statusButtonMaker(status) {
+				let statusButtonDiv = document.createElement("div");
+
+				switch (status) {
+					case 0:  // 「未上架」
+					    
+					    // 上架按鈕
 						let listButton = document.createElement("button");
 						listButton.setAttribute("id", "list-button");
-						listButton.classList.add("btn", "btn-success", "ms-auto");
+						listButton.classList.add("btn", "btn-success");
 						listButton.textContent = "上架";
-						listButton.addEventListener("click", function() {
-							axios.put(`${contextPath}/admin/api/event/${eventID}/edit-status`, {
-								editStatus: 1,
-							})
-							.then(res => {
-								console.log(res);
-								window.location.href = currentPath;  // 以後有空再修成以一個 div 包裝狀態改變按鈕、並能清空內容。
-								statusSpan.classList.remove("text-danger");
-								statusSpan.classList.add("text-success");
-								statusSpan.innerText = "已上架";
-								statusSpan.setAttribute("data-status", 1);
-							})
-							.catch(err => {
-								console.error(err); 
-							})
-						})
-						statusTd.appendChild(listButton);
+						statusButtonDiv.append(listButton);
 
+						// 刪除按鈕
 						let deleteButton = document.createElement("button");
 						deleteButton.setAttribute("id", "delete-button");
 						deleteButton.classList.add("btn", "btn-danger", "ms-3");
 						deleteButton.textContent = "刪除";
-						deleteButton.addEventListener("click", function() {
-							axios.delete(`${contextPath}/admin/api/event/${eventID}`)
-							.then(res => {
-								console.log(res);
-								const container = document.getElementById("container");
-								container.innerHTML = `
-									<div>已成功刪除。</div>
-									<a href="${currentPath.substring(0, currentPath.lastIndexOf("/"))}" class="btn btn-secondary my-3">回到活動列表</a>`;
-							})
-							.catch(err => {
-								console.error(err); 
-							})
-						})
-						statusTd.appendChild(deleteButton);
-
+						statusButtonDiv.append(deleteButton);
 
 						break;
-					case "1":
+					case 1:  // 「已上架」
+						
+						// 下架按鈕
 						let unlistButton = document.createElement("button");
-						unlistButton.setAttribute("id", "list-button");
-						unlistButton.classList.add("btn", "btn-warning", "ms-auto");
+						unlistButton.setAttribute("id", "unlist-button");
+						unlistButton.classList.add("btn", "btn-warning");
 						unlistButton.textContent = "下架";
-						unlistButton.addEventListener("click", function() {
-							axios.put(`${contextPath}/admin/api/event/${eventID}/edit-status`, {
-								editStatus: 0,
-							})
-							.then(res => {
-								console.log(res);
-								window.location.href = currentPath;  // 以後有空再修成以一個 div 包裝狀態改變按鈕、並能清空內容。
-								statusSpan.classList.remove("text-success");
-								statusSpan.classList.add("text-danger");
-								statusSpan.innerText = "未上架";
-								statusSpan.setAttribute("data-status", 0);
-							})
-							.catch(err => {
-								console.error(err);
+						statusButtonDiv.append(unlistButton);
 
-							})
-						})
-						statusTd.appendChild(unlistButton);
 						break;
 				}
-				
+
+				return statusButtonDiv;
 			}
+
+
+			// event-tbody maker
+			function eventTbodyMaker(eventData) {
+				document.getElementById("event-tbody").innerHTML = "";
+				const eventTbodyTemplate = document.getElementById("event-tbody-template").content.cloneNode(true);
+
+				// 活動編號
+				eventTbodyTemplate.getElementById("event-id").innerText = eventData.eventID;
+
+				// 狀態
+				const status = eventTbodyTemplate.getElementById("status");
+				switch (eventData.status) {
+					case 0:
+						status.classList.add("text-danger");
+						status.innerText = "未上架";
+						break;
+					case 1:
+						status.classList.add("text-success");
+						status.innerText = "已上架";
+						break;
+					case 2:
+						status.classList.add("text-primary");
+						status.innerText = "已啟售";
+						break;
+				}
+
+				// 編輯狀態按鈕
+				const statusButtonDiv = eventTbodyTemplate.getElementById("status-button");
+				statusButtonDiv.append(statusButtonMaker(eventData.status).cloneNode(true));
+				// 狀態按鈕的 EventListener
+				statusButtonDiv.addEventListener("click", event => {
+					switch (event.target.id) {
+						case "list-button":
+							editStatusButton(1);
+							break;
+						case "delete-button":
+							editStatusButton(-1);
+							break;
+						case "unlist-button":
+							editStatusButton(0);
+							break;
+					}
+				})
+				
+				// 活動名稱
+				eventTbodyTemplate.getElementById("event-name").innerText = eventData.eventName;
+
+				// 活動主圖
+				eventPicTd = eventTbodyTemplate.getElementById("event-pic");
+				if (eventData.eventPic != null) {
+					const img = document.createElement("img");
+					img.setAttribute("src", contextPath + eventData.eventPic);
+					img.setAttribute("alt", eventData.eventName);
+					img.setAttribute("width", "320px");
+					eventPicTd.append(img);
+				} else {
+					eventPicTd.innerText = "（無圖片）";
+				}
+
+				// 活動類別
+				eventTbodyTemplate.getElementById("event-category").innerHTML = eventData.eventCategory.categoryName;
+
+				// 活動標籤
+				const eventTagTd = eventTbodyTemplate.getElementById("event-tag");
+				if (eventData.eventTag != null) {
+					eventTagTd.innerText = eventData.eventTag.tagName;
+				} else {
+					eventTagTd.innerText = "（無標籤）";
+				}
+
+				// 活動介紹
+				const eventDescTd = eventTbodyTemplate.getElementById("event-desc");
+				if (eventData.eventDesc != null) {
+					eventDescTd.innerText = eventData.eventDesc;
+				} else {
+					eventDescTd.innerText = "（無活動介紹）";
+				}
+
+				// 地點
+				const placeTd = eventTbodyTemplate.getElementById("place");
+				if (eventData.place != null) {
+					placeTd.innerText = eventData.place;
+				} else {
+					placeTd.innerText = "（無地點）";
+				}
+
+				// 地址
+				eventTbodyTemplate.getElementById("address").innerHTML = eventData.address;
+
+				// 活動開始時間
+				eventTbodyTemplate.getElementById("event-start-time").innerHTML = dateFormat(eventData.eventStartTime);
+				
+				// 活動結束時間
+				eventTbodyTemplate.getElementById("event-end-time").innerHTML = dateFormat(eventData.eventEndTime);
+				
+				// 開始入場時間
+				eventTbodyTemplate.getElementById("start-entry-time").innerHTML = dateFormat(eventData.startEntryTime);
+				
+				// 結束入場時間
+				eventTbodyTemplate.getElementById("end-entry-time").innerHTML = dateFormat(eventData.endEntryTime);
+
+				// 可購買總量
+				eventTbodyTemplate.getElementById("quantity-total-available").innerHTML = eventData.quantityTotalAvailable;
+				
+				// 已購買總量
+				eventTbodyTemplate.getElementById("quantity-total-purchased").innerHTML = eventData.quantityTotalPurchased;
+
+				document.getElementById("event-tbody").append(eventTbodyTemplate);
+			}
+
+
+			// tickettype-tbody maker
+			function ticketTypesTbodyMaker (ticketTypesData) {
+				if (ticketTypesData.length == 0) {
+					document.getElementById("tickettype-tbody").innerHTML = '<tr><td colspan="7" style="text-align: center;">（目前沒有票種）</td></tr>';
+				} else {
+					document.getElementById("tickettype-tbody").innerHTML = "";
+
+					ticketTypesData.forEach(ticketType => {
+						const ticketTypeTemplate = document.getElementById("tickettype-tbody-template").content.cloneNode(true);
+						ticketTypeTemplate.querySelector(".tickettypeID").innerText = ticketType.ticketTypeID;
+						ticketTypeTemplate.querySelector(".typeName").innerText = ticketType.typeName;
+						ticketTypeTemplate.querySelector(".price").innerText = ticketType.price;
+						ticketTypeTemplate.querySelector(".startSaleTime").innerText = dateFormat(ticketType.startSaleTime);
+						ticketTypeTemplate.querySelector(".endSaleTime").innerText = dateFormat(ticketType.endSaleTime);
+						if (ticketType.quantityAvailable != null) {
+							ticketTypeTemplate.querySelector(".quantityAvailable").innerText = ticketType.quantityAvailable;
+						} else {
+							ticketTypeTemplate.querySelector(".quantityAvailable").innerText = "（無限量）";
+						}
+
+						document.getElementById("tickettype-tbody").append(ticketTypeTemplate);
+					});
+				}
+			}
+			
+
+			// 編輯狀態按鈕的 EventListener
+			function editStatusButton(editStatus) {
+				axios.put(editStatusUrl, {
+						editStatus: editStatus,
+					})
+					.then(res => {
+						console.log(res);
+						alert("編輯狀態成功！");
+						if (editStatus == -1) {
+							window.location.href = currentPath.substring(0, currentPath.lastIndexOf("/"));
+						} else {
+							getData();
+						}
+					})
+					.catch(err => {
+						console.error(err); 
+						alert("編輯狀態失敗。");
+					})
+			}
+
+
+			// 新增票種
+			const createTickettypeForm = document.getElementById("create-tickettype-form");
+
+			// 示範輸入
+			document.getElementById("demo").addEventListener("click", () => {
+				createTickettypeForm.elements["typeName"].value = "示範輸入票種名稱 01";
+				createTickettypeForm.elements["price"].value = "100";
+				createTickettypeForm.elements["startSaleTime"].value = "2024-11-10T00:00";
+				createTickettypeForm.elements["endSaleTime"].value = "2024-11-19T23:59";
+				// createTickettypeForm.elements["quantityAvailable"].value = "50";  // 暫不使用
+			})
+
+			// 新增票種
+			createTickettypeForm.addEventListener("submit", (event) => {
+				event.preventDefault();
+
+				const modalElement = document.getElementById("create-tickettype-model");
+				const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+
+				let formData = new FormData(createTickettypeForm);
+				axios.post(`${contextPath}/admin/api/event/${eventID}/tickettype`,formData)
+					.then(res => {
+						console.log(res);
+						window.alert("新增票種成功！");
+						modalInstance.hide();
+						createTickettypeForm.reset();
+						getData();
+					})
+					.catch(err => {
+						console.error(err);
+						window.alert("新增票種成功！");
+						modalInstance.hide();
+					})
+			})
+
 
 			// EventListener
 			document.getElementById("edit").addEventListener("click", function() {
@@ -112,8 +279,20 @@
 				window.location.href = currentPath.substring(0, currentPath.lastIndexOf("/"));
 			})
 
+			// Ajax 取得資料
+			function getData() {
+				axios.get(contextPath + "/admin/api/event/" + eventID)
+					.then(res => {
+						eventTbodyMaker(res.data.event);
+						ticketTypesTbodyMaker(res.data.ticketTypes)
+					})
+					.catch(err => {
+						console.error(err); 
+				})
+			}
+
 			// 初始執行
-			statusButtonMaker();
+			getData();
 		});
 	</script>
 </head>
@@ -125,59 +304,170 @@
 	<div id="container" class="container">
 		<h1>活動詳情</h1>
 		<table class="table table-hover" th:unless="${error}">
-			<tbody>
-				<tr>
-					<th>活動編號</th>
-					<td id="event-id">[[${event.eventID}]]</td>
-				</tr>
-				<tr>
-					<th>狀態</th>
-					<td id="statusTd" class="d-flex">
-						<span th:if="${event.status == 0}" id="status" th:data-status="${event.status}" class="d-flex align-items-center text-danger">未上架</span>
-						<span th:if="${event.status == 1}" id="status" th:data-status="${event.status}" class="d-flex align-items-center text-success">已上架</span>
-						<span th:if="${event.status == 2}" id="status" th:data-status="${event.status}" class="d-flex align-items-center text-primary">已啟售</span>
-					</td>
-				</tr>
-				<tr>
-					<th>活動名稱</th>
-					<td>[[${event.eventName}]]</td>
-				</tr>
-				<tr>
-					<th>活動主圖</th>
-					<td>
-						<img th:if="${event.eventPic != null}" th:src="@{${event.eventPic}}" th:alt="${event.eventName}" width=320px>
-						<span th:unless="${event.eventPic != null}">（無圖片）</span>
-					</td>
-				</tr>
-				<tr>
-					<th>活動類別</th>
-					<td>[[${event.eventCategory.categoryName}]]</td>
-				</tr>
-				<tr>
-					<th>活動標籤</th>
-					<td>
-						<span th:if="${event.eventTag != null}" th:text="${event.eventTag.tagName}"></span>
-						<span th:unless="${event.eventTag != null}">（無標籤）</span>
-					</td>
-				</tr>
-				<tr>
-					<th>活動介紹</th>
-					<td>
-						<span th:if="${event.eventDesc != null}">[[${event.eventDesc}]]</span>
-						<span th:unless="${event.eventDesc != null}">（無活動介紹）</span>
-					</td>
-				</tr>
+			<tbody id="event-tbody">
+				<!-- spinner -->
 			</tbody>
 		</table>
 		<div th:if="${error}">未找到此筆活動。</div>
-		<div id="action-buttons" class="d-flex mb-3">
+		<div id="action-buttons" class="d-flex mb-5">
 			<button class="btn btn-secondary" id="cancel">回到活動列表</button>
 			<button class="btn btn-primary ms-auto" id="edit">編輯活動</button>
 		</div>
+
+		<h2 style="display: inline-block;">票種列表</h2>		
+		<table class="table table-hover mb-3">
+			<thead>
+				<tr>
+					<th>票種編號</th>
+					<th>票種名稱</th>
+					<th>價格</th>
+					<th>開始售票時間</th>
+					<th>結束售票時間</th>
+					<th>可購買限量</th>
+					<th style="text-align: center;">行動</th>
+				</tr>
+			</thead>
+			<tbody id="tickettype-tbody">
+			</tbody>
+		</table>
+		<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#create-tickettype-model">新增票種</button>
 	</div>
 	
 
-   <div th:replace="~{commons/adminFooter}"></div>
+	<div th:replace="~{commons/adminFooter}"></div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="create-tickettype-model" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="create-tickettype-form" enctype="multipart/form-data">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="exampleModalLabel">新增票種</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<table class="table table-hover">
+							<tr>
+								<th><span class="mustMark">*</span>票種名稱</th>
+								<td>
+									<input type="text" class="form-control" name="typeName">
+								</td>
+							</tr>
+							<tr>
+								<th><span class="mustMark">*</span>價格</th>
+								<td>
+									<input type="number" class="form-control" name="price">
+								</td>
+							</tr>
+							<tr>
+								<th><span class="mustMark">*</span>開始售票時間</th>
+								<td>
+									<input type="datetime-local" class="form-control" name="startSaleTime">
+								</td>
+							</tr>
+							<tr>
+								<th><span class="mustMark">*</span>結束售票時間</th>
+								<td>
+									<input type="datetime-local" class="form-control" name="endSaleTime">
+								</td>
+							</tr>
+							<tr>
+								<th>可購買限量</th>
+								<td>
+									<input type="number" class="form-control" name="quantityAvailable">
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" id="demo" class="btn btn-warning">示範輸入</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+						<button type="submit" class="btn btn-primary">儲存</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<template id="event-tbody-template">
+		<tr>
+			<th>活動編號</th>
+			<td id="event-id"></td>
+		</tr>
+		<tr>
+			<th>狀態</th>
+			<td class="d-flex">
+				<span id="status" data-status="" class="d-flex align-items-center"></span>
+				<div id="status-button" class="ms-auto gap-3"></div>
+			</td>
+		</tr>
+		<tr>
+			<th>活動名稱</th>
+			<td id="event-name"></td>
+		</tr>
+		<tr>
+			<th>活動主圖</th>
+			<td id="event-pic"></td>
+		</tr>
+		<tr>
+			<th>活動類別</th>
+			<td id="event-category"></td>
+		</tr>
+		<tr>
+			<th>活動標籤</th>
+			<td id="event-tag"></td>
+		</tr>
+		<tr>
+			<th>活動介紹</th>
+			<td id="event-desc"></td>
+		</tr>
+		<tr>
+			<th>地點</th>
+			<td id="place"></td>
+		</tr>
+		<tr>
+			<th>地址</th>
+			<td id="address"></td>
+		</tr>
+		<tr>
+			<th>活動開始時間</th>
+			<td id="event-start-time"></td>
+		</tr>
+		<tr>
+			<th>活動結束時間</th>
+			<td id="event-end-time"></td>
+		</tr>
+		<tr>
+			<th>開始入場時間</th>
+			<td id="start-entry-time"></td>
+		</tr>
+		<tr>
+			<th>結束入場時間</th>
+			<td id="end-entry-time"></td>
+		</tr>
+		<tr>
+			<th>可購買總量</th>
+			<td id="quantity-total-available"></td>
+		</tr>
+		<tr>
+			<th>已購買總量</th>
+			<td id="quantity-total-purchased"></td>
+		</tr>
+	</template>
+	<template id="tickettype-tbody-template">
+		<tr>
+			<td class="tickettypeID"></td>
+			<td class="typeName"></td>
+			<td class="price"></td>
+			<td class="startSaleTime"></td>
+			<td class="endSaleTime"></td>
+			<td class="quantityAvailable"></td>
+			<td class="action" style="text-align: center;">
+				<button type="button" class="btn btn-primary tickettype-edit">編輯</button>
+				<button type="button" class="btn btn-danger ms-3 tickettype-delete">刪除</button>
+			</td>
+		</tr>
+	</template>
 </body>
 
 </html>
