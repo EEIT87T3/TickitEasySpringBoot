@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<body>
+<!-- 導覽列 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-heavy py-3">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <!-- 調整 Logo 的大小 -->
+        <img th:src="@{/logo/LogoColor.svg}" alt="TickitEasy Logo" class="imglogo">
+        <span class="ms-2">TickitEasy 易購售票</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#">首頁</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">活動</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">募資活動</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">周邊商品商城</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">討論區</a>
+          </li>
+        </ul>
+        <!-- 購物車和訂單圖標 -->
+        <div class="d-flex align-items-center ms-4">
+            <a href="#" class="icon-button me-3">
+              <i class="fas fa-shopping-cart"></i>
+            </a>
+        </div>
+        <!-- 登入前顯示會員圖標 -->
+        <div class="d-flex align-items-center ms-4" id="logged-out-header">
+          <a href="/TickitEasy/member/login" class="icon-button text-main-bright-orange">
+            <i class="fas fa-user-circle"></i> 
+          </a>
+        </div>
+        <!-- 登入後的顯示 (預設隱藏) -->
+        <div class="d-flex align-items-center ms-4 d-none" id="logged-in-header">
+          <!-- 會員頭像 -->
+          <img src="https://via.placeholder.com/40" alt="會員頭像" class="member-avatar">
+          <span class="ms-2 text-gray-700" id="memberName">會員名稱</span>
+          <!-- 登出按鈕 -->
+          <button class="btn btn-outline-main-bright-orange ms-3" id="logoutButton">登出</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+  </div>
+
+    <!-- 引入 jQuery 和 Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
+
+    <!-- 模擬登入狀態的簡單 JavaScript -->
+    <script>
+      $(document).ready(function() {
+        // 檢查 localStorage 中是否有 JWT Token
+        const token = localStorage.getItem('jwtToken');
+
+        if (token) {
+          // 如果 token 存在，顯示已登入狀態
+          $('#logged-out-header').addClass('d-none');
+          $('#logged-in-header').removeClass('d-none');
+          // 設定會員名稱
+          const memberName = localStorage.getItem('memberName');
+          $('#memberName').text(memberName ? memberName : '會員');
+        } else {
+          // 如果沒有 token，顯示未登入狀態
+          $('#logged-out-header').removeClass('d-none');
+          $('#logged-in-header').addClass('d-none');
+        }
+
+        // 登出按鈕事件
+        $('#logoutButton').click(function() {
+          // 清除 localStorage 中的 JWT token 和會員名稱
+          localStorage.removeItem('jwtToken');
+          localStorage.removeItem('memberName');
+
+          // 顯示登出提示並跳轉回首頁
+          Swal.fire({
+            icon: 'success',
+            title: '已成功登出',
+            text: '即將跳轉到首頁...',
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = '/TickitEasy/member/logout';
+          });
+        });
+      });
+    </script>
+
+</body>
+</html>

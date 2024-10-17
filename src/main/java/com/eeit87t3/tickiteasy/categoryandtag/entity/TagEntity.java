@@ -2,6 +2,7 @@ package com.eeit87t3.tickiteasy.categoryandtag.entity;
 
 import java.util.List;
 
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -41,6 +42,10 @@ public class TagEntity {
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "postTag")  
 	private List<PostEntity> posts;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "fundTag")
+	private List<FundProj> fundProj;
 	
 	public TagEntity() {
 	}

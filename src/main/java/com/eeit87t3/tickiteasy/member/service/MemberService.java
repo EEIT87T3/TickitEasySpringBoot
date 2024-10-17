@@ -16,6 +16,7 @@ import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.entity.Member.MemberStatus;
 import com.eeit87t3.tickiteasy.member.repository.MemberRepository;
+import com.eeit87t3.tickiteasy.util.JWTUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -30,19 +31,78 @@ public class MemberService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private JWTUtil jwtUtil;
 
     // 會員註冊
     @Transactional
-    public void register(String email, String password, String name, String nickname, LocalDate birthDate, String phone) {
+    public String register(String email, String password, String name, String nickname, LocalDate birthDate, String phone) {
         if (memberRepository.findByEmail(email) != null) {
             throw new IllegalArgumentException("該電子郵件已被註冊");
         }
+
+        // 生成驗證 token
+        String verificationToken = UUID.randomUUID().toString();
+
+        // 加密密碼
         String encodedPassword = passwordEncoder.encode(password);
-        Member newMember = new Member(email, encodedPassword, name, nickname, birthDate, phone, LocalDate.now(), MemberStatus.未驗證, null);
+        
+        // 創建新會員
+        Member newMember = new Member(email, encodedPassword, name, nickname, birthDate, phone, LocalDate.now(), Member.MemberStatus.未驗證, null);
+        newMember.setVerificationToken(verificationToken);
+
         memberRepository.save(newMember);
+
+        return verificationToken;
     }
 
- // 更新會員基本資料，不包括圖片
+    // 處理會員驗證
+    @Transactional
+    public void verifyMember(String token) {
+        Member member = memberRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("無效的驗證連結。"));
+
+        if (member.getStatus() == Member.MemberStatus.已驗證) {
+            throw new IllegalArgumentException("帳號已經被驗證過。");
+        }
+
+        // 更新會員狀態為已驗證，並清除驗證 token
+        member.setStatus(Member.MemberStatus.已驗證);
+        member.setVerificationToken(null);  // 清除 token
+        memberRepository.save(member);
+    }
+    
+ // 處理會員登入，驗證會員憑證並生成 JWT Token
+    @Transactional
+    public Optional<String> login(String email, String password) {
+        Member member = memberRepository.findByEmail(email);
+        
+        // 檢查會員是否存在
+        if (member == null) {
+            throw new IllegalArgumentException("該會員帳號不存在"); // 直接拋出例外，提供明確訊息
+        }
+
+        // 檢查會員是否完成驗證
+        if (member.getStatus() != Member.MemberStatus.已驗證) {
+            throw new IllegalArgumentException("會員尚未驗證，請先完成驗證程序");
+        }
+
+        // 比對密碼
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            return Optional.empty();  // 密碼錯誤，返回空值，提示前端登入失敗
+        }
+
+        // 生成 JWT Token
+        String token = jwtUtil.generateToken(member.getEmail());
+        
+        return Optional.of(token);  // 登入成功，返回 JWT Token
+    }
+
+    
+
+
+    // 更新會員基本資料，不包括圖片
     @Transactional
     public void updateProfile(Member currentMember, Member updatedInfo) {
         currentMember.setName(updatedInfo.getName());
@@ -69,15 +129,9 @@ public class MemberService {
         }
     }
 
-
-    // 處理會員登入
-    public Optional<Member> login(String email, String password) {
-        Member member = memberRepository.findByEmail(email);
-        if (member != null && passwordEncoder.matches(password, member.getPassword())) {
-            return Optional.of(member);
-        }
-        return Optional.empty();
-    }
+    
+    
+    /**************後台*********************/
 
     // 取得所有會員列表
     public List<Member> getAllMembers() {

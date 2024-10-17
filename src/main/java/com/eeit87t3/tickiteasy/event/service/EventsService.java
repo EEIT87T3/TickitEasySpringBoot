@@ -20,7 +20,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.event.dto.EventsDTO;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
-import com.eeit87t3.tickiteasy.event.repository.EventsRepo;
+import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.event.repository.EventsSpecification;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
@@ -34,11 +34,9 @@ import jakarta.transaction.Transactional;
  */
 @Service
 public class EventsService {
-	
+
 	@Autowired
-	private EventsRepo eventsRepo;
-	@Autowired
-	private EventsFindingService eventsFindingService;
+	private EventsProcessingService eventsProcessingService;
 	@Autowired
 	private CategoryService categoryService;
 	@Autowired
@@ -56,7 +54,7 @@ public class EventsService {
 	 * @return 查詢結果。
 	 */
 	public EventsEntity findById(Integer eventID) {
-		return eventsFindingService.findById(eventID);
+		return eventsProcessingService.findById(eventID);
 	}
 
 	/**
@@ -70,7 +68,7 @@ public class EventsService {
 		if (categoryEntity == null) {
 			return new ArrayList<>();
 		} else {			
-			return eventsFindingService.findByEventCategory(categoryEntity);
+			return eventsProcessingService.findByEventCategory(categoryEntity);
 		}
 	};
 	
@@ -85,7 +83,7 @@ public class EventsService {
 		if (tagEntity == null) {
 			return new ArrayList<>();
 		} else {			
-			return eventsFindingService.findByEventTag(tagEntity);
+			return eventsProcessingService.findByEventTag(tagEntity);
 		}
 	}
 	
@@ -97,7 +95,12 @@ public class EventsService {
 				.and(EventsSpecification.hasSerchingTime(searchingTime))
 				);
 		Pageable pageable = PageRequest.of(pageNumber - 1, 10, Direction.ASC, "eventID");  // （第幾頁（從 0 起算）, 一頁幾筆, 排序方向, 排序依據欄位）
-		return eventsFindingService.findBySpecificationAndPageable(specification, pageable);
+		return eventsProcessingService.findBySpecificationAndPageable(specification, pageable);
+	}
+	
+	
+	public List<EventsEntity> findByListingAndOnsale() {
+		return eventsProcessingService.findByListingAndOnsale();
 	}
 	
 	
@@ -113,7 +116,7 @@ public class EventsService {
 
 		// 活動名稱
 		if (createEventsDTO.getEventName() != null && !createEventsDTO.getEventName().isBlank()) {  // 未輸入活動名稱
-			if (eventsRepo.findByEventName(createEventsDTO.getEventName()) != null) {
+			if (eventsProcessingService.findByEventName(createEventsDTO.getEventName()) != null) {
 				return "輸入錯誤：此活動名稱已經存在。";
 			}
 		} else {
@@ -141,6 +144,42 @@ public class EventsService {
 		
 		// 活動介紹
 		// （無限制）
+		
+		// 地點
+		// （無限制）
+		
+		// 地址
+		if (createEventsDTO.getAddress() == null || createEventsDTO.getAddress().isBlank()) {  // 未輸入地址
+			return "輸入錯誤：未輸入地址。";
+		}
+		
+		// 活動開始時間
+		if (createEventsDTO.getEventStartTime() == null) {
+			return "輸入錯誤：未輸入活動開始時間。";
+		}
+		
+		// 活動結束時間
+		if (createEventsDTO.getEventEndTime() == null) {
+			return "輸入錯誤：未輸入活動結束時間。";
+		}
+		
+		// 開始入場時間
+		if (createEventsDTO.getStartEntryTime() == null) {
+			return "輸入錯誤：未輸入開始入場時間。";
+		}
+		
+		// 結束入場時間
+		if (createEventsDTO.getEndEntryTime() == null) {
+			return "輸入錯誤：未輸入結束入場時間。";
+		}
+		
+		// 可購買總量
+		if (createEventsDTO.getQuantityTotalAvailable() == null) {
+			return "輸入錯誤：未輸入可購買總量。";
+		} else if (createEventsDTO.getQuantityTotalAvailable() <= 0) {
+			return "輸入錯誤：可購買總量需大於 0。";
+		}
+		
 		
 		return "輸入正確！";
 	}
@@ -179,7 +218,42 @@ public class EventsService {
 			eventsEntity.setEventDesc(createEventsDTO.getEventDesc());
 		}
 		
-		eventsRepo.save(eventsEntity);  // 先 persist、取得活動編號
+		// 地點
+		if (createEventsDTO.getPlace() != null && !createEventsDTO.getPlace().isBlank()) {
+			eventsEntity.setPlace(createEventsDTO.getPlace());
+		}
+		
+		// 地址
+		if (createEventsDTO.getAddress() != null && !createEventsDTO.getAddress().isBlank()) {
+			eventsEntity.setAddress(createEventsDTO.getAddress());
+		}
+		
+		// 活動開始時間
+		if (createEventsDTO.getEventStartTime() != null) {
+			eventsEntity.setEventStartTime(createEventsDTO.getEventStartTime());
+		}
+		
+		// 活動結束時間
+		if (createEventsDTO.getEventEndTime() != null) {
+			eventsEntity.setEventEndTime(createEventsDTO.getEventEndTime());
+		}
+		
+		// 開始入場時間
+		if (createEventsDTO.getStartEntryTime() != null) {
+			eventsEntity.setStartEntryTime(createEventsDTO.getStartEntryTime());
+		}
+		
+		// 結束入場時間
+		if (createEventsDTO.getEndEntryTime() != null) {
+			eventsEntity.setEndEntryTime(createEventsDTO.getEndEntryTime());
+		}
+		
+		// 可購買總量
+		if (createEventsDTO.getQuantityTotalAvailable() != null) {
+			eventsEntity.setQuantityTotalAvailable(createEventsDTO.getQuantityTotalAvailable());
+		}
+		
+		eventsProcessingService.save(eventsEntity);  // 先 persist、取得活動編號
 		// 活動主圖
 		if (createEventsDTO.getEventPicFile() != null && createEventsDTO.getEventPicFile().getSize() != 0) {  // 有替換活動主圖
 			String baseName = eventsEntity.getEventID().toString() + "_" + UUID.randomUUID().toString();
@@ -190,6 +264,7 @@ public class EventsService {
 				e.printStackTrace();
 			}
 		}
+		
 		
 		return eventsEntity;
 	}
@@ -205,22 +280,17 @@ public class EventsService {
 	 */
 	public String validateEditInput(EventsDTO editEventsDTO) {
 		// 活動編號
-		EventsEntity eventsEntity = eventsFindingService.findById(editEventsDTO.getEventID());
+		EventsEntity eventsEntity = eventsProcessingService.findById(editEventsDTO.getEventID());
 		if (eventsEntity == null) {
 			return "輸入錯誤：此筆活動不存在。";
 		} else {
-			
-			// 狀態
-			if (editEventsDTO.getStatusString() != null && !editEventsDTO.getStatusString().isBlank()) {  // 有修改狀態
-				return "輸入錯誤：無法在此修改狀態。";
-			}
 			
 			// 活動名稱
 			if (editEventsDTO.getEventName() != null && !editEventsDTO.getEventName().isBlank()) {  // 有修改活動名稱
 				switch (eventsEntity.getStatus()) {
 					case 0:  // 原本為「未上架」
 					case 1:  // 原本為「已上架」
-						if (eventsRepo.findByEventName(editEventsDTO.getEventName()) != null) {
+						if (eventsProcessingService.findByEventName(editEventsDTO.getEventName()) != null) {
 							return "輸入錯誤：此活動名稱已經存在。";
 						}
 						break;
@@ -251,6 +321,30 @@ public class EventsService {
 			// 活動介紹
 			// （無限制）
 			
+			// 地點
+			// （無限制）
+			
+			// 地址
+			// （無限制）
+			
+			// 活動開始時間
+			// （無限制）
+			
+			// 活動結束時間
+			// （無限制）
+			
+			// 開始入場時間
+			// （無限制）
+			
+			// 結束入場時間
+			// （無限制）
+			
+			// 可購買總量
+			// 應該要做「若已啟售，修改只能變多」驗證，但是暫時擱置
+			if (editEventsDTO.getQuantityTotalAvailable() != null && editEventsDTO.getQuantityTotalAvailable() <= 0) {
+				return "輸入錯誤：可購買總量需大於 0。";
+			}
+			
 			return "輸入正確！";
 		}
 	}
@@ -263,20 +357,8 @@ public class EventsService {
 	 */
 	@Transactional
 	public EventsEntity edit(EventsDTO editEventsDTO) {
-		EventsEntity eventsEntity = eventsFindingService.findById(editEventsDTO.getEventID());
+		EventsEntity eventsEntity = eventsProcessingService.findById(editEventsDTO.getEventID());
 		if (eventsEntity != null) {
-			
-			// 狀態			
-			if (editEventsDTO.getStatusString() != null && !editEventsDTO.getStatusString().isBlank()) {  // 有修改狀態
-				switch (editEventsDTO.getStatusString()) {
-					case "draft":
-						eventsEntity.setStatus((short) 0);
-						break;
-					case "listing":
-						eventsEntity.setStatus((short) 1);
-						break;
-				}
-			}
 			
 			// 活動名稱
 			if (editEventsDTO.getEventName() != null && !editEventsDTO.getEventName().isBlank()) {  // 有修改活動名稱
@@ -316,6 +398,41 @@ public class EventsService {
 				eventsEntity.setEventDesc(editEventsDTO.getEventDesc());
 			}
 			
+			// 地點
+			if (editEventsDTO.getPlace() != null && !editEventsDTO.getPlace().isBlank()) {
+				eventsEntity.setPlace(editEventsDTO.getPlace());
+			}
+			
+			// 地址
+			if (editEventsDTO.getAddress() != null && !editEventsDTO.getAddress().isBlank()) {
+				eventsEntity.setAddress(editEventsDTO.getAddress());
+			}
+			
+			// 活動開始時間
+			if (editEventsDTO.getEventStartTime() != null) {
+				eventsEntity.setEventStartTime(editEventsDTO.getEventStartTime());
+			}
+			
+			// 活動結束時間
+			if (editEventsDTO.getEventEndTime() != null) {
+				eventsEntity.setEventEndTime(editEventsDTO.getEventEndTime());
+			}
+			
+			// 開始入場時間
+			if (editEventsDTO.getStartEntryTime() != null) {
+				eventsEntity.setStartEntryTime(editEventsDTO.getStartEntryTime());
+			}
+			
+			// 結束入場時間
+			if (editEventsDTO.getEndEntryTime() != null) {
+				eventsEntity.setEndEntryTime(editEventsDTO.getEndEntryTime());
+			}
+			
+			// 可購買總量
+			if (editEventsDTO.getQuantityTotalAvailable() != null) {
+				eventsEntity.setQuantityTotalAvailable(editEventsDTO.getQuantityTotalAvailable());
+			}
+			
 			return eventsEntity;
 		} else {
 			return null;
@@ -332,7 +449,7 @@ public class EventsService {
 	 */
 	public String validateEditStatus(Integer eventID, Short editStatus) {
 		// 活動編號
-		EventsEntity eventsEntity = eventsFindingService.findById(eventID);
+		EventsEntity eventsEntity = eventsProcessingService.findById(eventID);
 		if (eventsEntity == null) {
 			return "輸入錯誤：此筆活動不存在。";
 		} else {
@@ -362,13 +479,18 @@ public class EventsService {
 	 * 
 	 * @param eventID
 	 * @param editStatus：要改為的狀態值。
-	 * @return
+	 * @return 編輯狀態後的 EventsEntity。
 	 */
 	@Transactional
 	public EventsEntity editStatus(Integer eventID, Short editStatus) {
-		EventsEntity eventsEntity = eventsFindingService.findById(eventID);
+		EventsEntity eventsEntity = eventsProcessingService.findById(eventID);
 		if (eventsEntity != null) {
 			eventsEntity.setStatus(editStatus);
+			
+			// 一併修改該活動的所有票種的狀態值
+			for (TicketTypesEntity ticketTypesEntity : eventsEntity.getTicketTypes()) {
+				ticketTypesEntity.setStatus(editStatus);
+			}
 		}
 		return eventsEntity;
 	}
@@ -383,7 +505,7 @@ public class EventsService {
 	 * @return 驗證結果：若正確，回傳「輸入正確！」；若錯誤，會包含錯誤訊息。
 	 */
 	public String validateDeleteInput(Integer eventID) {
-		EventsEntity eventsEntity = eventsFindingService.findById(eventID);
+		EventsEntity eventsEntity = eventsProcessingService.findById(eventID);
 		if (eventsEntity == null) {
 			return "輸入錯誤：此筆活動不存在。";
 		} else {
@@ -402,21 +524,6 @@ public class EventsService {
 	 * @return 刪除執行結果。
 	 */
 	public Boolean delete(Integer eventID) {
-		EventsEntity eventsEntity = eventsFindingService.findById(eventID);
-		
-		// 刪除圖片
-		try {
-			imageUtil.deleteImage(eventsEntity.getEventPic());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		eventsRepo.delete(eventsEntity);
-		EventsEntity result = eventsFindingService.findById(eventID);
-		if (result == null) {
-			return true;
-		} else {
-			return false;
-		}
+		return eventsProcessingService.deleteById(eventID);
 	}
 }
