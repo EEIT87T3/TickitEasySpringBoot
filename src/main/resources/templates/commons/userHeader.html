@@ -31,7 +31,7 @@
             <a class="nav-link" href="#">討論區</a>
           </li>
         </ul>
-        <!-- 購物車和訂單圖標 -->
+        <!-- 購物車圖標 -->
         <div class="d-flex align-items-center ms-4">
             <a href="#" class="icon-button me-3">
               <i class="fas fa-shopping-cart"></i>
@@ -46,10 +46,17 @@
         <!-- 登入後的顯示 (預設隱藏) -->
         <div class="d-flex align-items-center ms-4 d-none" id="logged-in-header">
           <!-- 會員頭像 -->
-          <img src="https://via.placeholder.com/40" alt="會員頭像" class="member-avatar">
-          <span class="ms-2 text-gray-700" id="memberName">會員名稱</span>
+          <a href="/TickitEasy/member/memberProfile" class="d-flex align-items-center text-decoration-none">
+            <img
+              src="https://via.placeholder.com/40"
+              alt="會員頭像"
+              class="member-avatar"
+              id="memberAvatar"
+            />
+            <span class="ms-2 text-gray-700" id="memberName">會員名稱</span>
+          </a>
           <!-- 登出按鈕 -->
-          <button class="btn btn-outline-main-bright-orange ms-3" id="logoutButton">登出</button>
+          <a href="#" id="logoutButton" class="ms-3 btn btn-outline-danger btn-sm">登出</a>
         </div>
       </div>
     </div>
@@ -57,48 +64,107 @@
 
   <div class="content">
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <!-- 引入 jQuery 和 Bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
+    <!-- 引入 SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 模擬登入狀態的簡單 JavaScript -->
+    <!-- JavaScript -->
     <script>
-      $(document).ready(function() {
-        // 檢查 localStorage 中是否有 JWT Token
-        const token = localStorage.getItem('jwtToken');
+    document.addEventListener('DOMContentLoaded', function() {
+  // 檢查 localStorage 是否有 Token
+  const token = localStorage.getItem('jwtToken');
 
-        if (token) {
-          // 如果 token 存在，顯示已登入狀態
-          $('#logged-out-header').addClass('d-none');
-          $('#logged-in-header').removeClass('d-none');
-          // 設定會員名稱
-          const memberName = localStorage.getItem('memberName');
-          $('#memberName').text(memberName ? memberName : '會員');
-        } else {
-          // 如果沒有 token，顯示未登入狀態
-          $('#logged-out-header').removeClass('d-none');
-          $('#logged-in-header').addClass('d-none');
-        }
+  const loggedOutHeader = document.getElementById('logged-out-header');
+  const loggedInHeader = document.getElementById('logged-in-header');
+  const memberNameElement = document.getElementById('memberName');
+  const memberAvatarElement = document.getElementById('memberAvatar');
+  const logoutButton = document.getElementById('logoutButton');
 
-        // 登出按鈕事件
-        $('#logoutButton').click(function() {
-          // 清除 localStorage 中的 JWT token 和會員名稱
-          localStorage.removeItem('jwtToken');
-          localStorage.removeItem('memberName');
+  if (token) {
+    // 如果有 token，顯示已登入的狀態
+    loggedOutHeader.classList.add('d-none');
+    loggedInHeader.classList.remove('d-none');
 
-          // 顯示登出提示並跳轉回首頁
-          Swal.fire({
-            icon: 'success',
-            title: '已成功登出',
-            text: '即將跳轉到首頁...',
-            timer: 2000,
-            showConfirmButton: false
-          }).then(() => {
-            window.location.href = '/TickitEasy/member/logout';
-          });
-        });
-      });
+    // 會員的頭貼和名稱
+    const memberName = localStorage.getItem('memberName');
+    const memberAvatarUrl = localStorage.getItem('memberAvatarUrl'); // 頭貼 URL
+
+    memberNameElement.textContent = memberName ? memberName : '會員';
+
+    if (memberAvatarUrl) {
+      memberAvatarElement.setAttribute('src', memberAvatarUrl);
+    } else {
+      // 如果沒有頭貼，使用預設的頭貼
+      memberAvatarElement.setAttribute('src', '/TickitEasy/images/member/default-avatar.png');
+    }
+
+    // 
+    const memberAvatar = document.getElementById('memberAvatar');
+    memberAvatar.parentElement.addEventListener('click', function(e) {
+    });
+  } else {
+    // 如果沒有 token，顯示未登入的狀態
+    loggedOutHeader.classList.remove('d-none');
+    loggedInHeader.classList.add('d-none');
+  }
+
+  // 登出按鈕
+  logoutButton.addEventListener('click', function(e) {
+    e.preventDefault(); 
+
+    // 清除 token 和會員資料
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('memberName');
+    localStorage.removeItem('memberAvatarUrl');
+
+    // 顯示登出訊息並跳轉
+    Swal.fire({
+      icon: 'success',
+      title: '已成功登出',
+      text: '即將跳轉到首頁...',
+      timer: 2000,
+      showConfirmButton: false
+    }).then(() => {
+      window.location.href = '/TickitEasy/';
+    });
+  });
+
+  // 如果已登入，使用 axios 獲取資料
+  if (token) {
+    axios.get('/TickitEasy/api/member/profile', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .then(function(response) {
+      const data = response.data;
+
+      // 更新會員的名字
+      memberNameElement.textContent = data.nickname;
+
+      // 更新會員的頭貼
+      if (data.profilePic) {
+        const avatarUrl = '/TickitEasy/api/member/profilePic/' + data.memberID;
+        memberAvatarElement.setAttribute('src', avatarUrl);
+        // 儲存頭貼 URL
+        localStorage.setItem('memberAvatarUrl', avatarUrl);
+      } else {
+        // 使用預設頭貼
+        memberAvatarElement.setAttribute('src', '/TickitEasy/images/member/default-avatar.png');
+      }
+
+      // 儲存會員名稱
+      localStorage.setItem('memberName', data.nickname);
+    })
+    .catch(function(error) {
+      // 若讀取資料失敗，則登出
+      console.error('讀取會員資料失敗：', error);
+      logoutButton.click();
+    });
+  }
+});
     </script>
 
 </body>
