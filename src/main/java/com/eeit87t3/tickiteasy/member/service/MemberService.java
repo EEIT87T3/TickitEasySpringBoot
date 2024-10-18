@@ -64,10 +64,10 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("無效的驗證連結。"));
 
         if (member.getStatus() == Member.MemberStatus.已驗證) {
-            throw new IllegalArgumentException("帳號已經被驗證過。");
+            throw new IllegalArgumentException("此帳號已經過驗證。");
         }
 
-        // 更新會員狀態為已驗證，並清除驗證 token
+        // 更新會員狀態為已驗證，並清除token
         member.setStatus(Member.MemberStatus.已驗證);
         member.setVerificationToken(null);  // 清除 token
         memberRepository.save(member);
@@ -80,7 +80,7 @@ public class MemberService {
         
         // 檢查會員是否存在
         if (member == null) {
-            throw new IllegalArgumentException("該會員帳號不存在"); // 直接拋出例外，提供明確訊息
+            throw new IllegalArgumentException("該會員帳號不存在"); // 直接拋出例外
         }
 
         // 檢查會員是否完成驗證
@@ -90,7 +90,7 @@ public class MemberService {
 
         // 比對密碼
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            return Optional.empty();  // 密碼錯誤，返回空值，提示前端登入失敗
+            throw new IllegalArgumentException("密碼錯誤");  // 拋出異常
         }
 
         // 生成 JWT Token
@@ -99,7 +99,10 @@ public class MemberService {
         return Optional.of(token);  // 登入成功，返回 JWT Token
     }
 
-    
+ // 根據email找會員
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email);
+    }
 
 
     // 更新會員基本資料，不包括圖片
@@ -153,6 +156,17 @@ public class MemberService {
             return imageUtil.getImageByteArray(profilePicPath);
         }
         return imageUtil.getImageByteArray("/images/member/default-avatar.png");
+    }
+    
+   //獲取頭貼檔案名稱
+    public String getProfilePicFilename(Integer memberId) {
+    	Optional<Member> optionalMember = memberRepository.findById(memberId);
+    	if (optionalMember.isPresent()) {
+			Member member = optionalMember.get();
+			String profilePicPath = member.getProfilePicPath();
+			return profilePicPath.substring(profilePicPath.lastIndexOf("/") + 1);
+		}
+    	return "default-avatar.png";
     }
 
     // 移除會員頭貼
