@@ -47,6 +47,8 @@
                         { data: 'categoryName', defaultContent: 'N/A' },
                         { data: 'tagName', defaultContent: 'N/A' },
                         { data: 'postImgUrl', defaultContent: 'N/A' },
+                        { data: 'likesCount', defaultContent: 'N/A' },
+                        { data: 'viewCount', defaultContent: 'N/A' },
 
                         { data: 'status', defaultContent: 'N/A' },
                         { data: 'postTime', defaultContent: 'N/A' },
@@ -71,6 +73,7 @@
         }
         // 當頁面加載時抓取所有貼文
         $(document).ready(function () {
+            
             const startTime = new Date();
             fetchAllPosts();
             loadCategories();
@@ -238,7 +241,7 @@
     <select id="categoryFilter">
         <option value="">All Categories</option>
     </select>
-
+   
     <table id="postsTable" class="display">
         <thead>
             <tr>
@@ -249,6 +252,8 @@
                 <th>活動類別</th>
                 <th>標籤</th>
                 <th>圖片</th>
+                <th>按讚數</th>
+                <th>觀看數</th>
                 <th>狀態</th>
                 <th>發布時間</th>
                 <th>動作</th>

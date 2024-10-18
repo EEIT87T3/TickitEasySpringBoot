@@ -8,6 +8,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -76,7 +79,33 @@ public class PostJsonController {
 //	    List<PostEntity> posts = postService.findAll(); // 獲取所有貼文
 //	    return ResponseEntity.ok(posts);
 //	}
-
+	
+//	@GetMapping("GET/pages/")
+//    public Page<PostEntity> getPosts(
+//            @RequestParam(value = "page", defaultValue = "0") int page, 
+//            @RequestParam(value = "size", defaultValue = "10") int size) {
+//        return postService.getPostsByPage(page, size);
+//    }
+	
+//    @GetMapping("/posts/category/{categoryID}")
+//    public ResponseEntity<Page<ShowPostDTO>> getPostsByCategory(
+//            @PathVariable Integer categoryID,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size) {
+//        
+//        Page<ShowPostDTO> posts = postService.getPostsByCategory(categoryID, page, size);
+//        return ResponseEntity.ok(posts);
+//    }
+    @GetMapping("/posts/category/{categoryId}")
+    public ResponseEntity<Page<ShowPostDTO>> getPostsByCategory(
+            @PathVariable Integer categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Page<ShowPostDTO> posts = postService.getPostsByCategory(categoryId, page, size);
+        return ResponseEntity.ok(posts);
+    }
+	   
 	//根據id取得單一貼文
 	@GetMapping("GET/{postID}")
 	public ResponseEntity<PostEntity> getPostById(@PathVariable("postID") Integer postID) {

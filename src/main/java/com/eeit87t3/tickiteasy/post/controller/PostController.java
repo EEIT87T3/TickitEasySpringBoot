@@ -106,6 +106,16 @@ public class PostController {
 	public String userPostPage() {
 		return "post/userPost";  
 	}
+	//前台新增貼文
+	@GetMapping("/usercreate")
+	public String userAddPost() {
+		return "post/userAddPost";  
+	}
+	//前台編輯貼文
+	@GetMapping("/{postID}/useredit")
+	public String userEditPost() {
+		return "post/userEditPost";  
+	}
 
  	
 	//更新貼文

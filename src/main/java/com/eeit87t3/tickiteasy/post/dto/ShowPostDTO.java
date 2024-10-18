@@ -7,7 +7,9 @@ public class ShowPostDTO {
     private String postTitle; // 文章標題
     private String postContent; // 文章內容
     private String categoryName; // 類別名稱
+    private Integer categoryId; // 類別Id
     private String tagName; // 標籤名稱
+    private Integer tagId; // 標籤ID
     private String postImgUrl; // 文章圖片URL
     private Integer status; // 文章狀態
     private String postTime; // 文章時間
@@ -49,6 +51,13 @@ public class ShowPostDTO {
 		return viewCount;
 	}
 
+	public Integer getCategoryID() {
+		return categoryId;
+	}
+	public Integer getTagID() {
+		return tagId;
+	}
+	
 	public void setPostID(Integer postID) {
 		this.postID = postID;
 	}
@@ -82,5 +91,10 @@ public class ShowPostDTO {
 	public void setViewCount(Integer viewCount) {
 		this.viewCount = viewCount;
 	}
- 
+	public void setCategoryID(Integer categoryID) {
+		this.categoryId = categoryID;
+	}
+	public void setTagID(Integer tagID) {
+		this.tagId = tagID;
+	}
 }

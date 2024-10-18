@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +58,35 @@ public class PostService {
             return dto;
         }).collect(Collectors.toList());
     }
-	
+    public Page<ShowPostDTO> getPostsByCategory(Integer categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PostEntity> postPage = postRepo.findByPostCategory_CategoryId(categoryId, pageable);
+
+        return postPage.map(this::convertToShowPostDTO);
+    }	
+    private ShowPostDTO convertToShowPostDTO(PostEntity post) {
+        ShowPostDTO dto = new ShowPostDTO();
+        dto.setPostID(post.getPostID());
+        dto.setNickname(post.getMember().getNickname());
+        dto.setPostTitle(post.getPostTitle());
+        dto.setPostContent(post.getPostContent());
+        dto.setCategoryName(post.getPostCategory().getCategoryName());
+        dto.setCategoryID(post.getPostCategory().getCategoryId());
+        dto.setTagName(post.getPostTag() != null ? post.getPostTag().getTagName() : null);
+        dto.setTagID(post.getPostTag() != null ? post.getPostTag().getTagId() : null);
+        dto.setPostImgUrl(post.getPostImgUrl());
+        dto.setStatus(post.getStatus());
+        dto.setPostTime(post.getPostTime().toString()); // 或者轉換為你需要的格式
+        dto.setLikesCount(post.getLikesCount());
+        dto.setViewCount(post.getViewCount());
+        return dto;
+    }
+
+//	public Page<PostEntity> getPostsByPage(int page, int size) {
+//	    Pageable pageable = PageRequest.of(page, size); // page 是第幾頁, size 是每頁顯示的數量
+//	    return postRepo.findAll(pageable);
+//	}
+//	
 	//根據貼文ID取得單筆貼文
     @Transactional(readOnly = true)
     public PostEntity findById(Integer postId) {
