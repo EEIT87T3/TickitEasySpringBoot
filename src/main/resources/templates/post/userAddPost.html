@@ -111,26 +111,22 @@
      $('#fullCreatePostForm').on('submit', function(event) {
     event.preventDefault();
 
-    // const postData = {
-    //     postTitle: $('#fullPostTitle').val(),
-    //     postContent: $('#fullPostContent').val(),
-    //     categoryID: $('#fullPostCategory').val(),
-    //     tagID: $('#fullPostTag').val()
-    // };
+    const formData = new FormData();
+
     console.log($('#fullPostCategory').val());
 
-    // const postData = new URLSearchParams(); application/x-www-form-urlencoded
-    const postData = {
-    postTitle: $('#fullPostTitle').val(),
-    postContent: $('#fullPostContent').val(),
-    postImgUrl: $('#fullPostImgUrl').val(),
-    categoryID: $('#fullPostCategory').val(),
-    tagID: $('#fullPostTag').val()
-    };
+    // 使用formData取代json傳遞資料
+    formData.append('postTitle', $('#fullPostTitle').val());
+    formData.append('postContent', $('#fullPostContent').val());
+    formData.append('categoryID', $('#fullPostCategory').val());
+    formData.append('tagID', $('#fullPostTag').val());
+    // 附加圖片檔案
+    const imageFile = document.getElementById('formFile').files[0];
+    formData.append('image', imageFile);  // 'image' 是後端用來接收檔案的參數名
 
-    axios.post('/TickitEasy/admin/api/post/POST/', postData, {
+    axios.post('/TickitEasy/admin/api/post/POST/pic/', formData, {
         headers: {
-            'Content-Type': 'application/json'
+          'Content-Type': 'multipart/form-data'
         }
     })
     .then(response => {

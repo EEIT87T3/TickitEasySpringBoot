@@ -2,6 +2,8 @@ package com.eeit87t3.tickiteasy.post.entity;
 
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.BatchSize;
@@ -14,6 +16,7 @@ import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -97,6 +100,10 @@ public class PostEntity {
 	@JoinColumn(name = "memberID", referencedColumnName = "memberID", insertable = false, updatable = false)
 	private Member member;  
 	
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImagesEntity> images = new ArrayList<>();
+    
 //	@Transient
 //    private static final String DEFAULT_PROFILE_PIC = "/images/default-avatar.png"; // 預設頭貼路徑
 //	
@@ -174,7 +181,16 @@ public class PostEntity {
 	public void setEditTime(Timestamp editTime) {
 		this.editTime = editTime;
 	}
+
+	public List<PostImagesEntity> getImages() {
+		return images;
+	}
+
+	public void setImages(List<PostImagesEntity> images) {
+		this.images = images;
+	}
 	  
+	
 	// 會員頭貼
 
 //	public String getMemberProfilePic() {

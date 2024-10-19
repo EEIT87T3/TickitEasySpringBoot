@@ -1,10 +1,12 @@
 package com.eeit87t3.tickiteasy.post.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
@@ -33,15 +36,20 @@ import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
+import com.eeit87t3.tickiteasy.image.ImageDirectory;
+import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.post.dto.CreatePostDTO;
 import com.eeit87t3.tickiteasy.post.dto.ShowCommentDTO;
 import com.eeit87t3.tickiteasy.post.dto.ShowPostDTO;
 import com.eeit87t3.tickiteasy.post.entity.CommentEntity;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
+import com.eeit87t3.tickiteasy.post.entity.PostImagesEntity;
 import com.eeit87t3.tickiteasy.post.repository.CommentRepo;
+import com.eeit87t3.tickiteasy.post.repository.PostImagesRepo;
 import com.eeit87t3.tickiteasy.post.repository.PostRepo;
 import com.eeit87t3.tickiteasy.post.service.CommentService;
 import com.eeit87t3.tickiteasy.post.service.PostService;
+import com.eeit87t3.tickiteasy.test.TestImagesEntity;
 
 // 後臺路徑:/admin/api/post
 // 前臺路徑:/user/post
@@ -66,6 +74,10 @@ public class PostJsonController {
 	private TagRepo tagRepo;
 	@Autowired
 	private CommentRepo commentRepo;
+	@Autowired
+	private ImageUtil  imageUtil;
+	@Autowired
+	private PostImagesRepo postImagesRepo;
 	
 
 	//取得所有貼文
@@ -198,7 +210,57 @@ public class PostJsonController {
  	    PostEntity createdPost = postService.insert(post);
  	    return ResponseEntity.ok(createdPost);
  	}
- 	
+ 	//新增單筆貼文(附圖)
+ 	@PostMapping("POST/pic/")
+ 	public ResponseEntity<?> createPost(
+ 	        @ModelAttribute CreatePostDTO createPostDTO,
+ 	        @RequestParam("image") MultipartFile imageFile) {
+
+ 	    try {
+ 	        // 處理圖片上傳
+ 	    	String baseName = UUID.randomUUID().toString();
+ 			String pathString = imageUtil.saveImage(ImageDirectory.POST, imageFile,baseName); // 儲存圖片並取得 URL
+ 			
+ 			
+ 			PostImagesEntity postImagesPO = new PostImagesEntity();
+ 			postImagesPO.setImagePath(pathString);
+ 			postImagesRepo.save(postImagesPO);
+ 			
+ 	        // 創建貼文物件
+ 	        PostEntity newPost = new PostEntity();
+ 	        newPost.setPostTitle(createPostDTO.getPostTitle());
+ 	        newPost.setPostContent(createPostDTO.getPostContent());
+ 	        
+ 	       // 設置分類和標籤 (使用商品方法
+ 	 	    if (createPostDTO.getCategoryID() != null) {
+ 	 	        CategoryEntity category = categoryService.findProductCategoryById(createPostDTO.getCategoryID());
+ 	 	      newPost.setPostCategory(category);
+ 	 	    }
+ 	 	    if (createPostDTO.getTagID() != null) {
+ 	 	        TagEntity tag = tagService.findProductTagById(createPostDTO.getTagID());
+ 	 	      newPost.setPostTag(tag);
+ 	 	    }
+ 	 	    
+ 	 	 
+ 	        postImagesPO.setPost(newPost); // 設定外鍵關聯 postimg表
+ 	        newPost.getImages().add(postImagesPO); // 將圖片加入貼文的圖片列表
+// 	        newPost.setPostImgUrl(pathString);  // 使用圖片的 URL post表
+ 	        
+ 	       // 設置默認值或從當前用戶會話中獲取
+ 	       //newPost.setMemberID(getCurrentMemberId()); // 實現這個方法來獲取當前登錄用戶的ID
+ 	       newPost.setMemberID(1); // 實現這個方法來獲取當前登錄用戶的ID
+ 	       newPost.setStatus(1); // 假設 1 是默認狀態
+
+ 	 	    PostEntity createdPost = postService.insert(newPost);
+ 	     
+ 	        
+ 	        return ResponseEntity.ok("貼文新增成功！");
+ 	    } catch (IOException e) {
+ 	        e.printStackTrace();
+ 	        return new ResponseEntity<>("圖片上傳失敗", HttpStatus.INTERNAL_SERVER_ERROR);
+ 	    }
+ 	}
+
  
  	//取得類別列表
  	@GetMapping("/categories")
