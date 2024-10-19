@@ -96,11 +96,11 @@
         <label for="fullPostTag">標籤:</label>
         <select id="fullPostTag" name="tagID" class="border p-2 mb-4 w-full"></select>
         
-        <label for="fullPostImgUrl">圖片:</label>
-        <input type="text" id="fullPostImgUrl" name="postImgUrl" required class="border p-2 mb-4 w-full">
+        <!-- <label for="fullPostImgUrl">圖片:</label> -->
+        <!-- <input type="text" id="fullPostImgUrl" name="postImgUrl" required class="border p-2 mb-4 w-full"> -->
 	    <div class="mb-3">
-		  <label for="formFile" class="form-label">Default file input example</label>
-		  <input class="form-control" type="file" id="formFile">
+		  <label for="formFile" class="form-label">圖片:</label>
+		  <input class="form-control" type="file" id="formFile" name="image" accept="image/*">
 		</div>
         <br>
         <button class="button" type="submit">新增貼文</button>
@@ -135,7 +135,7 @@
     })
     .then(response => {
         alert("貼文新增成功！");
-        window.location.href = '/TickitEasy/admin/post/PostList'; // 跳轉到貼文列表頁
+        window.location.href = '/TickitEasy/user/post/PostList'; // 跳轉到貼文列表頁
     })
     .catch(error => {
         console.error("新增貼文失敗:", error);
@@ -143,23 +143,6 @@
     });
 
 
-    // postData.append('postTitle', $('#fullPostTitle').val());
-    // postData.append('postContent', $('#fullPostContent').val());
-    // postData.append('postImgUrl', $('#fullPostImgUrl').val());
-    // // postData.append('memberID', 1);
-    // // postData.append('status', 1);
-    // postData.append('categoryID', $('#fullPostCategory').val());
-    // postData.append('tagID', $('#fullPostTag').val());
-    // console.log(postData);
-    // axios.post('/TickitEasy/admin/api/post/POST/', postData)
-    //     .then(response => {
-    //         alert("貼文新增成功！");
-    //         window.location.href = '/TickitEasy/admin/post'; // 跳轉到貼文列表頁
-    //     })
-    //     .catch(error => {
-    //         console.error("新增貼文失敗:", error);
-    //         alert("新增失敗，請稍後再試。");
-    //     });
 });
 
 // 動態填充分類和標籤選項
@@ -180,7 +163,7 @@ axios.get('/TickitEasy/admin/api/post/tags')
     });
     $('.postList').on('click', function() {
                
-               window.location.href = `/TickitEasy/admin/post`; 
+               window.location.href = `/TickitEasy/user/post/PostList`; 
            });
         </script>
         

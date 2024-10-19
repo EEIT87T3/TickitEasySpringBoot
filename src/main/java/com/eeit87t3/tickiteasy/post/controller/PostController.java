@@ -84,38 +84,7 @@ public class PostController {
 		 	model.addAttribute("postID", postID);
 	        return "post/adminPostComment"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
 	    }
-	/////////////////////////////////////    前台頁面跳轉    ////////////////////////////////
-
-	//新增貼文頁面 *未完成*
-		@GetMapping("/test")
-		    public String testPage() {
-		        return "post/test";  
-		    }
-	//前台分類貼文列表 
-	@GetMapping("/PostList")
-	public String userThemePostList() {
-		return "post/userThemePostList";  
-	}
-	//前台分類貼文列表 
-	@GetMapping("/HomePage")
-	public String userHomePage() {
-		return "post/userPostHome";  
-	}
-	//前台單筆貼文
-	@GetMapping("Post/{postID}")
-	public String userPostPage() {
-		return "post/userPost";  
-	}
-	//前台新增貼文
-	@GetMapping("/usercreate")
-	public String userAddPost() {
-		return "post/userAddPost";  
-	}
-	//前台編輯貼文
-	@GetMapping("/{postID}/useredit")
-	public String userEditPost() {
-		return "post/userEditPost";  
-	}
+	
 
  	
 	//更新貼文

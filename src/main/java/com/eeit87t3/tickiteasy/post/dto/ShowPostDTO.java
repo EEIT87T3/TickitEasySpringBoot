@@ -1,5 +1,7 @@
 package com.eeit87t3.tickiteasy.post.dto;
 
+import java.sql.Timestamp;
+
 public class ShowPostDTO {
 	//getallpost用
 	private Integer postID; // 對應的 postID
@@ -12,10 +14,10 @@ public class ShowPostDTO {
     private Integer tagId; // 標籤ID
     private String postImgUrl; // 文章圖片URL
     private Integer status; // 文章狀態
-    private String postTime; // 文章時間
+    private Timestamp postTime; // 新增文章時間
+    private Timestamp editTime; // 編輯文章時間
     private Integer likesCount;
     private Integer viewCount;
-    
 	public Integer getPostID() {
 		return postID;
 	}
@@ -31,8 +33,14 @@ public class ShowPostDTO {
 	public String getCategoryName() {
 		return categoryName;
 	}
+	public Integer getCategoryId() {
+		return categoryId;
+	}
 	public String getTagName() {
 		return tagName;
+	}
+	public Integer getTagId() {
+		return tagId;
 	}
 	public String getPostImgUrl() {
 		return postImgUrl;
@@ -40,24 +48,18 @@ public class ShowPostDTO {
 	public Integer getStatus() {
 		return status;
 	}
-	public String getPostTime() {
+	public Timestamp getPostTime() {
 		return postTime;
 	}
-	
+	public Timestamp getEditTime() {
+		return editTime;
+	}
 	public Integer getLikesCount() {
 		return likesCount;
 	}
 	public Integer getViewCount() {
 		return viewCount;
 	}
-
-	public Integer getCategoryID() {
-		return categoryId;
-	}
-	public Integer getTagID() {
-		return tagId;
-	}
-	
 	public void setPostID(Integer postID) {
 		this.postID = postID;
 	}
@@ -73,8 +75,14 @@ public class ShowPostDTO {
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
 	}
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
 	public void setTagName(String tagName) {
 		this.tagName = tagName;
+	}
+	public void setTagId(Integer tagId) {
+		this.tagId = tagId;
 	}
 	public void setPostImgUrl(String postImgUrl) {
 		this.postImgUrl = postImgUrl;
@@ -82,8 +90,11 @@ public class ShowPostDTO {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	public void setPostTime(String postTime) {
+	public void setPostTime(Timestamp postTime) {
 		this.postTime = postTime;
+	}
+	public void setEditTime(Timestamp editTime) {
+		this.editTime = editTime;
 	}
 	public void setLikesCount(Integer likesCount) {
 		this.likesCount = likesCount;
@@ -91,10 +102,6 @@ public class ShowPostDTO {
 	public void setViewCount(Integer viewCount) {
 		this.viewCount = viewCount;
 	}
-	public void setCategoryID(Integer categoryID) {
-		this.categoryId = categoryID;
-	}
-	public void setTagID(Integer tagID) {
-		this.tagId = tagID;
-	}
+    
+
 }

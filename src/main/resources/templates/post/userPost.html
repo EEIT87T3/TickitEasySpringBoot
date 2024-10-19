@@ -38,7 +38,8 @@
         .post-actions button:hover {
             /* background-color: #e0e0e0; */
         }
-        .postListBtn{
+
+        .postListBtn {
             background-color: #5F46E8;
             border: none;
         }
@@ -47,8 +48,8 @@
 
 <body>
     <div th:replace="~{commons/userHeader}"></div>
-    <button  class="postListBtn text-white px-4 py-2 rounded">上一頁</button>
-   
+    <button class="postListBtn text-white px-4 py-2 rounded">上一頁</button>
+
     <div class="post">
         <div class="posts" id="post-container">
             <div id="post">
@@ -59,9 +60,9 @@
                 <button id="save-btn"><i class="far fa-star"></i> 收藏</button>
                 <button id="report-btn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>
                 <button id="subscribe-btn"><i class="far fa-bell"></i> 訂閱作者</button>
-                <button id="edit-btn" style="display: none;"><i class="fas fa-pen"></i> 編輯</button> 
-                <button id="delete-btn" style="display: none;"><i class="fas fa-trash"></i> 刪除</button> 
-        
+                <button id="edit-btn" style="display: none;"><i class="fas fa-pen"></i> 編輯</button>
+                <button id="delete-btn" style="display: none;"><i class="fas fa-trash"></i> 刪除</button>
+
             </div>
         </div>
 
@@ -74,7 +75,7 @@
             <h3>新增回應</h3>
             <form id="comment-form">
                 <input type="hidden" name="postID" id="postID" value="" />
-                <textarea name="content" id="comment-content" style="resize:none;height:100px;"
+                <textarea name="content" id="content" style="resize:none;height:100px;"
                     placeholder="輸入您的回應"></textarea>
                 <input type="submit" value="發表">
             </form>
@@ -82,18 +83,22 @@
     </div>
     <div th:replace="~{commons/userFooter}"></div>
     <script>
-          $('.postListBtn').on('click', function() {
-               
-               window.location.href = `/TickitEasy/admin/post/PostList`; 
-           });
-        const postID = window.location.pathname.split("/")[5];
-        const currentUserID = 1; // 假設這裡是當前登入會員的 ID
 
+        //從url讀取postID
+        const postID = window.location.pathname.split("/")[4];
+        // 假設這裡是當前登入會員的 ID
+        const currentUserID = 1; 
+    //////////////////////////////////////////////////
         // 根據ID取得單一貼文
         function fetchPost() {
             axios.get(`/TickitEasy/admin/api/post/GET/${postID}`)
                 .then(response => {
                     const post = response.data;
+                    //確定獲取post再設置按鈕
+                    $('.postListBtn').on('click', function () {
+
+                        window.location.href = `/TickitEasy/user/post/PostList?categoryId=${post.postCategory.categoryId}`;
+                    });
                     document.getElementById('post').innerHTML = `
                         <div class="title">
                             <h1>${post.postTitle}</h1>
@@ -108,12 +113,12 @@
                         <hr>
                         <div>${post.postContent}</div>
                     `;
-                     // 檢查當前登入會員ID是否等於貼文的會員ID
-                     if (post.member.memberID === currentUserID) {
-                        document.getElementById('delete-btn').style.display = 'inline-flex'; 
-                        document.getElementById('edit-btn').style.display = 'inline-flex'; 
-                        document.getElementById('subscribe-btn').style.display = 'none'; 
-                        document.getElementById('report-btn').style.display = 'none'; 
+                    // 檢查當前登入會員ID是否等於貼文的會員ID
+                    if (post.member.memberID === currentUserID) {
+                        document.getElementById('delete-btn').style.display = 'inline-flex';
+                        document.getElementById('edit-btn').style.display = 'inline-flex';
+                        document.getElementById('subscribe-btn').style.display = 'none';
+                        document.getElementById('report-btn').style.display = 'none';
                     }
                 })
                 .catch(error => {
@@ -121,13 +126,14 @@
                     document.getElementById('post').innerHTML = '未找到相關帖子';
                 });
         }
-          // 刪除貼文
-          document.getElementById('delete-btn').addEventListener('click', function () {
+        
+        // 刪除貼文
+        document.getElementById('delete-btn').addEventListener('click', function () {
             if (confirm("確定要刪除此貼文嗎？")) {
                 axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
                     .then(response => {
                         alert('貼文已刪除');
-                        window.location.href = '/TickitEasy/admin/post/PostList'; // 刪除後返回列表頁
+                        window.location.href = '/TickitEasy/user/post/PostList'; // 刪除後返回列表頁
                     })
                     .catch(error => {
                         console.error('Error deleting post:', error);
@@ -135,27 +141,29 @@
                     });
             }
         });
-          // 編輯貼文
-          document.getElementById('edit-btn').addEventListener('click', function () {
+        
+        // 編輯貼文
+        document.getElementById('edit-btn').addEventListener('click', function () {
             axios.get(`/TickitEasy/admin/api/post/GET/${postID}`)
-                    .then(response => {
-                        // 確保獲取成功後再進行跳轉
-                        if (response.status === 200) {
-                            // 可以在這裡進行其他操作，像是儲存狀態等等
-                            window.location.href = `/TickitEasy/admin/post/${postID}/useredit`;
-                        } else {
-                            console.error('Failed to load post data:', response.status);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching post data:', error);
-                    });
+                .then(response => {
+                    // 確保獲取成功後再進行跳轉
+                    if (response.status === 200) {
+                        // 可以在這裡進行其他操作，像是儲存狀態等等
+                        window.location.href = `/TickitEasy/user/post/${postID}/useredit`;
+                    } else {
+                        console.error('Failed to load post data:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching post data:', error);
+                });
         });
 
         // 根據貼文ID取得多筆留言
         function fetchComments() {
             axios.get(`/TickitEasy/admin/api/post/comments?postID=${postID}`)
                 .then(response => {
+                    document.getElementById('comments-container').innerHTML = '';
                     const comments = response.data;
                     const commentsContainer = document.getElementById('comments-container');
                     commentsContainer.innerHTML += comments.length ?
@@ -178,16 +186,17 @@
         // 提交新回應
         document.getElementById('comment-form').addEventListener('submit', function (event) {
             event.preventDefault();
-            const content = document.getElementById('comment-content').value;
+            const content = document.getElementById('content').value;
 
-            axios.post('/api/comments', {
+            axios.post('/TickitEasy/admin/api/post/comment/POST/', {
                 postID: postID,
                 memberID: 1, // 這裡可以根據實際情況更改
                 content: content
             })
                 .then(response => {
                     // 清空回應內容並重新加載留言
-                    document.getElementById('comment-content').value = '';
+                    document.getElementById('content').value = '';
+                   
                     fetchComments();
                 })
                 .catch(error => {

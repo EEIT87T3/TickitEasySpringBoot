@@ -125,11 +125,7 @@
             <!-- 文章列表將在這裡填充 -->
         </div>
     </div>
-    <!-- <div class="posts-pagination">
-        <button id="prevPostPage" onclick="fetchPosts(currentPostPage - 1)">上一頁</button>
-        <span id="postPageInfo"></span>
-        <button id="nextPostPage" onclick="fetchPosts(currentPostPage + 1)">下一頁</button>
-    </div> -->
+
     <div class="posts-pagination">
         <span id="postPageInfo"></span>
         <div id="paginationContainer"></div>
@@ -140,94 +136,111 @@
     <script>
         $('.postHomeBtn').on('click', function () {
 
-            window.location.href = `/TickitEasy/admin/post/HomePage`;
+            window.location.href = `/TickitEasy/user/post/HomePage`;
         });
         let currentPostPage = 0; // 當前頁面
         const pageSize = 6; // 每頁顯示的文章數量
 
-        let categoryId = 1; // 預設值
+        let categories = [];
+
+        function fetchCategories() {
+            axios.get('/TickitEasy/admin/api/post/categories')
+                .then(response => {
+                    categories = response.data; // 將獲取的類別資料賦值給 categories 變數
+                    console.log(categories); // 查看獲取的資料
+
+                    populateCategoryNav(); // 當類別獲取後，再生成導航
+                    let initialCategoryId = getCategoryIdFromUrl() || 1; // 如果URL中沒有categoryId，默認使用1
+                    initialCategoryId = parseInt(initialCategoryId);
+
+                    // 設置初始類別的active狀態
+                    const initialCategoryLink = document.querySelector(`a[href="?categoryId=${initialCategoryId}"]`);
+                    if (initialCategoryLink) {
+                        initialCategoryLink.classList.add('active'); //控制NAV顯示當前類別
+                    }
+
+                    loadArticles(initialCategoryId);
+                    // fetchPosts(0);
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                });
+        }
+
+        // let categoryId = 1; // 預設值
+        // 獲取 URL 查詢參數中的 categoryId
+        function getCategoryIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('categoryId');
+            return categoryId ? parseInt(categoryId) : null;
+        }
         // 獲取文章的函數
         function fetchPosts(page = 0) {
-            const themeID = document.querySelector('select[name="themeID"]').value;
-            // const url = `/TickitEasy/admin/api/post/GET/`; 
-
+            const categoryId = getCategoryIdFromUrl() || 1; // 如果沒有categoryId，使用默認值1
 
             const url = `/TickitEasy/admin/api/post/posts/category/${categoryId}?page=${page}&size=${pageSize}`;
+            console.log("請求 URL:", url);
 
             axios.get(url)
                 .then(response => {
-                    // const posts = response.data; // 獲取 JSON 數據 all
-                    const posts = response.data.content; // 獲取文章內容數組 page
-
+                    const posts = response.data.content; // 獲取文章內容數組
                     updateArticleList(posts); // 更新文章列表
                     updatePagination(response.data); // 更新分頁信息
                 })
                 .catch(error => {
-                    console.error("Error fetching posts:", error);
+                    console.error("獲取文章時出錯:", error);
                 });
         }
-        // 控制主題標籤//////////////////
-        const categories = [
-            { categoryID: 1, categoryName: "閒聊" },
-            { categoryID: 2, categoryName: "其他" },
-            { categoryID: 3, categoryName: "展覽" },
-            { categoryID: 4, categoryName: "音樂" },
-            { categoryID: 5, categoryName: "演唱會" },
-            { categoryID: 6, categoryName: "舞蹈" },
-            { categoryID: 7, categoryName: "戲劇" },
-            { categoryID: 8, categoryName: "學習" },
-            { categoryID: 9, categoryName: "電影" },
-            { categoryID: 10, categoryName: "旅遊" },
-            { categoryID: 11, categoryName: "遊戲" },
-            { categoryID: 12, categoryName: "運動" }
-        ];
 
-        // 獲取 nav 容器
-        const categoryNav = document.getElementById('categoryNav');
+        function populateCategoryNav() {
+            // 獲取 nav 容器
+            const categoryNav = document.getElementById('categoryNav');
 
-        // 動態生成類別導航連結
-        categories.forEach((category, index) => {
-            const navLink = document.createElement('a');
-            navLink.classList.add('flex-sm-fill', 'text-sm-center', 'nav-link');
-            navLink.setAttribute('href', '#');
-            navLink.setAttribute('data-id', category.categoryID);
-            navLink.innerText = category.categoryName;
+            // 動態生成類別導航連結
+            categories.forEach((category) => {
+                const navLink = document.createElement('a');
+                navLink.classList.add('flex-sm-fill', 'text-sm-center', 'nav-link');
+                navLink.setAttribute('href', `?categoryId=${category.categoryId}`);
 
-            // 點擊事件處理
-            navLink.addEventListener('click', function () {
-                // 先移除所有 active 樣式
-                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                navLink.innerText = category.categoryName;
 
-                // 為當前點擊的項目添加 active 樣式
-                this.classList.add('active');
+                // 點擊事件處理
+                navLink.addEventListener('click', function (event) {
+                    event.preventDefault(); // 阻止默認的連結跳轉行為
 
-                // 載入該類別的文章
-                loadArticles(category.categoryName);
+                    // 先移除所有 active 樣式
+                    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+                    // 為當前點擊的項目添加 active 樣式
+                    this.classList.add('active');
+
+                    // 載入該類別的文章，使用 categoryId
+                    loadArticles(category.categoryId);
+                });
+
+                // 將連結加入到 nav 容器
+                categoryNav.appendChild(navLink);
             });
+        }
 
-            // 將連結加入到 nav 容器
-            categoryNav.appendChild(navLink);
-            // 初始狀態設置為第一個項目 active，僅在第一個連結上設置
-            if (index === 0) {
-                navLink.classList.add('active'); // 只為第一個連結設置 active
-                loadArticles(category.categoryName); // 載入第一個類別的文章
-            }
-        });
+        function loadArticles(categoryId) {
 
-        // 預設載入第一個類別的文章
-        loadArticles(categories[0].categoryName);
-
-        function loadArticles(categoryName) {
-            // 根據類別名稱更新 categoryId
-            const selectedCategory = categories.find(category => category.categoryName === categoryName);
+            // 確保 categoryId 是數字
+            categoryId = parseInt(categoryId);
+            // 確保 categoryId 是有效值
+            const selectedCategory = categories.find(category => category.categoryId === categoryId);
             if (selectedCategory) {
-                categoryId = selectedCategory.categoryID; // 更新 categoryId
+                console.log(`正在載入類別: ${selectedCategory.categoryName} (ID: ${categoryId}) 的文章`);
+            } else {
+                console.error(`未找到類別 ID: ${categoryId}`);
+                return;
             }
 
-            console.log(`Loading articles for category: ${categoryName} (ID: ${categoryId})`);
+            // 更新 URL
+            window.history.pushState({}, '', `?categoryId=${categoryId}`);
 
             // 重新獲取文章
-            fetchPosts(); // 確保不傳遞任何參數，將使用預設的 page = 0
+            fetchPosts(0); // 從第一頁開始加載新類別的文章
         }
 
         // 控制頁碼///////////////////////////////////////
@@ -275,11 +288,6 @@
             // 顯示當前頁碼訊息
             document.getElementById('postPageInfo').innerText = `第 ${currentPostPage + 1} 頁，共 ${totalPages} 頁`;
 
-            // document.getElementById('postPageInfo').innerText = `第 ${currentPostPage + 1} 頁，共 ${totalPages} 頁`;
-
-            // // 更新上一頁和下一頁按鈕的狀態
-            // document.getElementById('prevPostPage').disabled = currentPostPage === 0;
-            // document.getElementById('nextPostPage').disabled = currentPostPage + 1 >= totalPages;
         }
 
         // 更新文章列表的函數
@@ -296,62 +304,52 @@
                 console.log(post); // 查看每個貼文的數據
                 const articleItem = document.createElement('div');
                 articleItem.classList.add('article-item');
+
+                // const formattedDate = formatDate(post.postTime);
+                // 檢查 editTime 是否為 null
+                let editDateHtml = '';
+                if (post.editTime) {
+                    const formattedEditDate = new Date(post.editTime).toLocaleString();
+                    editDateHtml = `<span>編輯日期：${formattedEditDate}</span>`;
+                }
+
                 articleItem.innerHTML = `
-            <img class="postImg" src="${post.postImgUrl}" alt="文章縮略圖">
-            <div>
-                <span class="theme">${post.categoryName}</span>
-                <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
-                <a href="#" class="post-title">${post.postTitle}</a>
-                <p>${post.postContent}</p>
-                <div class="article-meta">
-                    <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
-                </div>
-            </div>
-            <div class="meta-right">
-                  <span><i class="fas fa-thumbs-up"></i>${post.likesCount !== null ? post.likesCount : 0}</span>
-            <span><i class="fas fa-eye"></i>${post.viewCount !== null ? post.viewCount : 0}</span>
-            </div>
-        `;
+                    <img class="postImg" src="${post.postImgUrl}" alt="文章縮略圖">
+                    <div>
+                        <span class="theme">${post.categoryName}</span>
+                        <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
+                        <a href="#" class="post-title">${post.postTitle}</a>
+                        <p>${post.postContent}</p>
+                        <div class="article-meta">
+                            <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
+                            <span>編輯日期：${new Date(post.editTime).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div class="meta-right">
+                        <span><i class="fas fa-thumbs-up"></i>${post.likesCount !== null ? post.likesCount : 0}</span>
+                    <span><i class="fas fa-eye"></i>${post.viewCount !== null ? post.viewCount : 0}</span>
+                    </div>
+                `;
 
                 // 添加 click 事件監聽器
                 articleItem.addEventListener('click', function () {
-                    window.location.href = `/TickitEasy/admin/post/Post/${post.postID}`;
-
-
+                    window.location.href = `/TickitEasy/user/post/${post.postID}`;
                 });
 
                 container.appendChild(articleItem);
             });
         }
 
-        // 排序文章的函數
-        function sortArticlesBySelect() {
-            const criteria = document.getElementById('sortCriteria').value;
-            const articles = Array.from(document.querySelectorAll('.article-item'));
-
-            articles.sort((a, b) => {
-                switch (criteria) {
-                    case 'date':
-                        return new Date(b.querySelector('.article-meta span:nth-child(3)').innerText) - new Date(a.querySelector('.article-meta span:nth-child(3)').innerText);
-                    case 'views':
-                        return parseInt(b.querySelector('.meta-right span:nth-child(2)').innerText) - parseInt(a.querySelector('.meta-right span:nth-child(2)').innerText);
-                    case 'likes':
-                        return parseInt(b.querySelector('.meta-right span:nth-child(1)').innerText) - parseInt(a.querySelector('.meta-right span:nth-child(1)').innerText);
-                    default:
-                        return 0;
-                }
-            });
-
-            const container = document.getElementById('articleList');
-            container.innerHTML = ''; // 清空容器
-            articles.forEach(article => {
-                container.appendChild(article);
-            });
+        // 頁面加載時獲取 categoryId
+        function getCategoryIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('categoryId');
         }
 
         // 當頁面加載時獲取所有文章
         document.addEventListener('DOMContentLoaded', () => {
-            fetchPosts(0); // 初始載入第一頁
+            fetchCategories();
+
         });
     </script>
 

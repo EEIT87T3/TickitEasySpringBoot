@@ -53,7 +53,8 @@ public class PostService {
             dto.setLikesCount(post.getLikesCount() );
             dto.setViewCount(post.getViewCount() );
             dto.setStatus(post.getStatus());
-            dto.setPostTime(post.getPostTime() != null ? post.getPostTime().toString() : "N/A"); // 根據需要格式化時間
+            dto.setPostTime(post.getPostTime() ); // 根據需要格式化時間
+            dto.setEditTime(post.getEditTime() ); // 根據需要格式化時間
             
             return dto;
         }).collect(Collectors.toList());
@@ -71,12 +72,13 @@ public class PostService {
         dto.setPostTitle(post.getPostTitle());
         dto.setPostContent(post.getPostContent());
         dto.setCategoryName(post.getPostCategory().getCategoryName());
-        dto.setCategoryID(post.getPostCategory().getCategoryId());
+        dto.setCategoryId(post.getPostCategory().getCategoryId());
         dto.setTagName(post.getPostTag() != null ? post.getPostTag().getTagName() : null);
-        dto.setTagID(post.getPostTag() != null ? post.getPostTag().getTagId() : null);
+        dto.setTagId(post.getPostTag() != null ? post.getPostTag().getTagId() : null);
         dto.setPostImgUrl(post.getPostImgUrl());
         dto.setStatus(post.getStatus());
-        dto.setPostTime(post.getPostTime().toString()); // 或者轉換為你需要的格式
+        dto.setPostTime(post.getPostTime()); // 或者轉換為你需要的格式
+        dto.setEditTime(post.getEditTime()); // 或者轉換為你需要的格式
         dto.setLikesCount(post.getLikesCount());
         dto.setViewCount(post.getViewCount());
         return dto;

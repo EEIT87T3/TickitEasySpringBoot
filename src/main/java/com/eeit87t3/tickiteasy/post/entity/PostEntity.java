@@ -58,6 +58,10 @@ public class PostEntity {
 //	@CreationTimestamp
 //	private LocalDateTime createdAt;
 	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
+	@Column(name = "editTime")
+	private Timestamp editTime;
+	
 	@Column(name = "likesCount")
 	private Integer likesCount;
 	
@@ -161,6 +165,14 @@ public class PostEntity {
 
 	public void setComments(Set<CommentEntity> comments) {
 	        this.comments = comments;
+	}
+
+	public Timestamp getEditTime() {
+		return editTime;
+	}
+
+	public void setEditTime(Timestamp editTime) {
+		this.editTime = editTime;
 	}
 	  
 	// 會員頭貼

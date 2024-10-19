@@ -139,7 +139,7 @@
           document.getElementById("updateResult").innerText = "Post updated successfully!";
           document.getElementById("updateResult").className = "success";
           setTimeout(() => {
-            window.location.href = `/TickitEasy/admin/post/Post/${postID}`;
+            window.location.href = `/TickitEasy/user/post/${postID}`;
           }, 1000); // 1秒後跳轉
         } else {
           document.getElementById("updateResult").innerText = `Failed to update post: ${response.status}`;
@@ -153,7 +153,7 @@
     loadPostData();
     $('.postList').on('click', function() {
                
-               window.location.href = `/TickitEasy/admin/post`; 
+               window.location.href = `/TickitEasy/user/post/PostList`; 
            });
   </script>
 <div th:replace="~{commons/userFooter}"></div>
