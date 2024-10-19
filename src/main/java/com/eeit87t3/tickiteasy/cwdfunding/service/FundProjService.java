@@ -184,6 +184,7 @@ public class FundProjService {
 			dto.setTagId(fundProj.getFundTag().getTagId());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
+			dto.setFundplanList(fundProj.getFundPlan());
 			return dto;
 		});
 		return dto;
@@ -202,6 +203,7 @@ public class FundProjService {
 		return String.valueOf(fundProjRepo.findTopProjectById().getProjectID()+1);
 	}
 	
+
 	
 	/* 刪除 
 	 * 1. 刪除FundProject的同時會一併刪除該對應的plan
@@ -289,7 +291,7 @@ public class FundProjService {
 	    return fundProjRepo.save(proj);
 	}
 
-	/* 編輯募資活動方案 */
+	/* 編輯募資活動的方案 */
 	public FundPlan editPlan(
 			String projectID,
 			String planID,

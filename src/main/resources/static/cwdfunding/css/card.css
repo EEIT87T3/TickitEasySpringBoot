@@ -1,3 +1,10 @@
+/* 固定輪播照片尺寸 */
+.carousel-item img {
+  height: 400px; /* 固定高度，根據需要調整 */
+  object-fit: cover; /* 確保圖片以適合方式填充 */
+  width: 100%; /* 保持圖片寬度自適應 */
+}
+
 .custom-card {
   width: 360px;
   height: 322px;
@@ -16,7 +23,7 @@
 }
 
 .progress {
-  height: 8px;
+  --bs-progress-height: 0.6rem !important; /* 覆蓋 Bootstrap 的進度條高度 */
   width: 100%;
 }
 
