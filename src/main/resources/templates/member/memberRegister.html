@@ -2,133 +2,258 @@
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- 使用 Thymeleaf 來引入公共的 Head -->
     <meta th:replace="~{commons/userHead}">
-    <title>註冊帳號 - TickitEasy</title>
-
-    <!-- 引入 SweetAlert2 -->
+    <title>會員註冊 - TickitEasy</title>
+    <!-- 引入 SweetAlert2 的 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
     <style>
-        /* 設定色彩與佈局 */
+        :root {
+            --main-blue-purple: #5F46E8;
+            --main-bright-orange: #FFB44D;
+            --light-orange: #F5BE74;
+            --dark-purple: #322770;
+            --text-gray: #6c757d;
+        }
+
         body {
-            background-color: #FFF7E6; /* 非常淺的橘色 */
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f9fa;
         }
 
         .register-container {
             max-width: 500px;
             margin: 50px auto;
-            background-color: white;
+            background-color: #fff;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
-            color: var(--main-blue-purple);
-            font-weight: 700;
+        .register-container h2 {
+            color: var(--dark-purple);
             text-align: center;
+            margin-bottom: 30px;
         }
 
         .form-label {
-            color: #333;
+            color: var(--dark-purple);
             font-weight: 600;
         }
 
-        .btn-main-bright-orange {
-            background-color: var(--main-bright-orange);
-            border: none;
-            font-size: 16px;
-        }
-
-        .btn-main-bright-orange:hover {
-            background-color: #ff9933;
-        }
-
-        .text-main-blue-purple {
-            color: var(--main-blue-purple);
-        }
-
-        /* 讓註冊頁面更有空間感 */
         .form-control {
-            padding: 15px;
-            font-size: 16px;
+            border-radius: 5px;
         }
 
-        .form-container {
-            margin-bottom: 20px;
+        .btn-register {
+            background-color: var(--main-blue-purple);
+            color: #fff;
+            width: 100%;
+            padding: 10px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-register:hover {
+            background-color: var(--dark-purple);
+        }
+        
+        .form-text {
+            color: var(--text-gray);
+        }
+
+        .required::after {
+            content: '*';
+            color: red;
+            margin-left: 5px;
+        }
+
+        .swal2-confirm {
+            background-color: var(--main-bright-orange) !important;
+            border: none !important;
+            border-radius: 5px !important;
+        }
+
+        .swal2-cancel {
+            background-color: gray !important;
+            border: none !important;
+            border-radius: 5px !important;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .login-link a {
+            color: var(--main-bright-orange);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-    <!-- 引入公共的 Header -->
     <div th:replace="~{commons/userHeader}"></div>
 
     <!-- 註冊表單 -->
     <div class="register-container">
-        <h2 class="mb-4">註冊帳號</h2>
-        <form th:action="@{/member/register}" th:object="${memberForm}" method="post">
-            <div class="form-container">
-                <label for="email" class="form-label">電子郵件</label>
-                <input type="email" class="form-control" id="email" placeholder="請輸入電子郵件" th:field="*{email}" required>
+        <h2>TickitEasy 會員註冊</h2>
+        <form id="registerForm">
+            <div class="mb-3">
+                <label for="email" class="form-label required">電子信箱</label>
+                <input type="email" class="form-control" id="email" placeholder="請輸入您的電子信箱" required>
+                <div class="form-text">我們不會與他人分享您的電子信箱。</div>
             </div>
-            <div class="form-container">
-                <label for="password" class="form-label">密碼</label>
-                <input type="password" class="form-control" id="password" placeholder="請輸入密碼" th:field="*{password}" required>
+            <div class="mb-3">
+                <label for="password" class="form-label required">密碼</label>
+                <input type="password" class="form-control" id="password" placeholder="請輸入密碼" required>
+                <div class="form-text">密碼需至少8位，包含大小寫字母、數字和特殊字符。</div>
             </div>
-            <div class="form-container">
-                <label for="name" class="form-label">姓名</label>
-                <input type="text" class="form-control" id="name" placeholder="請輸入姓名" th:field="*{name}" required>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label required">確認密碼</label>
+                <input type="password" class="form-control" id="confirmPassword" placeholder="請再次輸入密碼" required>
             </div>
-            <div class="form-container">
-                <label for="nickname" class="form-label">暱稱</label>
-                <input type="text" class="form-control" id="nickname" placeholder="請輸入暱稱" th:field="*{nickname}" required>
+            <div class="mb-3">
+                <label for="name" class="form-label required">姓名</label>
+                <input type="text" class="form-control" id="name" placeholder="請輸入您的姓名" required>
             </div>
-            <div class="form-container">
-                <label for="birthDate" class="form-label">出生日期</label>
-                <input type="date" class="form-control" id="birthDate" th:field="*{birthDate}" required>
+            <div class="mb-3">
+                <label for="nickname" class="form-label required">暱稱</label>
+                <input type="text" class="form-control" id="nickname" placeholder="請輸入您的暱稱" required>
             </div>
-            <div class="form-container">
-                <label for="phone" class="form-label">電話</label>
-                <input type="text" class="form-control" id="phone" placeholder="請輸入電話號碼" th:field="*{phone}" required>
+            <div class="mb-3">
+                <label for="birthDate" class="form-label required">生日</label>
+                <input type="date" class="form-control" id="birthDate" required>
             </div>
-            <button type="submit" class="btn btn-main-bright-orange w-100">註冊</button>
+            <div class="mb-3">
+                <label for="phone" class="form-label required">手機號碼</label>
+                <input type="tel" class="form-control" id="phone" placeholder="請輸入您的手機號碼" required>
+            </div>
+            <button type="submit" class="btn btn-register">註冊</button>
         </form>
-
-        <!-- 已經有帳號？前往登入 -->
-        <div class="text-center mt-4">
-            <p>已經有 TickitEasy 帳號嗎？<a href="/TickitEasy/member/login" class="text-main-blue-purple">前往登入</a></p>
+        <div class="login-link">
+            已經是 TickitEasy 會員了嗎？<a href="/TickitEasy/member/login">前往登入</a>
         </div>
     </div>
 
-    <!-- 引入公共的 Footer -->
     <div th:replace="~{commons/userFooter}"></div>
 
-    <!-- 引入 SweetAlert2 和 Bootstrap, jQuery 等 JS 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
+    <!-- 引入 Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 引入 SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
 
-    <!-- 使用 SweetAlert2 來顯示註冊成功或失敗的消息 -->
-    <script th:if="${message}">
-        Swal.fire({
-            icon: 'success',
-            title: '註冊成功',
-            text: '[[(\'${message}\')]]'
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const registerForm = document.getElementById('registerForm');
+
+            registerForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                //獲取表單內容
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const name = document.getElementById('name').value.trim();
+                const nickname = document.getElementById('nickname').value.trim();
+                const birthDate = document.getElementById('birthDate').value;
+                const phone = document.getElementById('phone').value.trim();
+
+                // 前端驗證
+                if (!validateEmail(email)) {
+                    Swal.fire('錯誤', '請輸入有效的電子信箱', 'error');
+                    return;
+                }
+
+                if (!validatePassword(password)) {
+                    Swal.fire('錯誤', '密碼需至少8位，包含大小寫字母、數字和特殊字符', 'error');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    Swal.fire('錯誤', '兩次密碼輸入不一致', 'error');
+                    return;
+                }
+
+                if (name === '') {
+                    Swal.fire('錯誤', '姓名不得為空', 'error');
+                    return;
+                }
+
+                if (nickname === '') {
+                    Swal.fire('錯誤', '暱稱不得為空', 'error');
+                    return;
+                }
+
+                if (birthDate === '') {
+                    Swal.fire('錯誤', '請選擇您的生日', 'error');
+                    return;
+                }
+
+                if (!validatePhone(phone)) {
+                    Swal.fire('錯誤', '請輸入有效的手機號碼', 'error');
+                    return;
+                }
+
+                // 發送到後端
+                const payload = {
+                    email: email,
+                    password: password,
+                    confirmPassword: confirmPassword,
+                    name: name,
+                    nickname: nickname,
+                    birthDate: birthDate,
+                    phone: phone
+                };
+
+                // 發送到後端請求
+                axios.post('/TickitEasy/api/member/register', payload)
+                    .then(function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '註冊成功',
+                            text: response.data.message,
+                            confirmButtonText: '前往登入'
+                        }).then(() => {
+                            window.location.href = '/TickitEasy/member/login';
+                        });
+                    })
+                    .catch(function (error) {
+                        let errorMessage = '發生錯誤，請稍後再試。';
+                        if (error.response && error.response.data && error.response.data.error) {
+                            errorMessage = error.response.data.error;
+                        }
+                        Swal.fire('註冊失敗', errorMessage, 'error');
+                    });
+            });
+
+            // 信箱正規表示式驗證
+            function validateEmail(email) {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
+            }
+
+            // 密碼格式
+            function validatePassword(password) {
+                // 至少8位，包含大小寫字母，數字和特殊字符
+                const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+                return regex.test(password);
+            }
+
+            // 手機號碼格式
+            function validatePhone(phone) {
+                const regex = /^09\d{8}$/;
+                return regex.test(phone);
+            }
         });
     </script>
-    <script th:if="${error}">
-        Swal.fire({
-            icon: 'error',
-            title: '註冊失敗',
-            text: '[[(\'${error}\')]]'
-        });
-    </script>
-
 </body>
 
 </html>
