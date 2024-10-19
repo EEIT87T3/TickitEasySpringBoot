@@ -84,6 +84,12 @@
         <artifactId>junit-jupiter-engine</artifactId>
         <scope>test</scope>
     </dependency>
+    	<!-- base64 -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.15</version>
+		</dependency>
 		
 	</dependencies>
 

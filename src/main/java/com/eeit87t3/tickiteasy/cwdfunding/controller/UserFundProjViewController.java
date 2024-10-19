@@ -15,8 +15,10 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
+import com.eeit87t3.tickiteasy.cwdfunding.service.FundPlanService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 
 @Controller
@@ -25,6 +27,9 @@ public class UserFundProjViewController {
 
 	@Autowired
 	private FundProjService projService;
+	
+	@Autowired
+	private FundPlanService planService;
 	
 	@Autowired
 	private CategoryService categoryService;
@@ -57,5 +62,14 @@ public class UserFundProjViewController {
 		return "cwdfunding/cust_showOneFundProj";
 	}
 	
+	@GetMapping("/payment/{planID}")
+	public String paymentPage(@PathVariable Integer planID, Model model) {
+		
+		FundPlan fundPlan = planService.findFundPlanById(planID);
+		
+		model.addAttribute("fundPlan",fundPlan);
+		
+		return "cwdfunding/cust_payPage";
+	}
 	
 }

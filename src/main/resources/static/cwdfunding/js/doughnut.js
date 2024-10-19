@@ -1,13 +1,30 @@
 $(document).ready(function () {
   const ctx = document.getElementById("myDoughnutChart").getContext("2d");
+  const targetAmount = document
+    .getElementById("targetAmount")
+    .getAttribute("data-targetamount");
+  const currentAmount = document
+    .getElementById("currentAmount")
+    .getAttribute("data-currentamount");
+  const nowProgress = (parseInt(currentAmount) / parseInt(targetAmount)) * 100;
+  let leftProgress;
+  if (100 - nowProgress >= 0) {
+    leftProgress = 100 - nowProgress;
+  } else {
+    leftProgress = 0;
+  }
+  console.log(targetAmount);
+  console.log(currentAmount);
+  console.log(nowProgress);
+  console.log(leftProgress);
+
   const myDoughnutChart = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["紅色", "藍色", "黃色"],
       datasets: [
         {
           label: "我的數據",
-          data: [80, 20],
+          data: [nowProgress, leftProgress],
           backgroundColor: ["#5f46e8", "#e0e0e0"],
           borderColor: ["#5f46e8", "#e0e0e0"],
           borderWidth: 1,
@@ -39,7 +56,7 @@ $(document).ready(function () {
             weight: "bold",
           },
           formatter: function () {
-            return "200%"; // 在中間顯示的文本
+            return `${nowProgress}%`; // 在中間顯示的文本
           },
         },
       },
@@ -55,7 +72,7 @@ $(document).ready(function () {
           ctx.fillStyle = "#000"; // 文字顏色
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText("80%", x, y); // 中間的文字
+          ctx.fillText(`${nowProgress}%`, x, y); // 中間的文字
           ctx.save();
         },
       },

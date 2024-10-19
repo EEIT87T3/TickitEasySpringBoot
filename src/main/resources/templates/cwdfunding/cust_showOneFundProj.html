@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
   <head>
+    <meta th:replace="~{commons/userHead}" />
     <!-- 在這裡放要引入的 CSS 與 JS library -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
@@ -47,27 +48,32 @@
         font-size: 0.9rem;
       }
       .img-plan {
-        max-width: 80%;
+        max-width: 60%;
         height: auto;
-        border-radius: 25px;
+        border-radius: 5px;
       }
       .custom-letter-spacing {
-        letter-spacing: 1.25px; /* 您可以根據需要調整此值 */
+        letter-spacing: 1.25px;
       }
+
       .hr-thick {
         position: relative;
-        z-index: 1; /* 增加層級以確保顯示 */
+        z-index: 1;
         width: 100%;
       }
       .hr-thin {
-        height: 1px; /* 設定較細的線條 */
-        background-color: gray; /* 設定線條顏色 */
-        border: none; /* 移除預設邊框 */
+        height: 1px;
+        background-color: gray;
+        border: none;
       }
 
-      .btn-like {
+      .card {
+        border: #e0e0e0 2px solid !important;
+      }
+
+      button .btn-like {
         border: 10px;
-        border-color: #b197fc;
+        border-color: var(--main-blue-purple) !important;
       }
       .btn-buy {
         border: 1px solid;
@@ -110,12 +116,52 @@
         border-radius: 50%; /* 如果您希望圓形圖表外框也是圓形的 */
       }
     </style>
-    <meta th:replace="~{commons/userHead}" />
-    <title>TickitEasy|</title>
+
+    <title th:text="'TickitEasy｜募資 - ' + ${fundProjDTO.title}"></title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/TickitEasy/cwdfunding/js/doughnut.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // 計算(結束日期-開始日期)的天數，並填入id="daysLeft"中
+        let daysLeft = document.querySelector("#daysLeft");
+        let timeSpan = document.querySelector("#time-span");
+        console.log(daysLeft);
+        const startDate = new Date(
+          daysLeft.getAttribute("data-startdate").replace(" ", "T")
+        );
+        const endDate = new Date(
+          daysLeft.getAttribute("data-enddate").replace(" ", "T")
+        );
+
+        const timeDiff = endDate - startDate;
+        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        daysLeft.textContent = daysDiff + " 天";
+
+        // 格式化日期：2024-10-16 14:30
+        let formattedStartDate = dateFormatter(
+          daysLeft.getAttribute("data-startdate").replace(" ", "T")
+        );
+        let formattedEndDate = dateFormatter(
+          daysLeft.getAttribute("data-enddate").replace(" ", "T")
+        );
+        timeSpan.textContent = `募資期間 ${formattedStartDate} – ${formattedEndDate}`;
+        function dateFormatter(target) {
+          let targetDate = new Date(target);
+          let year = targetDate.getFullYear();
+          let month = String(targetDate.getMonth() + 1).padStart(2, "0"); // 月份從0開始，所以需要+1
+          let day = String(targetDate.getDate()).padStart(2, "0");
+          let hours = String(targetDate.getHours()).padStart(2, "0");
+          let minutes = String(targetDate.getMinutes()).padStart(2, "0");
+          let seconds = String(targetDate.getSeconds()).padStart(2, "0");
+
+          // 組合成指定格式
+          let formattedDate = `${year}/${month}/${day} ${hours}:${minutes}`;
+          return formattedDate;
+        }
+      });
+    </script>
   </head>
 
   <body>
@@ -124,18 +170,16 @@
     <div class="container py-5">
       <div class="row custom-row px-5">
         <!-- Image Section -->
-        <div class="col-md-7 image-container ps-4 ms-2">
-          <img
-            src="/TickitEasy/images/cwdfunding/06f1bd17-c766-4896-b40a-961dad99792e.jpg"
-            alt="Image"
-          />
+        <div class="col-md-8 image-container ps-4 ms-2">
+          <img th:src="@{${fundProjDTO.image}}" alt="Image" />
         </div>
 
         <!-- Text Section -->
-        <div class="col-md-4 text-container d-flex align-items-start">
+        <div class="col-md-3 text-container d-flex align-items-start">
           <div class="custom-letter-spacing pt-3 extra-small">
             <a
-              th:text="|群眾集資 \ ${fundProjDTO.categoryName}|"
+              class="link-secondary link-offset-3 link-underline-opacity-25 link-underline-opacity-100-hover"
+              th:text="'群眾集資 \ ' + ${fundProjDTO.categoryName}"
               th:href="|/TickitEasy/fundprojects?categoryID=${fundProjDTO.categoryId}|"
             ></a>
           </div>
@@ -148,8 +192,18 @@
               <canvas id="myDoughnutChart"></canvas>
             </div>
             <div class="ps-4">
-              <div class="extra-small">目標 NT$ 100,000</div>
-              <div class="fs-4 fw-bolder">NT$ 2,422,550</div>
+              <div
+                id="targetAmount"
+                class="extra-small"
+                th:text="'目標 NT$ ' + ${fundProjDTO.targetAmount}"
+                th:data-targetamount="${fundProjDTO.targetAmount}"
+              ></div>
+              <div
+                id="currentAmount"
+                class="fs-4 fw-bolder"
+                th:text="'NT$ ' + ${fundProjDTO.currentAmount}"
+                th:data-currentamount="${fundProjDTO.currentAmount}"
+              ></div>
               <div>
                 <small class="custom-small-text2"
                   ><i class="fa-solid fa-user" style="color: #797a7c"></i
@@ -163,7 +217,13 @@
                     style="color: #797a7c"
                   ></i
                 ></small>
-                <small class="custom-small-text2 fw-semibold">12 天 </small>
+                <small
+                  class="custom-small-text2 fw-semibold"
+                  th:data-startdate="${fundProjDTO.startDate}"
+                  th:data-enddate="${fundProjDTO.endDate}"
+                  id="daysLeft"
+                  >0 天
+                </small>
               </div>
             </div>
           </div>
@@ -173,9 +233,10 @@
 				× 名片、證件、行事曆，口袋收納更方便：）
 			  </small> -->
           <hr class="hr-thick" />
-          <small class="custom-small-text mt-2"
-            >募資期間 2024/07/09 11:55 – 2024/10/16 23:59</small
-          >
+          <small
+            id="time-span"
+            class="custom-small-text mt-2 custom-letter-spacing"
+          ></small>
           <button
             type="button"
             class="btn border fw-bolder my-5 btn-like purple-text"
@@ -189,74 +250,51 @@
     <div class="container">
       <div class="row custom-row px-5 pt-3 pb-5 mb-5">
         <!-- Content Section -->
-        <div class="col-md-7 ps-4 ms-2 mt-2">
-          <p>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita
-            sequi qui perferendis, rerum, officiis pariatur ut vero amet nostrum
-            eum rem perspiciatis iusto cumque at aliquid, ullam veritatis
-            reiciendis? Laborum.
-          </p>
+        <div class="col-md-8 ps-4 ms-2 mt-2">
+          <p th:text="${fundProjDTO.description}"></p>
         </div>
 
         <!-- Plan  -->
-        <div class="col-md-4 text-container d-flex align-items-start pe-5 me-2">
+        <div class="col-md-3 text-container d-flex align-items-start pe-5 me-2">
           <div class="row row-cols-1 row-cols-md-1 g-5">
-            <div class="col">
-              <div class="card border border-2">
-                <img
-                  src="/TickitEasy/images/cwdfunding/06f1bd17-c766-4896-b40a-961dad99792e.jpg"
-                  class="card-img-top img-plan d-block mx-auto py-3"
-                  alt="..."
-                />
-                <div class="card-body mx-3">
-                  <h5 class="card-title">Card title</h5>
-                  <p class="card-text">
-                    This is a wider card with supporting text below as a natural
-                    lead-in to additional content. This content is a little bit
-                    longer.
-                  </p>
-                </div>
-                <div
-                  class="card-footer text-center py-3 bg-transparent border border-0"
-                >
-                  <hr class="hr-thin" />
-                  <small class="custom-small-text">預計2025年二月實現</small>
+            <th:block th:each=" aFundPlan : ${fundProjDTO.fundplanList}">
+              <div class="col">
+                <div class="card">
+                  <img
+                    th:src="@{${aFundPlan.planImage}}"
+                    class="card-img-top img-plan d-block mx-auto py-2"
+                    alt="..."
+                  />
+                  <div class="card-body mx-2 pb-0">
+                    <p
+                      class="card-text custom-letter-spacing custom-small-text2 text-light-emphasis fw-medium"
+                      th:text="${aFundPlan.planTitle}"
+                    ></p>
+                    <h5
+                      class="card-title fw-bolder pb-1"
+                      th:text="'NT$ '+${aFundPlan.planUnitPrice}"
+                    ></h5>
+                    <p
+                      class="card-text custom-letter-spacing custom-small-text2 pb-2"
+                      th:text="${aFundPlan.planContent}"
+                    ></p>
+                    <a
+                      type="button"
+                      class="btn fw-medium pt-1 btn-buy custom-letter-spacing"
+                      th:href="@{'/fundprojects/payment/'+${aFundPlan.planID}}"
+                    >
+                      贊助
+                    </a>
+                  </div>
+                  <div
+                    class="card-footer text-center py-3 bg-transparent border border-0"
+                  >
+                    <hr class="hr-thin" />
+                    <small class="custom-small-text">預計2025年二月實現</small>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col">
-              <div class="card border border-2">
-                <img
-                  src="/TickitEasy/images/cwdfunding/06f1bd17-c766-4896-b40a-961dad99792e.jpg"
-                  class="card-img-top img-plan d-block mx-auto py-3"
-                  alt="..."
-                />
-                <div class="card-body mx-3 pb-0">
-                  <p
-                    class="card-text custom-letter-spacing custom-small-text2 text-light-emphasis fw-medium"
-                  >
-                    獨家早鳥｜贈日本製實用禮
-                  </p>
-                  <h5 class="card-title fw-bolder pb-1">NT$ 5,990</h5>
-                  <p class="card-text custom-letter-spacing custom-small-text2">
-                    超早鳥｜HAL昭釜八式無水鍋 嘖嘖獨賣價 $5990 未來市價
-                    $10000，現省 $4010
-                  </p>
-                  <button
-                    type="button"
-                    class="btn fw-medium pt-1 btn-buy custom-letter-spacing"
-                  >
-                    贊助
-                  </button>
-                </div>
-                <div
-                  class="card-footer text-center py-3 bg-transparent border border-0"
-                >
-                  <hr class="hr-thin" />
-                  <small class="custom-small-text">預計2025年二月實現</small>
-                </div>
-              </div>
-            </div>
+            </th:block>
           </div>
         </div>
       </div>
