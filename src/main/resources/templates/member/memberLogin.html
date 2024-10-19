@@ -1,84 +1,240 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TickitEasy 會員登入</title>
-    <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta th:replace="~{commons/userHead}">
+    <title>會員登入 - TickitEasy</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
+        :root {
+            --main-blue-purple: #5F46E8;
+            --main-bright-orange: #FFB44D;
+            --light-orange: #F5BE74;
+            --dark-purple: #322770;
+            --text-gray: #6c757d;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f9fa;
+        }
+
         .login-container {
-            margin-top: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-card {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
             padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .logo {
+
+        .login-container h2 {
+            color: var(--dark-purple);
             text-align: center;
             margin-bottom: 30px;
         }
-        .logo img {
-            width: 150px;
+
+        .form-label {
+            color: var(--dark-purple);
+            font-weight: 600;
         }
-        .login-title {
+
+        .form-control {
+            border-radius: 5px;
+        }
+
+        .btn-login {
+            background-color: var(--main-blue-purple);
+            color: #fff;
+            width: 100%;
+            padding: 10px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-login:hover {
+            background-color: var(--dark-purple);
+        }
+
+        .btn-google {
+            background-color: #DB4437;
+            color: #fff;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-google:hover {
+            background-color: #C33D2E;
+        }
+
+        .btn-facebook {
+            background-color: #4267B2;
+            color: #fff;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-facebook:hover {
+            background-color: #375494;
+        }
+
+        .form-text {
+            color: var(--text-gray);
+        }
+        
+        .register-link {
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            color: #5F46E8; /* 調整標題顏色 */
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: var(--main-bright-orange);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .swal2-confirm {
+            background-color: var(--main-bright-orange) !important;
+            border: none !important;
+            border-radius: 5px !important;
+        }
+
+        .swal2-cancel {
+            background-color: gray !important;
+            border: none !important;
+            border-radius: 5px !important;
         }
     </style>
 </head>
+
 <body>
+    <div th:replace="~{commons/userHeader}"></div>
+
+    <!-- 登入表單 -->
     <div class="login-container">
-        <div class="login-card">
-            <!-- TickitEasy 會員登入標題 -->
-            <div class="login-title">TickitEasy 會員登入</div>
-
-            <!-- Logo -->
-            <div class="logo">
-               <img alt="TickitEasy Logo" th:src="@{/logo/LogoColor.svg}">
+        <h2>會員登入</h2>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">電子信箱</label>
+                <input type="email" class="form-control" id="email" placeholder="請輸入您的電子信箱" required>
             </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密碼</label>
+                <input type="password" class="form-control" id="password" placeholder="請輸入密碼" required>
+            </div>
+            <button type="submit" class="btn btn-login">登入</button>
+        </form>
 
-           <!-- 登入表單 -->
-            <form th:action="@{/member/login}" th:object="${memberForm}" method="post">
-                <div class="form-group">
-                    <label for="email">電子郵件</label>
-                    <!-- 使用 th:field 來自動綁定表單數據到後端 -->
-                    <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="輸入電子郵件" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">密碼</label>
-                    <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="輸入密碼" required>
-                      <span class="absolute inset-y-0 right-0 flex items-center pr-3 pt-6 cursor-pointer" id="togglePassword">
-        <i class="fas fa-eye text-gray-500"></i>
-    </span>
-                </div>
-                <!-- 登入錯誤信息 -->
-                <div th:if="${error}" class="alert alert-danger">
-                    <p th:text="${error}"></p>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">登入</button>
-                 <button type="button" class="btn btn-secondary btn-block" id="fillDemo">一鍵填入</button>
-                <div class="text-center mt-3">
-                    <a th:href="@{/member/register}">還沒有帳號？註冊</a>
-                </div>
-            </form>
+        <!-- 第三方登入 -->
+        <button class="btn btn-google" id="googleLogin">
+            <i class="fab fa-google"></i> 使用 Google 帳號登入
+        </button>
+        <button class="btn btn-facebook" id="facebookLogin">
+            <i class="fab fa-facebook-f"></i> 使用 Facebook 帳號登入
+        </button>
+
+        <!-- 註冊連結 -->
+        <div class="register-link">
+            還不是 TickitEasy 會員嗎？<a href="/TickitEasy/member/register">前往註冊</a>
         </div>
     </div>
-     <script>
-        document.getElementById('fillDemo').addEventListener('click', function() {
-            document.getElementById('email').value = 'test88@example.com';
-            document.getElementById('password').value = 'Demo1234';
+
+    <div th:replace="~{commons/userFooter}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
+
+    <script src="https://kit.fontawesome.com/4256e31571.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('loginForm');
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // 拿到表單數據
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+
+                // 前端驗證
+                if (!validateEmail(email)) {
+                    Swal.fire('錯誤', '請輸入有效的電子信箱', 'error');
+                    return;
+                }
+
+                if (password === '') {
+                    Swal.fire('錯誤', '密碼不得為空', 'error');
+                    return;
+                }
+
+                // 準備發送的數據
+                const payload = {
+                    email: email,
+                    password: password
+                };
+
+                // 發送請求到後端
+                axios.post('/TickitEasy/api/member/login', payload)
+                    .then(function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '登入成功',
+                            text: '歡迎回來！',
+                            confirmButtonText: '前往首頁'
+                        }).then(() => {
+                            // 將 JWT Token 保存到 localStorage
+                            localStorage.setItem('jwtToken', response.data.token);
+                            // 可以存其他的資料
+                            // localStorage.setItem('memberName', response.data.nickname);
+
+                            window.location.href = '/TickitEasy/';
+                        });
+                    })
+                    .catch(function (error) {
+                        let errorMessage = '發生錯誤，請稍後再試。';
+                        if (error.response && error.response.data && error.response.data.message) {
+                            errorMessage = error.response.data.message;
+                        }
+                        Swal.fire('登入失敗', errorMessage, 'error');
+                    });
+            });
+
+            //第三方登入
+            document.getElementById('googleLogin').addEventListener('click', function () {
+                Swal.fire('提示', 'Google 登入功能尚未實現', 'info');
+            });
+
+            document.getElementById('facebookLogin').addEventListener('click', function () {
+                Swal.fire('提示', 'Facebook 登入功能尚未實現', 'info');
+            });
+
+            // 正規表示式信箱格式
+            function validateEmail(email) {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
+            }
         });
-        
-        
-     </script>
+    </script>
 </body>
+
 </html>
