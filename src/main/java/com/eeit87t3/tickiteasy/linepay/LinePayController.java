@@ -34,27 +34,20 @@ public class LinePayController {
 		//前端傳來payment，使用formMaker()添加完整資訊（如redirect:url等等）
 		Map<String, Object> paymentDataFull = linePayService.formMaker(paymentData);
 		
-		//請求無論成功失敗，linepay request api都會回傳response body，用JsonNode接起來
+		// requestAPI(): 向linepay request api發送請求
+		// root: 請求無論成功失敗，linepay request api都會回傳response body
         JsonNode root = linePayService.requestAPI(paymentDataFull);
 
         if (root != null && root.has("info")) {
-            return ResponseEntity.ok(root);
+            //在這邊跟資料庫互動
+        	
+        	return ResponseEntity.ok(root);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(root);
         }
     }
 	
-//	@ResponseBody
-//	@PostMapping("api/linepay/confirm/{transactionID}")
-//    public ResponseEntity<JsonNode> confirmLinePay(@PathVariable String transactionID) {
-//        JsonNode root = linePayService.confirmAPI(transactionID);
-//
-//        if (root != null && root.has("info")) {
-//            return ResponseEntity.ok(root);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(root);
-//        }
-//    }
+
 	
 	// line pay頁面，付款成功會導向至這裡
 	@GetMapping("/test/linepay/requestOK")
