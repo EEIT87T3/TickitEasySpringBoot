@@ -67,8 +67,10 @@
         </div>
         <div class="col-md-7 ms-4 ps-4 mt-2">
           <div
+            id="fundProject"
             class="fw-semibold custom-medium-text custom-letter-spacing mb-3"
             th:text="${fundPlan.fundProj.title}"
+            th:data-project-id="${fundPlan.fundProj.projectID}"
           ></div>
           <div class="d-flex align-items-end">
             <p

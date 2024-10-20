@@ -5,6 +5,9 @@ $(document).ready(function () {
   const planID = document
     .getElementById("planTitle")
     .getAttribute("data-plan-id");
+  const projectID = document
+    .getElementById("fundProject")
+    .getAttribute("data-project-id");
 
   //監聽加碼欄位，同時變動加碼金額&總金額
   const bonusInput = document.getElementById("bonusInput");
@@ -51,9 +54,10 @@ $(document).ready(function () {
   function requestLinePay() {
     axios
       .post("http://localhost:8080/TickitEasy/api/linepay/request", {
+        projectID: projectID,
+        planID: planID,
         amount: totalAmountValue,
         currency: "TWD",
-        orderId: "EXAMPLE_ORDER_20230422_1000001",
         packages: [
           {
             id: "1",

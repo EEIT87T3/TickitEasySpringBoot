@@ -40,8 +40,10 @@
         progressBars.forEach(function (element) {
           const targetAmount = element.getAttribute("data-targetamount");
           const currentAmount = element.getAttribute("data-currentamount");
-          const nowProgress =
-            (parseInt(currentAmount) / parseInt(targetAmount)) * 100;
+          const nowProgress = (
+            (parseInt(currentAmount) / parseInt(targetAmount)) *
+            100
+          ).toFixed(0);
           element.style.width = nowProgress + "%";
 
           // 找到與該進度條相鄰的 small 標籤，並設置其文本為當前進度百分比
