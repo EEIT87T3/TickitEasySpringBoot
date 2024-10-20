@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
-import com.eeit87t3.tickiteasy.event.service.EventsService;
+import com.eeit87t3.tickiteasy.event.service.AdminEventsService;
 
 /**
  * @author Chuan(chuan13)
  */
 @Controller
 @RequestMapping("/admin/event")
-public class EventsPageController {
+public class AdminEventsPageController {
 	
 	@Autowired
-	private EventsService eventsService;
+	private AdminEventsService eventsService;
 	@Autowired
 	private CategoryService categoryService;
 	@Autowired

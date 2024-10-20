@@ -13,7 +13,7 @@ import jakarta.transaction.Transactional;
  * @author Chuan(chuan13)
  */
 @Service
-public class TicketTypesService {
+public class AdminTicketTypesService {
 
 	@Autowired
 	private TicketTypesProcessingService ticketTypesProcessingService;

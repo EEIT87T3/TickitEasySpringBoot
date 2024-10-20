@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+	<link rel="stylesheet" href="/TickitEasy/event/css/findAll.css"/>
+	<script src="/TickitEasy/event/js/utils.js"></script>
+
+    <meta th:replace="~{commons/userHead}">
+	<title>探索活動</title>
+	<style>
+		.card-img-top {
+			width: 100%;
+			height: calc(358.4px * 9 / 16);  /* 想用寬度計算 16 : 9 的相應高度，但是不知道怎麼寫；暫時用寫死的方式呈現。 */
+		}
+	</style>
+	<script>
+		$(document).ready(function () {
+
+			const eventContent = document.getElementById("event-content");
+
+			// 清空 event-content 區塊、並產生 spinner
+			function spinnerMaker() {
+				eventContent.innerHTML = `
+					<!-- spinner -->
+					<div class="d-flex justify-content-center align-item-center m-5">
+						<div class="spinner-border" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+					</div>`;
+			}
+			
+			
+			// 產生活動卡片區塊
+			function eventsDivMaker(eventsData) {
+				// 先將 eventsDivTemplate append 進 eventContent
+				const eventsDivTemplate = document.getElementById("event-div-template").content.cloneNode(true);
+				eventContent.append(eventsDivTemplate);
+				// 抓取已在 document 出現的 eventsDiv
+				const eventsDiv = document.getElementById("events-div");
+
+				if (eventsData.length == 0) {  // 查詢無結果
+					eventsDiv.innerHTML = `
+						<div></div>
+						<div><h3>目前沒有符合條件的活動。</h3></div>
+						<div></div>`;
+				} else {
+					eventsData.forEach(event => {
+						// 從 template 複製結構
+						const eventCard = document.getElementById("event-card-template").content.cloneNode(true);
+		
+						// 連結
+						eventCard.querySelector(".custom-card").setAttribute("href", currentPath + "/" + event.eventID);
+
+						// 活動主圖
+						if (event.eventPic) {
+							eventCard.querySelector(".card-img-top").setAttribute("src", contextPath + event.eventPic);
+						} else {
+							eventCard.querySelector(".card-img-top").setAttribute("src", contextPath + "/images/event/EventPicDefault.png");
+						}
+	
+						// 活動名稱
+						eventCard.querySelector(".card-title").innerText = event.eventName;
+	
+						// 活動城市
+						eventCard.querySelector(".city").innerText = event.address.substring(0, 2);
+	
+						// 活動場地
+						if (event.place) {
+							eventCard.querySelector(".place").innerText = event.place;
+						}
+	
+						// 開始時間
+						eventCard.querySelector(".event-start-time").innerText = dateFormat(event.eventStartTime);
+						
+						// 結束時間
+						eventCard.querySelector(".event-end-time").innerText = dateFormat(event.eventEndTime);
+	
+						// 類別
+						eventCard.querySelector(".category").innerText = event.eventCategory.categoryName;
+						
+						// 標籤
+						if (event.tag) {
+							eventCard.querySelector(".tag").innerText = event.eventTag.tagName;
+						}
+	
+						// 將 eventCard append 進 eventsDiv
+						eventsDiv.append(eventCard);
+					});
+				}
+			}
+
+			// 產生分頁按鈕
+			function paginationMaker(pageData) {
+				console.log("pageData.totalPages: " + pageData.totalPages);
+				console.log("pageData.pageable.pageNumber: " + pageData.pageable.pageNumber);
+				console.log("pageData.first: " + pageData.first);
+				console.log("pageData.last: " + pageData.last);
+
+				// 先將 pagenationDivTemplate append 進 eventContent
+				const pagenationDivTemplate = document.getElementById("pagenation-div-template").content.cloneNode(true);
+				eventContent.append(pagenationDivTemplate);
+				// 抓取已在 document 出現的 eventsDiv
+				const pagenationDiv = document.getElementById("pagenation-div");
+
+				for (let index = 1; index <= pageData.totalPages; index++) {
+					const pageButtonLi = document.getElementById("pagenation-page-button").content.cloneNode(true);
+
+					const pageButton = pageButtonLi.querySelector(".page-button");
+					// 顯示文字為頁數
+					pageButton.innerText = index;
+
+					// 判斷是否為此頁
+					if (index == pageData.pageable.pageNumber + 1) {
+						pageButton.parentElement.classList.add("active");
+					}
+
+					// EventListener
+					pageButton.addEventListener("click", () => {
+						const params = getParams();
+						params.pageNumber = index;
+						getData(params);
+					})
+
+					document.querySelector('.pagination').insertBefore(pageButtonLi, pagenationDiv.querySelector('.next-page').parentElement);
+				}
+
+				// 如果為 first、將 prev-page 加上 disabled
+				if (pageData.first) {
+					pagenationDiv.querySelector(".prev-page").parentElement.classList.add("disabled");
+				} else {  // EventListener
+					pagenationDiv.querySelector(".prev-page").addEventListener("click", () => {
+						const params = getParams();
+						params.pageNumber = pageData.pageable.pageNumber;
+						getData(params);
+					})
+				}
+				// 如果為 last、將 next-page 加上 disabled
+				if (pageData.last) {
+					pagenationDiv.querySelector(".next-page").parentElement.classList.add("disabled");
+				} else {  // EventListener
+					pagenationDiv.querySelector(".next-page").addEventListener("click", () => {
+						const params = getParams();
+						params.pageNumber = pageData.pageable.pageNumber + 2;
+						getData(params);
+					})
+				}
+
+			}
+
+
+			// 查詢按鈕
+			document.getElementById("search").addEventListener("click", () => {
+				const params = getParams();
+				console.log(params);
+				
+				getData(params);
+			})
+
+			// 取得查詢參數
+			function getParams() {
+				return {
+					eventName: document.getElementById("event-name").value,
+					cityName: document.getElementById("city-name").value,
+					categoryString: document.getElementById("category").value,
+					tagString: document.getElementById("tag").value,
+					searchingDate: document.getElementById("searching-date").value,
+					orderByProperty: document.getElementById("order-by").value,
+					directionString: document.getElementById("direction").value
+				}
+			}
+
+			
+			function getData(innerParams) {
+				spinnerMaker();
+				axios.get(contextPath + "/api/event", {
+					params: innerParams
+				})
+					.then(res => {
+						console.log(res);
+
+						// 清空 event-content 區塊
+						eventContent.innerHTML = "";
+
+						eventsDivMaker(res.data.content);
+						paginationMaker(res.data);
+
+						// 回到查詢結果區頂部
+						document.getElementById("event-content").scrollIntoView({ behavior: 'smooth' });
+					})
+					.catch(err => {
+						console.error(err);
+
+						// 在 event-content 區塊顯示錯誤訊息
+						eventContent.innerHTML = "<div><h3>查詢活動時發生錯誤。</h3></div>";
+					})
+			}
+
+
+			// 初始執行
+			getData({});
+
+
+			
+		});
+	</script>
+</head>
+
+<body>
+	<div th:replace="~{commons/userHeader}"></div>
+    <div class="container">
+
+		<!-- 標題 -->
+		<h1 class="my-4 text-center">探索活動</h1>
+
+		<!-- 查詢區 -->
+		<div class="card mb-5" id="searchingDiv">
+			<div class="card-header">
+				<h5 class="mb-0">查詢與排序</h5>
+			</div>
+			<div class="card-body">
+				<div class="d-flex justify-content-around mb-2">
+					<div class="d-flex align-items-center">
+						<label for="event-name" class="text-end me-3" style="width: 100px;">活動名稱</label>
+						<input type="text" id="event-name" class="form-control">
+					</div>
+					<div class="d-flex align-items-center">
+						<label for="event-name" class="text-end me-3" style="width: 100px;">都市</label>
+						<input type="text" id="city-name" class="form-control">
+					</div>
+				</div>
+				<div class="d-flex justify-content-around mb-2">
+					<div class="d-flex align-items-center">
+						<label class="text-end me-3" style="width: 100px;">類別</label>
+						<select class="form-select" id="category">
+							<option value="" selected>（全部）</option>
+							<option value="1">One</option>
+							<option value="2">Two</option>
+							<option value="3">Three</option>
+						</select>
+					</div>
+					<div class="d-flex align-items-center mb-2">
+						<label class="text-end me-3" style="width: 100px;">標籤</label>
+						<select class="form-select" id="tag">
+							<option value="" selected>（全部）</option>
+							<option value="1">One</option>
+							<option value="2">Two</option>
+							<option value="3">Three</option>
+						</select>
+					</div>
+					<div class="d-flex align-items-center">
+						<label for="searching-date" class="text-end me-3" style="width: 100px;">日期</label>
+						<input type="date" id="searching-date" class="form-control">
+					</div>
+				</div>
+				<div class="d-flex justify-content-around mb-2">
+					<div class="d-flex align-items-center">
+						<label class="text-end me-3" style="width: 140px;">排序依據</label>
+						<select class="form-select" id="order-by">
+							<option value="eventStartTime" selected>活動開始時間</option>
+						</select>
+					</div>
+					<div class="d-flex align-items-center">
+						<label class="text-end me-3" style="width: 140px;">排序方向</label>
+						<select class="form-select" id="direction">
+							<option value="ASC" selected>升冪</option>
+							<option value="DESC">降冪</option>
+						</select>
+					</div>
+				</div>
+				<div class="d-flex justify-content-center align-items-center">
+					<button class="btn btn-primary" id="search">查詢</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- 結果顯示區 -->
+		<div id="event-content"></div>
+
+    </div>
+	<div th:replace="~{commons/userFooter}"></div>
+
+
+	<!-- 活動卡片區塊 template -->
+	<template id="event-div-template">
+		<div id="events-div" class="row row-cols-1 row-cols-md-3 g-4 ms-5 me-5"></div>
+	</template>
+
+	<!-- 活動卡片 template -->
+	<template id="event-card-template">
+		<div class="col d-flex justify-content-center mb-3">
+			<a class="card h-100 custom-card">
+				<img src="/TickitEasy/images/event/5_f0264110-1cc9-41cc-b8e5-69cb80bd8b8d.png" class="card-img-top" alt="..."/>
+				<div class="card-body">
+					<div class="card-title fw-semibold fs-5">活動名稱</div>
+					<div>
+						<span class="city">活動城市</span>
+						<span class="ms-3 place"></span>
+					</div>
+					<div class="mt-2 fs-6">
+						<span class="event-start-time">2024 年 11 月 20 日 00:00</span>
+						<span class="ms-1">～</span><br>
+						<span class="event-end-time">2024 年 11 月 20 日 00:00</span>
+					</div>
+				</div>
+				<div class="card-footer bg-transparent border-0">
+					<div class="d-flex justify-content-around">
+						<span class="category badge bg-main-blue-purple fw-normal fs-6">類別</span>
+						<span class="tag badge bg-main-bright-orange fw-normal fs-6"></span>
+					</div>
+				</div>
+			</a>
+		</div>
+	</template>
+
+	<!-- Pagenation 區塊 template -->
+	<template id="pagenation-div-template">
+		<div id="pagenation-div" class="d-flex justify-content-center mt-3">
+			<ul class="pagination">
+
+				<!-- 上一頁 -->
+				<li class="page-item">
+					<button class="page-link prev-page">&laquo;</button>
+				</li>
+
+				<!-- 頁數 -->
+
+				<!-- 下一頁 -->
+				<li class="page-item">
+					<button class="page-link next-page">&raquo;</button>
+				</li>
+			</ul>
+		</div>
+	</template>
+
+	<!-- Pagenation 單個按鈕 -->
+	<template id="pagenation-page-button">
+		<li class="page-item"><button class="page-link page-button"></button></li>
+	</template>
+</body>
+
+</html>
