@@ -101,7 +101,7 @@ public class MemberController {
             String verificationToken = memberService.register(email, password, name, nickname, birthDate, phone);
             
             //寄驗證信
-            String verificationLink = "http://localhost:8080/TickitEasy/member/verify?token=" + verificationToken;
+            String verificationLink = "http://localhost:8080/TickitEasy/verify?token=" + verificationToken;
             emailService.sendVerificationEmail(email, verificationLink);
 
     		response.put("message", "註冊成功！請檢查您的信箱以驗證帳號。");
@@ -299,7 +299,45 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-
+    
+    //密碼變更
+    @PostMapping("/change-password")
+    public ResponseEntity<Map<String, String>> changePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, String> passwordData) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            // 從 Authorization Header 拿 Token
+            String token = authHeader.replace("Bearer ", "");
+            // 從 Token 拿電子信箱
+            String email = jwtUtil.getEmailFromToken(token);            
+            String currentPassword = passwordData.get("currentPassword");
+            String newPassword = passwordData.get("newPassword");
+            String confirmPassword = passwordData.get("confirmPassword");
+            // 驗證新密碼
+            if (newPassword == null || !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$")) {
+                response.put("error", "新密碼需至少8位，包含大小寫字母、數字和特殊字符");
+                return ResponseEntity.badRequest().body(response);
+            }
+            // 驗證確認密碼
+            if (!newPassword.equals(confirmPassword)) {
+                response.put("error", "新密碼與確認密碼不一致");
+                return ResponseEntity.badRequest().body(response);
+            }
+            memberService.changePassword(email, currentPassword, newPassword);
+            response.put("message", "密碼已成功變更");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            logger.error("變更密碼失敗：{}", e.getMessage());
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            logger.error("變更密碼時發生錯誤：{}", e.getMessage());
+            response.put("error", "變更密碼失敗，請稍後再試");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }
+
+
+
