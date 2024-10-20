@@ -33,7 +33,7 @@ $(document).ready(function () {
     }
     bonusValue = parseInt(bonusValue); // 確保是數字類型
     bonusResult.value = bonusValue;
-    bonusResult.textContent = `+ NT$ ${bonusValue}元`;
+    bonusResult.textContent = `+ NT$ ${bonusValue.toLocaleString()}元`;
 
     updateTotalAmount();
   });
@@ -42,7 +42,7 @@ $(document).ready(function () {
   function updateTotalAmount() {
     totalAmountValue = unitPriceValue + parseInt(bonusValue);
     totalAmount.value = totalAmountValue;
-    totalAmount.textContent = ` NT$ ${totalAmountValue}元`;
+    totalAmount.textContent = ` NT$ ${totalAmountValue.toLocaleString()}元`;
   }
 
   const linePayButton = document.getElementById("linePayButton");

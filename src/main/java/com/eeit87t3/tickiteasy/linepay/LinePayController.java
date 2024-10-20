@@ -25,13 +25,6 @@ public class LinePayController {
 	private FundOrderService fundOrderService;
 	
 	
-//	@GetMapping("/linepay/test")
-//	public String testAPI() {
-//		//發出請求後回傳的頁面（可能是請求成功頁面aka付款頁面；或請求失敗頁面）
-//		 linePayService.requestAPI();
-//		return "cwdfunding/linepayOK";
-//	}
-	
 	@ResponseBody
 	@PostMapping("api/linepay/request")
     public ResponseEntity<JsonNode> requestLinePay(@RequestBody Map<String, Object> paymentData) {
@@ -56,16 +49,11 @@ public class LinePayController {
 	// line pay頁面，付款成功會導向至這裡
 	@GetMapping("/test/linepay/requestOK")
 	public String linepayReqOK() {
-		//*********************
-		// 這裡要放confirmAPI，即完成請款且已與資料庫互動
-		// 接著return 付款且請款成功的page!
-		
-		//*********************
-		return "cwdfunding/linepayOK";
+		return "cwdfunding/fundprojects";
 	}
 	
 	
-	// line pay付款失敗畫面，付款失敗會導向至這裡
+	// line pay畫面，付款失敗會導向至這裡
 	@GetMapping("/test/linepay/requestNO")
 	public String linepayReqReject() {
 		return "cwdfunding/linepayNO";

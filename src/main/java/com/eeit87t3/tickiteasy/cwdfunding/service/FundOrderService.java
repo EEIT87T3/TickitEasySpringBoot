@@ -45,10 +45,6 @@ public class FundOrderService {
 		String projectIDString =   form.get("projectID").toString();
 		String planIDString =  form.get("planID").toString();
 		
-//		System.out.println("projectID:"+projectIDString);
-//		System.out.println("planID:"+planIDString);
-//		System.out.println("totalAmount:"+totalAmountString);
-//		System.out.println("bonus:"+bonusString);
 		
 		/* 從fullForm取出資料 */
 		

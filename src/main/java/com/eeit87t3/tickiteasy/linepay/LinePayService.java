@@ -68,7 +68,7 @@ public class LinePayService {
 	        String nonce = UUID.randomUUID().toString();
 	        String signature;
 			signature = encrypt(CHANNEL_SECRET, CHANNEL_SECRET + requestUri + formString + nonce);
-	        String httpsUrl = "https://sandbox-api-pay.line.me/v3/payments/request";
+	        String httpsUrl = API_URL;
 	        JsonNode json = null;
 
 				json = PostApiUtil.sendPost(CHANNEL_ID, nonce, signature, httpsUrl, formString);
