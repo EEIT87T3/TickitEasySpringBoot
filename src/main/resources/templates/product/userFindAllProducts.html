@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta th:replace="~{commons/userHead}">
+	<title>周邊商品</title>
+	<script>
+		$(document).ready(function () {
+			
+			// 這裡是 JavaScript 內容
+			
+		});
+	</script>
+</head>
+
+<body>
+	<div th:replace="~{commons/userHeader}"></div>
+    
+	<div class="container mt-4">
+        <h1 class="text-center mb-4">商品列表</h1>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <select id="categorySelect" class="form-select">
+                    <option value="">所有類別</option>
+                    <option th:each="category : ${categoryList}" 
+                            th:value="${category.categoryId}" 
+                            th:text="${category.categoryName}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="minPrice" class="form-control" placeholder="最低價格">
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="maxPrice" class="form-control" placeholder="最高價格">
+            </div>
+            <div class="col-md-2">
+        <button id="priceFilterBtn" class="btn btn-primary w-100">確認價格</button>
+    </div>
+            <div class="col-md-3">
+                <select id="sortSelect" class="form-select">
+                    <option value="0">由舊到新</option>
+                    <option value="3">最新商品</option>
+                    <option value="1">價格從低到高</option>
+                    <option value="2">價格從高到低</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-9">
+                <input type="text" id="searchInput" class="form-control" placeholder="搜索商品名稱">
+            </div>
+            <div class="col-md-3">
+                <button id="searchButton" class="btn btn-primary w-100">搜索</button>
+            </div>
+        </div>
+
+        <div id="productList" class="row row-cols-1 row-cols-md-3 g-4">
+            <!-- 商品卡片將通過 JavaScript 動態添加 -->
+        </div>
+
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center" id="pagination">
+                <!-- 分頁按鈕將通過 JavaScript 動態添加 -->
+            </ul>
+        </nav>
+    </div>
+
+
+
+   <div th:replace="~{commons/userFooter}"></div>
+   <script th:inline="javascript">
+	let currentPage = 0;
+	const pageSize = 9;
+
+	function loadProducts() {
+		const categoryId = document.getElementById('categorySelect').value;
+		const minPrice = document.getElementById('minPrice').value;
+		const maxPrice = document.getElementById('maxPrice').value;
+		const productName = document.getElementById('searchInput').value;
+		const sort = document.getElementById('sortSelect').value;
+
+		axios.get('/TickitEasy/user/api/product', {
+			params: {
+				categoryId: categoryId || null,
+				minPrice: minPrice || null,
+				maxPrice: maxPrice || null,
+				productName: productName || null,
+				sort: sort,
+				page: currentPage,
+				size: pageSize
+			}
+		})
+		.then(response => {
+			const products = response.data.content;
+			const totalPages = response.data.totalPages;
+			displayProducts(products);
+			displayPagination(totalPages);
+		})
+		.catch(error => console.error('Error loading products:', error));
+	}
+
+	function displayProducts(products) {
+        const productList = document.getElementById('productList');
+        productList.innerHTML = ''; // 清空現有內容
+
+        products.forEach(function(product) {
+            const productElement = document.createElement('div');
+            productElement.className = 'col';
+            productElement.innerHTML = `
+                <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/TickitEasy/user/product/${product.productID}'">
+                    <img src="/TickitEasy${product.productPic}" class="card-img-top" alt="${product.productName}">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.productName}</h5>
+                        <p class="card-text">價格: $${product.price}</p>
+                    </div>
+                </div>
+            `;
+            productList.appendChild(productElement);
+        });
+    }
+
+	function displayPagination(totalPages) {
+		const pagination = document.getElementById('pagination');
+		pagination.innerHTML = '';
+		for (let i = 0; i < totalPages; i++) {
+			const pageItem = `
+				<li class="page-item ${i === currentPage ? 'active' : ''}">
+					<a class="page-link" href="#" onclick="changePage(${i})">${i + 1}</a>
+				</li>
+			`;
+			pagination.innerHTML += pageItem;
+		}
+	}
+
+	function changePage(page) {
+		currentPage = page;
+		loadProducts();
+	}
+
+	// 新添加的 DOMContentLoaded 事件監聽器
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('searchButton').addEventListener('click', () => {
+            currentPage = 0;
+            loadProducts();
+        });
+
+        document.getElementById('categorySelect').addEventListener('change', loadProducts);
+        document.getElementById('sortSelect').addEventListener('change', loadProducts);
+
+        // 新增：價格篩選按鈕事件監聽器
+        document.getElementById('priceFilterBtn').addEventListener('click', () => {
+            currentPage = 0;
+            loadProducts();
+        });
+
+        // 初始加載產品
+        loadProducts();
+    });
+</script>
+</body>
+
+</html>

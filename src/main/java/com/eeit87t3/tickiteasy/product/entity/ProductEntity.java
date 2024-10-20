@@ -1,11 +1,14 @@
 package com.eeit87t3.tickiteasy.product.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +22,7 @@ public class ProductEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "productID")
 	private Integer productID;
 	
 	@ManyToOne
@@ -45,20 +49,24 @@ public class ProductEntity {
 	private Integer stock;
 	
 	@Column(name = "status", nullable = false)
-	private Integer status;
+	private Integer status =0;
 	
 	@Column(name = "prodTotalReviews", nullable = false)
-	private Integer prodTotalReviews;
+	private Integer prodTotalReviews = 0;
 	
 	@Column(name = "prodTotalScore", nullable = false)
-	private Integer prodTotalScore;
+	private Integer prodTotalScore = 0;
+	
+	@Column(name = "createdDate")
+	@CreationTimestamp
+	private LocalDateTime createdDate;
 
 	public ProductEntity() {
 	}
 
 	public ProductEntity(Integer productID, CategoryEntity productCategory, TagEntity productTag, String productName,
 			String productPic, String productDesc, Integer price, Integer stock, Integer status,
-			Integer prodTotalReviews, Integer prodTotalScore) {
+			Integer prodTotalReviews, Integer prodTotalScore, LocalDateTime createdDate) {
 		this.productID = productID;
 		this.productCategory = productCategory;
 		this.productTag = productTag;
@@ -70,6 +78,7 @@ public class ProductEntity {
 		this.status = status;
 		this.prodTotalReviews = prodTotalReviews;
 		this.prodTotalScore = prodTotalScore;
+		this.createdDate = createdDate;
 	}
 
 	public Integer getProductID() {
@@ -160,5 +169,12 @@ public class ProductEntity {
 		this.prodTotalScore = prodTotalScore;
 	}
 
+	public LocalDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
+	}
 
 }

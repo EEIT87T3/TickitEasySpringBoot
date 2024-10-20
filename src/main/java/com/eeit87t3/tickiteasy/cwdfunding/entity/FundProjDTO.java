@@ -37,8 +37,7 @@ public class FundProjDTO {
 
     private String tagName;
     
-//    private List<E>
-    
+    private List<FundPlan> fundplanList;
     
 	public Integer getProjectID() {
 		return projectID;
@@ -135,6 +134,12 @@ public class FundProjDTO {
 	}
 	public void setTagId(Integer tagId) {
 		this.tagId = tagId;
+	}
+	public List<FundPlan> getFundplanList() {
+		return fundplanList;
+	}
+	public void setFundplanList(List<FundPlan> fundplanList) {
+		this.fundplanList = fundplanList;
 	}
 
 

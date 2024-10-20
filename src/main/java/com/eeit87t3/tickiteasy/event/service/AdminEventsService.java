@@ -33,7 +33,7 @@ import jakarta.transaction.Transactional;
  * @author Chuan(chuan13)
  */
 @Service
-public class EventsService {
+public class AdminEventsService {
 
 	@Autowired
 	private EventsProcessingService eventsProcessingService;
@@ -88,22 +88,6 @@ public class EventsService {
 	}
 	
 	
-	public Page<EventsEntity> findByDynamic(Integer pageNumber, String categoryString, String tagString, LocalDateTime searchingTime) {
-		Specification<EventsEntity> specification = Specification.where(
-				EventsSpecification.hasCategoryString(categoryString)
-				.and(EventsSpecification.hasTagString(tagString))
-				.and(EventsSpecification.hasSerchingTime(searchingTime))
-				);
-		Pageable pageable = PageRequest.of(pageNumber - 1, 10, Direction.ASC, "eventID");  // （第幾頁（從 0 起算）, 一頁幾筆, 排序方向, 排序依據欄位）
-		return eventsProcessingService.findBySpecificationAndPageable(specification, pageable);
-	}
-	
-	
-	public List<EventsEntity> findByListingAndOnsale() {
-		return eventsProcessingService.findByListingAndOnsale();
-	}
-	
-	
 	// 新增
 	
 	/**
@@ -150,6 +134,7 @@ public class EventsService {
 		
 		// 地址
 		if (createEventsDTO.getAddress() == null || createEventsDTO.getAddress().isBlank()) {  // 未輸入地址
+//		if (StringUtils.isBlank(createEventsDTO.getAddress())) {  // 未輸入地址
 			return "輸入錯誤：未輸入地址。";
 		}
 		
@@ -200,18 +185,22 @@ public class EventsService {
 		// 活動類別
 		if (createEventsDTO.getCategoryString() != null && !createEventsDTO.getCategoryString().isBlank()) {  // 有輸入活動類別
 			CategoryEntity categoryEntity = categoryService.findByCategoryString(createEventsDTO.getCategoryString());
+			System.out.println("=== 這裡是要印出 category 裡的 events ===");
+			for (EventsEntity event : categoryEntity.getEvents()) {
+				System.out.println(event.getAddress());
+			}
 			if (categoryEntity != null) {					
 				eventsEntity.setEventCategory(categoryEntity);
 			}
 		}
 		
-		// 活動標籤
-		if (createEventsDTO.getTagString() != null && !createEventsDTO.getTagString().isBlank()) {  // 有輸入活動標籤
-			TagEntity tagEntity = tagService.findByTagString(createEventsDTO.getTagString());
-			if (tagEntity != null) {
-				eventsEntity.setEventTag(tagEntity);
-			}
-		}
+//		// 活動標籤
+//		if (createEventsDTO.getTagString() != null && !createEventsDTO.getTagString().isBlank()) {  // 有輸入活動標籤
+//			TagEntity tagEntity = tagService.findByTagString(createEventsDTO.getTagString());
+//			if (tagEntity != null) {
+//				eventsEntity.setEventTag(tagEntity);
+//			}
+//		}
 		
 		// 活動介紹
 		if (createEventsDTO.getEventDesc() != null && !createEventsDTO.getEventDesc().isBlank()) {
@@ -224,9 +213,15 @@ public class EventsService {
 		}
 		
 		// 地址
+//		System.out.println("=== createEventsDTO 檢查 ===");
+//		System.out.println(createEventsDTO);
 		if (createEventsDTO.getAddress() != null && !createEventsDTO.getAddress().isBlank()) {
+//		if (StringUtils.isNotBlank(createEventsDTO.getAddress())) {
+			System.out.println("地址 if 有地址");
 			eventsEntity.setAddress(createEventsDTO.getAddress());
-		}
+		} /*else {
+			System.out.println("地址 else 沒地址");
+		}*/
 		
 		// 活動開始時間
 		if (createEventsDTO.getEventStartTime() != null) {
@@ -265,6 +260,13 @@ public class EventsService {
 			}
 		}
 		
+		// 活動標籤
+		if (createEventsDTO.getTagString() != null && !createEventsDTO.getTagString().isBlank()) {  // 有輸入活動標籤
+			TagEntity tagEntity = tagService.findByTagString(createEventsDTO.getTagString());
+			if (tagEntity != null) {
+				eventsEntity.setEventTag(tagEntity);
+			}
+		}
 		
 		return eventsEntity;
 	}
@@ -526,4 +528,5 @@ public class EventsService {
 	public Boolean delete(Integer eventID) {
 		return eventsProcessingService.deleteById(eventID);
 	}
+
 }
