@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta th:replace="~{commons/adminHead}">
+    <title>商品管理</title>
+</head>
+
+<body>
+    <div th:replace="~{commons/adminHeader}"></div>
+    <h1>商品管理</h1>
+    <div class="search-container">
+        <form th:action="@{/admin/product/create}" method="get" enctype="multipart/form-data">
+            <input type="submit" value="新增商品" class="btn btn-primary">
+        </form>
+    </div>
+    <!-- <div class="search-container">
+        <form th:action="@{/admin/products/create}" method="get" enctype="multipart/form-data">
+            <input type="submit" value="新增多筆商品" class="btn btn-primary">
+        </form>
+    </div>
+     -->
+    <div class="search-container">
+        <input id="searchInput" type="text" placeholder="搜尋商品名稱">
+        <button id="searchButton">搜尋</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>商品編號</th>
+                <th>類別</th>
+                <th>標籤</th>
+                <th>商品名稱</th>
+                <th>商品圖片</th>
+                <th>商品描述</th>
+                <th>價格</th>
+                <th>庫存</th>
+                <th>新增日期</th>
+                <th>狀態</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="productTableBody">
+            <!-- 產品數據將在這裡動態插入 -->
+        </tbody>
+    </table>
+
+    <div id="pagination">
+        <!-- 分頁按鈕將在這裡動態插入 -->
+    </div>
+
+    <div th:replace="~{commons/adminFooter}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script th:inline="javascript">
+        let currentPage = 1;  // 改為 1-based 以便於理解
+        let pageSize = 5;
+        let totalPages = 1;
+        let searchInput, searchButton, productTableBody, paginationDiv;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            searchInput = document.getElementById('searchInput');
+            searchButton = document.getElementById('searchButton');
+            productTableBody = document.getElementById('productTableBody');
+            paginationDiv = document.getElementById('pagination');
+
+            searchButton.addEventListener('click', function () {
+                currentPage = 1;
+                fetchProducts();
+            });
+
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    currentPage = 1;
+                    fetchProducts();
+                }
+            });
+
+            // 初始加載
+            fetchProducts();
+        });
+
+        // 設置日期格式
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const year = date.getFullYear(); // 取得年份
+            const month = date.getMonth() + 1; // getMonth() 返回 0-11
+            const day = date.getDate();
+            return `${year}年${month}月${day}日`;
+        }
+
+        function fetchProducts() {
+            axios.get('/TickitEasy/admin/api/product', {
+                params: {
+                    name: searchInput.value,
+                    page: currentPage - 1,  // 後端使用 0-based 頁碼
+                    size: pageSize
+                }
+            })
+                .then(response => {
+                    const products = response.data.content;
+                    totalPages = response.data.totalPages;
+                    renderProducts(products);
+                    renderPagination();
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+
+        function renderProducts(products) {
+            const tbody = document.querySelector('#productTableBody');
+            tbody.innerHTML = '';
+            products.forEach(product => {
+                const tr = document.createElement('tr');
+                const imageUrl = product.productPic ? `/TickitEasy${product.productPic}` : '';
+                tr.innerHTML = `
+            <td>${product.productID}</td>
+            <td>${product.productCategory ? product.productCategory.categoryName : ''}</td>
+            <td>${product.productTag ? product.productTag.tagName : ''}</td>
+            <td>${product.productName}</td>
+            <td><img src="${imageUrl}" alt="商品圖片" style="width: 50px; height: 50px; object-fit: cover;"></td>
+            <td>${product.productDesc}</td>
+            <td>${product.price}</td>
+            <td>${product.stock}</td>
+            <td>${formatDate(product.createdDate)}</td>
+            <td>
+                <select class="status-select" data-product-id="${product.productID}">
+                    <option value="1" ${product.status == 1 ? 'selected' : ''}>上架</option>
+                    <option value="0" ${product.status == 0 ? 'selected' : ''}>下架</option>
+                    <option value="2" ${product.status == 2 ? 'selected' : ''}>補貨中</option>
+                </select>
+            </td>
+            <td>
+                <a href="/TickitEasy/admin/product/${product.productID}/edit">修改</a>
+                <button onclick="deleteProduct(${product.productID})">刪除</button>
+            </td>
+        `;
+                tbody.appendChild(tr);
+            });
+
+            // 在渲染完成後添加事件監聽器
+            addStatusChangeListeners();
+        }
+
+        function addStatusChangeListeners() {
+            const statusSelects = document.querySelectorAll('.status-select');
+            statusSelects.forEach(select => {
+                select.addEventListener('change', function () {
+                    const productId = this.getAttribute('data-product-id');
+                    const newStatus = this.value;
+
+                    axios.put(`/TickitEasy/admin/api/product/${productId}/status`, {
+                        status: parseInt(newStatus)
+                    })
+                        .then(response => {
+                            console.log('Status updated successfully:', response.data);
+                            // 您可以在這裡添加用戶反饋，比如顯示一個成功通知
+                        })
+                        .catch(error => {
+                            console.error('Error updating status:', error);
+                            // 您可以在這裡添加錯誤處理，比如向用戶顯示錯誤消息
+                        });
+                });
+            });
+        }
+
+        function renderPagination() {
+            paginationDiv.innerHTML = '';
+
+            /// 首頁按鈕
+            paginationDiv.innerHTML += `<button onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>首頁</button>`;
+
+            // 前一頁按鈕
+            paginationDiv.innerHTML += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>前一頁</button>`;
+
+            // 直接生成所有頁碼按鈕
+            for (let i = 1; i <= totalPages; i++) {
+                paginationDiv.innerHTML += `
+            <button onclick="changePage(${i})" ${currentPage === i ? 'class="active"' : ''}>
+                ${i}
+            </button>`;
+            }
+
+            // 下一頁按鈕
+            paginationDiv.innerHTML += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一頁</button>`;
+
+            // 最後一頁按鈕
+            paginationDiv.innerHTML += `<button onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>最後一頁</button>`;
+        }
+        function changePage(page) {
+            currentPage = page;
+            fetchProducts();
+        }
+
+        function deleteProduct(productID) {
+            if (confirm('確定要刪除這個商品嗎？')) {
+                axios.delete(`/TickitEasy/admin/api/product/${productID}`)
+                    .then(() => {
+                        fetchProducts();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting product:', error);
+                    });
+            }
+        }
+    </script>
+    <div th:replace="~{commons/adminFooter}"></div>
+</body>
+
+</html>

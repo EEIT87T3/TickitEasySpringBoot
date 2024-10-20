@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta th:replace="~{commons/adminHead}">
+    <!-- 添加 FilePond CSS -->
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+        rel="stylesheet">
+    <style>
+  /* 隐藏 PQINA 链接 */
+  .filepond--credits {
+    display: none !important;
+  }
+</style>
+    <title>新增商品</title>
+</head>
+
+<body>
+    <div th:replace="~{commons/adminHeader}"></div>
+
+    <div class="container">
+        <h1>新增商品</h1>
+
+        <form id="addProductForm" enctype="multipart/form-data">
+            <table class="table">
+                <tr>
+                    <th><span class="mustMark">*</span>商品名稱</th>
+                    <td><input type="text" class="form-control" name="productName" required></td>
+                </tr>
+                <tr>
+                    <th>商品圖片</th>
+                    <td>
+                        <input type="file" class="form-control" name="imageFile" accept="image/*">
+                        <div id="imagePreviewContainer" class="mt-2"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="mustMark">*</span>商品類別</th>
+                    <td>
+                        <select class="form-select" name="categoryId">
+                            <option value="">（未選擇）</option>
+                            <th:block th:each="category : ${categoryList}">
+                                <option th:value="${category.categoryId}" th:text="${category.categoryName}"></option>
+                            </th:block>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>商品標籤</th>
+                    <td>
+                        <select class="form-select" name="tagId">
+                            <option value="">（未選擇）</option>
+                            <th:block th:each="tag : ${tagList}">
+                                <option th:value="${tag.tagId}" th:text="${tag.tagName}"></option>
+                            </th:block>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>商品描述</th>
+                    <td><textarea class="form-control" name="productDesc" rows="4"></textarea></td>
+                </tr>
+                <tr>
+                    <th><span class="mustMark">*</span>價格</th>
+                    <td><input type="number" class="form-control" name="price" required min="0"></td>
+                </tr>
+                <tr>
+                    <th><span class="mustMark">*</span>庫存</th>
+                    <td><input type="number" class="form-control" name="stock" required min="0"></td>
+                </tr>
+                
+                <tr>
+                    <th>商品詳細圖片</th>
+                    <td>
+                        <input type="file" id="productDetailPics" name="productDetailPics" multiple accept="image/*">
+                    </td>
+                </tr>
+
+
+            </table>
+
+            <div id="action-buttons" class="d-flex mb-3">
+                <div id="result" class="d-flex align-items-center me-3"></div>
+                <button type="submit" id="addProductBtn" class="btn btn-primary">新增</button>
+                <button type="button" class="btn btn-secondary me-2"
+                    onclick="location.href='/TickitEasy/admin/product'">返回商品列表</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:replace="~{commons/adminFooter}"></div>
+
+    <!-- 添加 FilePond JS -->
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const addProductForm = document.getElementById('addProductForm');
+            const addProductBtn = document.getElementById('addProductBtn');
+
+            // 註冊 FilePond 
+            FilePond.registerPlugin(FilePondPluginImagePreview);
+
+            // 初始化 FilePond
+            const pond = FilePond.create(document.querySelector('input[name="productDetailPics"]'), {
+                allowMultiple: true,
+                maxFiles: 4,
+                acceptedFileTypes: ['image/*'],
+                labelIdle: '拖曳或 <span class="filepond--label-action">點擊此處上傳圖片</span>',
+                labelFileCountSingular: '個圖片',
+                labelFileCountPlural: '個圖片',
+                labelFileLoading: '加載中',
+                labelFileAdded: '已新增',
+                labelFileLoadError: '加載失敗',
+                labelTapToCancel: '點擊取消',
+                labelTapToRetry: '點擊重試',
+                labelTapToUndo: '點擊撤銷',
+            });
+
+            addProductForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                addProductBtn.disabled = true;
+
+                const formData = new FormData(addProductForm);
+
+                // 新增商品
+                axios.post('/TickitEasy/admin/api/product', formData)
+                    .then(response => {
+                        const productID = response.data.productID;
+
+                        // 上傳商品詳情圖片
+                        const files = pond.getFiles();
+                        const uploadPromises = files.map(fileItem => {
+                            const picFormData = new FormData();
+                            picFormData.append('fileName', fileItem.file);
+
+                            return axios.post(`/TickitEasy/admin/api/productPhoto/${productID}`, picFormData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            });
+                        });
+
+                        return Promise.all(uploadPromises);
+                    })
+                    .then(() => {
+                        alert('商品新增成功！');
+                        // 重置表單
+                        addProductForm.reset();
+                        pond.removeFiles();
+                        imagePreviewContainer.innerHTML = ''; // 清除商品主圖預覽
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('新增失敗，請稍後再試。');
+                    })
+                    .finally(() => {
+                        addProductBtn.disabled = false;
+                    });
+            });
+        });
+        
+        // 圖片預覽
+            document.querySelector('input[name="imageFile"]').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-thumbnail mt-2';
+                        img.style.maxWidth = '200px';
+                        const container = document.getElementById('imagePreviewContainer');
+                        container.innerHTML = '';
+                        container.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        
+    </script>
+</body>
+
+</html>
