@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eeit87t3.tickiteasy.event.dto.TicketTypesDTO;
 import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
-import com.eeit87t3.tickiteasy.event.service.TicketTypesService;
+import com.eeit87t3.tickiteasy.event.service.AdminTicketTypesService;
 
 /**
  * @author Chuan(chuan13)
  */
 @RestController
 @RequestMapping("/admin/api/event/{eventID}/tickettype")
-public class TicketTypesJsonController {
+public class AdminTicketTypesJsonController {
 	
 	@Autowired
-	private TicketTypesService ticketTypesService;
+	private AdminTicketTypesService ticketTypesService;
 
 	@PostMapping
 	public ResponseEntity<?> create(@PathVariable Integer eventID,

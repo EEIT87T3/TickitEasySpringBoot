@@ -1,11 +1,8 @@
 package com.eeit87t3.tickiteasy.event.controller;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,38 +13,37 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eeit87t3.tickiteasy.event.dto.EventWithTicketTypesDTO;
 import com.eeit87t3.tickiteasy.event.dto.EventsDTO;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
-import com.eeit87t3.tickiteasy.event.service.EventsService;
+import com.eeit87t3.tickiteasy.event.service.AdminEventsService;
 
 /**
  * @author Chuan(chuan13)
  */
 @RestController
 @RequestMapping("/admin/api/event")
-public class EventsJsonController {
+public class AdminEventsJsonController {
 	
 	@Autowired
-	private EventsService eventsService;
+	private AdminEventsService eventsService;
 
-	@GetMapping
-	public Page<EventsEntity> findByDynamic(
-			@RequestParam(value = "p", defaultValue = "1") Integer pageNumber,
-			@RequestParam(value = "category-string", required = false) String categoryString,
-			@RequestParam(value = "tag-string", required = false) String tagString,
-			@RequestParam(value = "searching-time", required = false) LocalDateTime searchingTime
-			) {
-		return eventsService.findByDynamic(pageNumber, categoryString, tagString, searchingTime);
-	}
+//	@GetMapping
+//	public Page<EventsEntity> findByDynamic(
+//			@RequestParam(value = "p", defaultValue = "1") Integer pageNumber,
+//			@RequestParam(value = "category-string", required = false) String categoryString,
+//			@RequestParam(value = "tag-string", required = false) String tagString,
+//			@RequestParam(value = "searching-time", required = false) LocalDateTime searchingTime
+//			) {
+//		return eventsService.findByDynamic(pageNumber, categoryString, tagString, searchingTime);
+//	}
 	
-	@GetMapping("/listing")
-	public List<EventsEntity> findByListingAndOnsale() {
-		return eventsService.findByListingAndOnsale();
-	}
+//	@GetMapping("/listing")
+//	public List<EventsEntity> findByListingAndOnsale() {
+//		return eventsService.findByListingAndOnsale();
+//	}
 	
 	@GetMapping("/{eventID}")
 	public EventWithTicketTypesDTO findById(@PathVariable Integer eventID) {

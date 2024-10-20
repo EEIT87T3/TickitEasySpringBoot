@@ -2,18 +2,20 @@
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 引入 Google Fonts -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
+  
+  <!-- 引入 Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-    <!-- 引入 Bootstrap, FontAwesome, jQuery -->
+  <!-- 引入 Bootstrap, FontAwesome, jQuery -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <style>
+  <style>
     /* 自訂色調 */
     :root {
       --main-blue-purple: #5F46E8;
@@ -122,7 +124,107 @@
     }
 
   </style>
+  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
+    <!-- 引入 SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- JavaScript -->
+    <script>
+	    document.addEventListener('DOMContentLoaded', function() {
+		  // 檢查 localStorage 是否有 Token
+		  const token = localStorage.getItem('jwtToken');
+		
+		  const loggedOutHeader = document.getElementById('logged-out-header');
+		  const loggedInHeader = document.getElementById('logged-in-header');
+		  const memberNameElement = document.getElementById('memberName');
+		  const memberAvatarElement = document.getElementById('memberAvatar');
+		  const logoutButton = document.getElementById('logoutButton');
+		
+		  if (token) {
+		    // 如果有 token，顯示已登入的狀態
+		    loggedOutHeader.classList.add('d-none');
+		    loggedInHeader.classList.remove('d-none');
+		
+		    // 會員的頭貼和名稱
+		    const memberName = localStorage.getItem('memberName');
+		    const memberAvatarUrl = localStorage.getItem('memberAvatarUrl'); // 頭貼 URL
+		
+		    memberNameElement.textContent = memberName ? memberName : '會員';
+		
+		    if (memberAvatarUrl) {
+		      memberAvatarElement.setAttribute('src', memberAvatarUrl);
+		    } else {
+		      // 如果沒有頭貼，使用預設的頭貼
+		      memberAvatarElement.setAttribute('src', '/TickitEasy/images/member/default-avatar.png');
+		    }
+		
+		    // 
+		    const memberAvatar = document.getElementById('memberAvatar');
+		    memberAvatar.parentElement.addEventListener('click', function(e) {
+		    });
+		  } else {
+		    // 如果沒有 token，顯示未登入的狀態
+		    loggedOutHeader.classList.remove('d-none');
+		    loggedInHeader.classList.add('d-none');
+		  }
+		
+		  // 登出按鈕
+		  logoutButton.addEventListener('click', function(e) {
+		    e.preventDefault(); 
+		
+		    // 清除 token 和會員資料
+		    localStorage.removeItem('jwtToken');
+		    localStorage.removeItem('memberName');
+		    localStorage.removeItem('memberAvatarUrl');
+		
+		    // 顯示登出訊息並跳轉
+		    Swal.fire({
+		      icon: 'success',
+		      title: '已成功登出',
+		      text: '即將跳轉到首頁...',
+		      timer: 2000,
+		      showConfirmButton: false
+		    }).then(() => {
+		      window.location.href = '/TickitEasy/';
+		    });
+		  });
+		
+		  // 如果已登入，使用 axios 獲取資料
+		  if (token) {
+		    axios.get('/TickitEasy/api/member/profile', {
+		      headers: {
+		        'Authorization': 'Bearer ' + token
+		      }
+		    })
+		    .then(function(response) {
+		      const data = response.data;
+		
+		      // 更新會員的名字
+		      memberNameElement.textContent = data.nickname;
+		
+		      // 更新會員的頭貼
+		      if (data.profilePic) {
+		        const avatarUrl = '/TickitEasy/api/member/profilePic/' + data.memberID;
+		        memberAvatarElement.setAttribute('src', avatarUrl);
+		        // 儲存頭貼 URL
+		        localStorage.setItem('memberAvatarUrl', avatarUrl);
+		      } else {
+		        // 使用預設頭貼
+		        memberAvatarElement.setAttribute('src', '/TickitEasy/images/member/default-avatar.png');
+		      }
+		
+		      // 儲存會員名稱
+		      localStorage.setItem('memberName', data.nickname);
+		    })
+		    .catch(function(error) {
+		      // 若讀取資料失敗，則登出
+		      console.error('讀取會員資料失敗：', error);
+		      logoutButton.click();
+		    });
+		  }
+		});
+    </script>
   
 </head>
 
