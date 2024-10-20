@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta th:replace="~{commons/userHead}">
+    <style>
+        .thumbnail-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+        }
+    </style>
+    <title>周邊商品</title>
+    <script>
+        $(document).ready(function () {
+
+            // 這裡是 JavaScript 內容
+
+        });
+    </script>
+</head>
+
+<body>
+    <div th:replace="~{commons/userHeader}"></div>
+
+    <!--  這裡是網頁內容 >-->
+
+
+    <div class="container mt-5">
+        <div class="row" id="productDetail">
+            <!-- 商品詳情將通過 JavaScript 動態添加 -->
+        </div>
+    </div>
+    <script th:inline="javascript">
+        const productID = /*[[${productID}]]*/ '';
+
+        function loadProductDetail() {
+            axios.get(`/TickitEasy/user/api/product/${productID}`)
+                .then(response => {
+                    const product = response.data;
+                    displayProductDetail(product);
+                })
+                .catch(error => {
+                    console.error('Error loading product details:', error);
+                    document.getElementById('productDetail').innerHTML = '<p class="text-danger">商品加載失敗，請稍後再試。</p>';
+                });
+        }
+
+        function displayProductDetail(product) {
+            const detailHtml = `
+            <div class="col-md-6">
+                <img id="mainImage" src="/TickitEasy${product.productPic}" alt="${product.productName}" class="main-image">
+                <div class="d-flex flex-wrap mt-2" id="thumbnails">
+                    <img src="/TickitEasy${product.productPic}" alt="${product.productName}" class="thumbnail-image" onclick="changeMainImage(this.src)">
+                    ${product.detailPhotos.map(photo => `
+                        <img src="/TickitEasy${photo}" alt="${product.productName}" class="thumbnail-image" onclick="changeMainImage(this.src)">
+                    `).join('')}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2>${product.productName}</h2>
+                <p>價格: $${product.price}</p>
+                <p>庫存: ${product.stock}</p>
+                <h4 class="mt-4">商品描述</h4>
+                <p>${product.productDesc}</p>
+                <input type="number" id="quantityInput" value="1" min="1">
+                 <button onclick="addToCart(false)" class="btn btn-primary mr-2">加入購物車</button>
+    			 <button onclick="addToCart(true)" class="btn btn-success">直接購買</button>
+            </div>
+        `;
+            document.getElementById('productDetail').innerHTML = detailHtml;
+        }
+
+        function changeMainImage(src) {
+            document.getElementById('mainImage').src = src;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProductDetail);
+
+
+        //購物車按鈕
+        function addToCart(buyNow) {
+            const quantity = parseInt(document.getElementById('quantityInput').value, 10);
+
+            if (isNaN(quantity) || quantity < 1) {
+                alert('請輸入大於0的數量');
+                return;
+            }
+
+            axios.post('/TickitEasy/user/api/product', null, {
+                params: {
+                    productID: productID, // 假設 productID 是全局變量
+                    quantity: quantity
+                }
+            })
+                .then(response => {
+                    const cartItem = response.data;
+                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                    const existingItemIndex = cart.findIndex(item => item.productID === cartItem.productID);
+
+                    if (existingItemIndex > -1) {
+                        cart[existingItemIndex].quantity += quantity;
+                    } else {
+                        cart.push(cartItem);
+                    }
+
+                    localStorage.setItem('cart', JSON.stringify(cart));
+
+                    if (buyNow) {
+                        window.location.href = '/TickitEasy/user/cart';
+                    } else {
+                        alert('商品已加入購物車');
+                    }
+                })
+                .catch(error => {
+                    console.error('加入購物車失敗:', error);
+                    alert('加入購物車失敗，請稍後再試');
+                });
+        }
+    </script>
+
+    <div th:replace="~{commons/userFooter}"></div>
+</body>
+
+</html>

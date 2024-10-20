@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+
+    <meta th:replace="~{commons/userHead}">
+    <title>購物車</title>
+    <script>
+        $(document).ready(function () {
+
+            // 這裡是 JavaScript 內容
+
+        });
+    </script>
+</head>
+
+<body>
+    <div th:replace="~{commons/userHeader}"></div>
+
+    <!--  這裡是網頁內容 >-->
+    <!--<h1>購物車</h1>-->
+    <div class="container mt-5">
+        <div id="cartItems"></div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5>購物明細</h5>
+                <p>總數量: <span id="totalQuantity">0</span></p>
+                <p>總金額: $<span id="totalAmount">0</span></p>
+                <button class="btn btn-primary" onclick="checkout()">結帳</button>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{commons/userFooter}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        let cartItems = []; // 用來儲存購物車中的商品
+
+        // 加載購物車內容
+        function loadCart() {
+            cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+            renderCart(); // 渲染購物車內容
+            updateTotals(); // 更新總數量和總金額
+        }
+
+        // 渲染購物車中的商品
+        function renderCart() {
+            const cartItemsElement = document.getElementById('cartItems');
+            cartItemsElement.innerHTML = ''; // 清空目前的購物車內容
+
+            cartItems.forEach(item => {
+                const itemElement = document.createElement('div'); // 建立每個商品的元素
+                itemElement.className = 'card mb-3';
+                itemElement.innerHTML = `
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <img src="/TickitEasy${item.productPic}" alt="${item.productName}" class="img-fluid">
+                            </div>
+                            <div class="col-md-4">
+                                <h5 class="card-title">${item.productName}</h5>
+                            </div>
+                            <div class="col-md-2">
+                                <p>單價: $${item.price}</p>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary" onclick="decreaseQuantity(${item.productID})">-</button>
+                                    <input type="number" class="form-control" value="${item.quantity}" onchange="updateQuantity(${item.productID}, this.value)">
+                                    <button class="btn btn-outline-secondary" onclick="increaseQuantity(${item.productID})">+</button>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <p>總計: $${item.price * item.quantity}</p>
+                                <button class="btn btn-danger btn-sm" onclick="removeItem(${item.productID})">刪除</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cartItemsElement.appendChild(itemElement); // 將商品元素添加到購物車
+            });
+        }
+
+        // 更新總數量和總金額
+        function updateTotals() {
+            const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0); // 計算總數量
+            const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0); // 計算總金額
+
+            document.getElementById('totalQuantity').textContent = totalQuantity; // 更新總數量顯示
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(0); // 更新總金額顯示
+        }
+
+        // 更新特定商品的數量
+        function updateQuantity(productId, newQuantity) {
+            const item = cartItems.find(item => item.productID === productId); // 查找商品
+            if (item) {
+                item.quantity = parseInt(newQuantity); // 更新數量
+                updateCartItem(item); // 更新購物車中的商品
+            }
+        }
+
+        // 增加商品數量
+        function increaseQuantity(productId) {
+            const item = cartItems.find(item => item.productID === productId); // 查找商品
+            if (item) {
+                item.quantity++; // 數量增加
+                updateCartItem(item); // 更新購物車中的商品
+            }
+        }
+
+        // 減少商品數量
+        function decreaseQuantity(productId) {
+            const item = cartItems.find(item => item.productID === productId); // 查找商品
+            if (item && item.quantity > 1) {
+                item.quantity--; // 數量減少
+                updateCartItem(item); // 更新購物車中的商品
+            }
+        }
+
+        // 更新購物車中的商品
+        function updateCartItem(item) {
+            axios.put('/TickitEasy/user/api/product', {
+                productID: item.productID,
+                quantity: item.quantity
+            }, {
+                params: {
+                    newQuantity: item.quantity
+                }
+            })
+                .then(() => {
+                    localStorage.setItem('cart', JSON.stringify(cartItems)); // 更新 localStorage
+                    renderCart(); // 重新渲染購物車
+                    updateTotals(); // 更新總數量和金額
+                })
+                .catch(error => {
+                    console.error('更新購物車失敗:', error.response.data); // 輸出錯誤資訊
+                    alert('加入購物車失敗，請稍後再試'); // 提示會員
+                });
+        }
+
+        // 刪除商品
+        function removeItem(productId) {
+            cartItems = cartItems.filter(item => item.productID !== productId); // 移除指定商品
+            localStorage.setItem('cart', JSON.stringify(cartItems)); // 更新 localStorage
+            renderCart(); // 重新渲染購物車
+            updateTotals(); // 更新總數量和金額
+        }
+		
+		
+        // 結帳邏輯 在checkout 函數內寫結帳邏輯，並將總金額傳遞到付款頁面
+        //在付款頁面，你可以這樣抓取總金額：const totalAmount = localStorage.getItem('totalAmount'); // 從 localStorage 取得總金額
+        //document.getElementById('totalAmountDisplay').textContent = `$${totalAmount}`; // 顯示在付款頁面
+
+        function checkout() {
+            const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0); // 計算總金額
+            localStorage.setItem('totalAmount', totalAmount); // 儲存總金額到 localStorage
+            window.location.href = '/付款頁面'; // 跳轉到付款頁面
+            alert('去付款~'); // 提示會員結帳
+        }
+
+        // 頁面加載時初始化購物車
+        window.onload = loadCart; // 當頁面加載完成時加載購物車
+    </script>
+</body>
+
+</html>
