@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 
 @Controller
-@RequestMapping("/member")
+@RequestMapping
 public class MemberPageController {
 	@Autowired
     private MemberService memberService;
