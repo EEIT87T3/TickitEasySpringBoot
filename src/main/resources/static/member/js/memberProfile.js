@@ -1,29 +1,17 @@
 // memberProfile.js
 
-// 獲取存儲的 Token
-function getToken() {
-    return localStorage.getItem('jwtToken');
-}
-
-// 檢查登入狀態
-function checkLogin() {
-    const token = getToken();
-    if (!token) {
-        console.log('未找到 token，重定向到登入頁面');
-        window.location.href = '/TickitEasy/login';
-        return false;
-    }
-    return true;
-}
-
 // 獲取會員資料
 async function getMemberProfile() {
     console.log('開始獲取會員資料');
-    if (!checkLogin()) return;
+    if (!Auth.isLoggedIn()) {
+        console.log('未登入，重定向到登入頁面');
+        Auth.logout();
+        return;
+    }
 
     try {
         const response = await axios.get('/TickitEasy/api/member/profile', {
-            headers: { 'Authorization': `Bearer ${getToken()}` }
+            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
         });
         console.log('API 回應:', response.data);
         updateProfileUI(response.data);
@@ -36,11 +24,11 @@ async function getMemberProfile() {
 // 更新會員資料
 async function updateProfile(formData) {
     console.log('開始更新會員資料:', formData);
-    if (!checkLogin()) return;
+    if (!Auth.isLoggedIn()) return;
 
     try {
         const response = await axios.put('/TickitEasy/api/member/profile', formData, {
-            headers: { 'Authorization': `Bearer ${getToken()}` }
+            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
         });
         console.log('更新資料回應:', response.data);
         Swal.fire('成功', '資料更新成功', 'success');
@@ -54,7 +42,7 @@ async function updateProfile(formData) {
 // 更新頭像
 async function updateProfilePic(file) {
     console.log('開始更新頭像');
-    if (!checkLogin()) return;
+    if (!Auth.isLoggedIn()) return;
 
     const formData = new FormData();
     formData.append('profilePic', file);
@@ -62,7 +50,7 @@ async function updateProfilePic(file) {
     try {
         const response = await axios.post('/TickitEasy/api/member/profilePic', formData, {
             headers: {
-                'Authorization': `Bearer ${getToken()}`,
+                'Authorization': `Bearer ${Auth.getToken()}`,
                 'Content-Type': 'multipart/form-data'
             }
         });
@@ -78,7 +66,7 @@ async function updateProfilePic(file) {
 // 變更密碼
 async function changePassword(currentPassword, newPassword, confirmPassword) {
     console.log('開始變更密碼');
-    if (!checkLogin()) return;
+    if (!Auth.isLoggedIn()) return;
 
     try {
         const response = await axios.post('/TickitEasy/api/member/change-password', {
@@ -86,7 +74,7 @@ async function changePassword(currentPassword, newPassword, confirmPassword) {
             newPassword,
             confirmPassword
         }, {
-            headers: { 'Authorization': `Bearer ${getToken()}` }
+            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
         });
         console.log('變更密碼回應:', response.data);
         Swal.fire('成功', '密碼已成功變更', 'success');
@@ -103,8 +91,7 @@ function handleApiError(error, defaultMessage = '操作失敗') {
     if (error.response) {
         if (error.response.status === 401) {
             console.log('Token 無效，清除並重定向到登入頁面');
-            localStorage.removeItem('jwtToken');
-            window.location.href = '/TickitEasy/login';
+            Auth.logout();
             return;
         }
         errorMessage = error.response.data.error || error.response.data.message || defaultMessage;
@@ -112,21 +99,32 @@ function handleApiError(error, defaultMessage = '操作失敗') {
     Swal.fire('錯誤', errorMessage, 'error');
 }
 
-// 更新 UI 上的會員資料
 function updateProfileUI(memberData) {
     console.log('開始更新 UI，會員數據:', memberData);
     
     // 更新側邊欄的會員名字
-	const memberNameElement = document.getElementById('memberName1');
-	if (memberNameElement) {
-	    console.log('成功抓取到 memberName 元素，正在更新內容');
-	    const displayName = memberData.nickname || memberData.name || '會員';
-	    memberNameElement.textContent = displayName;
-	} else {
-	    console.error('未能找到 memberName1 元素');
-	}
-
+    const memberNameElement = document.getElementById('memberName1');
+    if (memberNameElement) {
+        console.log('成功抓取到 memberName1 元素，正在更新內容');
+        const displayName = memberData.nickname || memberData.name || '會員';
+        memberNameElement.textContent = displayName;
+    } else {
+        console.error('未能找到 memberName1 元素');
+    }
     
+    // 更新導航欄的會員名字和頭像
+    const navMemberName = document.getElementById('memberName');
+    const navMemberAvatar = document.getElementById('memberAvatar');
+    
+    if (navMemberName && navMemberAvatar) {
+        navMemberName.textContent = memberData.nickname || memberData.name || '會員';
+        navMemberAvatar.src = memberData.profilePic
+            ? `/TickitEasy/api/member/profilePic/${memberData.memberID}`
+            : '/TickitEasy/images/member/default-avatar.png';
+    } else {
+        console.error('導航欄中的會員頭像或名稱元素未找到');
+    }
+
     // 更新其他表單字段
     const elements = {
         email: document.getElementById('email'),
@@ -160,6 +158,11 @@ function updateProfileUI(memberData) {
 // 當頁面加載完成時執行
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM 加載完成，開始初始化');
+    
+    if (!Auth.isLoggedIn()) {
+        Auth.logout();
+        return;
+    }
     
     // 獲取並顯示會員資料
     getMemberProfile();

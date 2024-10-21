@@ -3,7 +3,7 @@
 
 <body>
 <!-- 導覽列 -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-heavy py-3">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-heavy py-3 fixed-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="/TickitEasy">
         <!-- 調整 Logo 的大小 -->
@@ -39,14 +39,14 @@
         </div>
         <!-- 登入前顯示會員圖標 -->
         <div class="d-flex align-items-center ms-4" id="logged-out-header">
-          <a href="/TickitEasy/member/login" class="icon-button text-main-bright-orange">
+          <a href="/TickitEasy/login" class="icon-button text-main-bright-orange">
             <i class="fas fa-user-circle"></i> 
           </a>
         </div>
         <!-- 登入後的顯示 (預設隱藏) -->
         <div class="d-flex align-items-center ms-4 d-none" id="logged-in-header">
           <!-- 會員頭像 -->
-          <a href="/TickitEasy/member/memberProfile" class="d-flex align-items-center text-decoration-none">
+          <a href="/TickitEasy/profile" class="d-flex align-items-center text-decoration-none">
             <img
               src="https://via.placeholder.com/40"
               alt="會員頭像"

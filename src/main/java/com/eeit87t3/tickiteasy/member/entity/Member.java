@@ -43,6 +43,15 @@ public class Member {
     @Column(name = "verificationToken")
     private String verificationToken;
     
+    @Column(name = "googleId")
+    private String googleId;
+
+    
+
+	@Column(name = "facebookId")
+    private String facebookId;
+
+    
     // 無參構造函數
     public Member() {
     }
@@ -61,6 +70,22 @@ public class Member {
     }
 
     // Getter 和 Setter 方法
+    public String getGoogleId() {
+    	return googleId;
+    }
+    
+    public void setGoogleId(String googleId) {
+    	this.googleId = googleId;
+    }
+    
+    public String getFacebookId() {
+    	return facebookId;
+    }
+    
+    public void setFacebookId(String facebookId) {
+    	this.facebookId = facebookId;
+    }
+    
     public Integer getMemberID() {
         return memberID;
     }
