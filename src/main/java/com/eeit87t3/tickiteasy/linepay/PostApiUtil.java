@@ -18,10 +18,10 @@ public final class PostApiUtil {
         headers.add("X-LINE-ChannelId", channelId);
         headers.add("X-LINE-Authorization-Nonce", nonce);
         headers.add("X-LINE-Authorization", signature);
-        System.out.println("channelID:"+channelId);
-        System.out.println("nonce:"+nonce);
-        System.out.println("signature:"+signature);
-        System.out.println("mapperData"+mapperData);
+//        System.out.println("channelID:"+channelId);
+//        System.out.println("nonce:"+nonce);
+//        System.out.println("signature:"+signature);
+//        System.out.println("mapperData"+mapperData);
         HttpEntity<String> request = new HttpEntity<String>(mapperData, headers);
         String responsebody = restTemplate.postForObject(httpsUrl, request,String.class);
         ObjectMapper mapper = new ObjectMapper();
