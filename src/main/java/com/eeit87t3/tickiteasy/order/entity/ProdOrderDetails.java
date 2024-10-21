@@ -35,6 +35,7 @@ public class ProdOrderDetails {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prodOrderID")
     private ProdOrders prodOrder;
+    
 
     // 構造函數
     public ProdOrderDetails() {

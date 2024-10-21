@@ -24,4 +24,12 @@ public interface ProdOrdersRepository extends JpaRepository<ProdOrders, Integer>
 	
 	@Query(value = "SELECT * FROM ProdOrders WHERE memberId LIKE CONCAT('%', :number, '%')", nativeQuery = true)
 	public Page<ProdOrders> findByMemberId(@Param("number") Integer number, Pageable pageable);
+	
+	//查詢訂單狀態 已付款
+	@Query(value = "SELECT * FROM ProdOrders WHERE status = '已付款'", nativeQuery = true)
+	public List<ProdOrders> findByStatusPaid();
+	
+	//查詢訂單狀態 已付款
+	@Query(value = "SELECT * FROM ProdOrders WHERE status = '未付款'", nativeQuery = true)
+	public List<ProdOrders> findByStatusNotPaid();
 }

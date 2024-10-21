@@ -39,13 +39,13 @@
                     <label class="col-sm-2 col-form-label text-right">會員編號</label>
                     <div class="col-sm-10">
                         <input type="number" id="memberID" class="form-control col-md-6"
-                            name="memberID" th:value="${prodOrders.memberID}">
+                            name="memberID" th:value="${prodOrders.member.memberID}">
                     </div>
                 </div></br>
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label text-right">訂單日期</label>
                     <div class="col-sm-10">
-                        <input type="date" id="orderDate" class="form-control col-md-6"
+                        <input type="datetime-local" id="orderDate" class="form-control col-md-6"
                             name="orderDate" th:value="${prodOrders.orderDate}">
                     </div>
                 </div></br>

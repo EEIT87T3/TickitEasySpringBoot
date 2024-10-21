@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KKTIX Ticket Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .user-info {
+            font-size: 14px;
+        }
+        .alert {
+            background-color: #d9534f;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .steps {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .step {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background-color: #ddd;
+            margin-right: 5px;
+        }
+        .step.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .contact-info {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .user-icon-section {
+            background-color: #00a0e9;
+            color: white;
+            width: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .user-icon i {
+            font-size: 24px;
+            color: #00a0e9;
+        }
+        .form-fields {
+            flex-grow: 1;
+            padding-left: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .checkbox-group {
+            margin-top: 20px;
+        }
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">KKTIX</div>
+        <div class="user-info">tony475767 ▼</div>
+    </header>
+
+
+
+    <div class="container">
+        <h1>PISCO-14-THUNDER IS COMING PART III（台北場）</h1>
+        
+        <div class="steps">
+            <div class="step active">填寫資料</div>
+        </div>
+
+        <table>
+            <tr>
+                <th>票種</th>
+                <th>金額</th>
+            </tr>
+            <tr>
+                <td>單人預售票</td>
+                <td>TWD$800 x 1</td>
+            </tr>
+            <tr>
+                <td>總金額</td>
+                <td>TWD$800</td>
+            </tr>
+        </table>
+
+        <form>
+            <div class="contact-info">
+                <div class="user-icon-section">
+                    <div class="user-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="form-fields">
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" name="name" value="陳子鈞">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="dodosh8689@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">手機</label>
+                        <input type="text" id="phone" name="phone" value="886938520702">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">地址</label>
+                        <input type="text" id="address" name="address" value="台灣">
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="agree" name="agree" checked>
+                <label for="agree">在公開頁面顯示您參加了本活動</label>
+            </div>
+
+            <button type="submit" class="submit-btn">確認表單資料</button>
+        </form>
+    </div>
+</body>
+</html>

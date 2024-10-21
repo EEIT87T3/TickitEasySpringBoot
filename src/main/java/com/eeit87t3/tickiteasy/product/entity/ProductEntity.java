@@ -177,4 +177,7 @@ public class ProductEntity {
 		this.createdDate = createdDate;
 	}
 
+	
+	
+
 }
