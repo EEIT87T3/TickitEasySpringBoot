@@ -1,70 +1,172 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人資料 - TickitEasy</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta th:replace="~{commons/userHead}">
+    <title>會員資料管理</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --main-blue-purple: #5F46E8;
+            --main-bright-orange: #FFB44D;
+            --light-orange: #F5BE74;
+            --dark-purple: #322770;
+            --light-gray: #f8f9fa;
+            --text-gray: #6c757d;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .container1 {
+            max-width: 960px;
+        }
+        .sidebar {
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .sidebar .nav-link {
+            color: var(--text-gray);
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link:focus {
+            background-color: var(--light-orange);
+            color: var(--dark-purple);
+        }
+        .sidebar .nav-link.active {
+            background-color: var(--main-blue-purple);
+            color: white;
+        }
+        .content1 {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: var(--dark-purple);
+        }
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 4px solid var(--light-orange);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #memberName1 {
+    color: #000; /* 設定文字顏色 */
+    visibility: visible;
+    opacity: 1;
+}
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header text-center">
-                        <h3>個人資料</h3>
-                    </div>
-                    <div class="card-body">
-                        <!-- 基本資料更新表單 -->
-                        <form method="post" th:action="@{/member/profile}">
-                            <div class="form-group">
-                                <label for="email">電子郵件</label>
-                                <input type="email" class="form-control" id="email" name="email" th:value="${member.email}" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">姓名</label>
-                                <input type="text" class="form-control" id="name" name="name" th:value="${member.name}">
-                            </div>
-                            <div class="form-group">
-                                <label for="nickname">暱稱</label>
-                                <input type="text" class="form-control" id="nickname" name="nickname" th:value="${member.nickname}">
-                            </div>
-                            <div class="form-group">
-                                <label for="birthDate">生日</label>
-                                <input type="date" class="form-control" id="birthDate" name="birthDate" th:value="${member.birthDate}">
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">電話</label>
-                                <input type="text" class="form-control" id="phone" name="phone" th:value="${member.phone}">
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-block">更新資料</button>
-                        </form>
+    <div th:replace="~{commons/userHeader}"></div>
 
-                        <!-- 頭像上傳表單 -->
-                        <form method="post" th:action="@{/member/profilePic}" enctype="multipart/form-data" class="mt-3">
-                            <div class="form-group text-center">
-                                <label for="profilePic">頭像</label>
-                                <br>
-                                <img th:src="@{${member.profilePicPath}(timestamp=${#dates.format(new java.util.Date(), 'yyyyMMddHHmmss')})}" alt="頭像" class="img-thumbnail" width="150">
-                                <input type="file" class="form-control mt-2" id="profilePic" name="profilePic">
-                            </div>
-                            <button type="submit" class="btn btn-secondary btn-block">更新頭像</button>
-                        </form>
+    <div class="container1 my-5 mx-auto">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <div class="text-center">
+                    <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-pic" id="profilePicDisplay">
+                    <h3 class="text-center">嗨！<span id="memberName1"></span></h3>
+                </div>
+                <ul class="nav nav-pills flex-column mt-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" aria-current="page">
+                            <i class="fas fa-user me-2"></i> 個人資料
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-file-invoice me-2"></i> 訂單記錄
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-donate me-2"></i> 募資紀錄
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-pen me-2"></i> 發表過的貼文
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-heart me-2"></i> 收藏匣
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="fas fa-headset me-2"></i> 線上客服
+                </a>
+              </li>
+               
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <div class="content1">
+                    <h2>修改資料</h2>
+                    <form id="editProfileForm">
+                        <div class="mb-3">
+                            <label for="profilePic" class="form-label">頭貼</label>
+                            <input type="file" class="form-control" id="profilePic">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">姓名</label>
+                            <input type="text" class="form-control" id="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label">暱稱</label>
+                            <input type="text" class="form-control" id="nickname">
+                        </div>
+                        <div class="mb-3">
+                            <label for="birthDate" class="form-label">生日</label>
+                            <input type="date" class="form-control" id="birthDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">手機號碼</label>
+                            <input type="text" class="form-control" id="phone">
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-3">儲存</button>
+                    </form>
 
-                        <p class="mt-3 text-center"><a th:href="@{/member/logout}">登出</a></p>
-                    </div>
+                    <h2>變更密碼</h2>
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">目前密碼</label>
+                            <input type="password" class="form-control" id="currentPassword" name="currentPassword">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">新密碼</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">確認新密碼</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                        </div>
+                        <button type="submit" class="btn btn-primary">確認變更</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    <script>
-    document.querySelector('form[th\\:action="@{/member/profilePic}"]').onsubmit = function() {
-        setTimeout(function() {
-            var img = document.querySelector('img[alt="頭像"]');
-            img.src = img.src + "?timestamp=" + new Date().getTime(); // 更新圖片 URL 加上時間戳
-        }, 500); // 等待 500ms 確保圖片上傳完成後刷新
-    };
-</script>
-    
+
+    <div th:replace="~{commons/userFooter}"></div>
+	<script th:src="@{/Token/auth.js}"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/member/js/memberProfile.js}"></script>
 </body>
 </html>
