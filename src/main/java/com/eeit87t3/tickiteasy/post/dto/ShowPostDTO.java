@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.post.dto;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class ShowPostDTO {
 	//getallpost用
@@ -12,7 +13,9 @@ public class ShowPostDTO {
     private Integer categoryId; // 類別Id
     private String tagName; // 標籤名稱
     private Integer tagId; // 標籤ID
-    private String postImgUrl; // 文章圖片URL
+    private List<String> imagePaths; // 僅包含圖片路徑的列表
+
+//    private String postImgUrl; // 文章圖片URL
     private Integer status; // 文章狀態
     private Timestamp postTime; // 新增文章時間
     private Timestamp editTime; // 編輯文章時間
@@ -42,9 +45,9 @@ public class ShowPostDTO {
 	public Integer getTagId() {
 		return tagId;
 	}
-	public String getPostImgUrl() {
-		return postImgUrl;
-	}
+//	public String getPostImgUrl() {
+//		return postImgUrl;
+//	}
 	public Integer getStatus() {
 		return status;
 	}
@@ -84,9 +87,9 @@ public class ShowPostDTO {
 	public void setTagId(Integer tagId) {
 		this.tagId = tagId;
 	}
-	public void setPostImgUrl(String postImgUrl) {
-		this.postImgUrl = postImgUrl;
-	}
+//	public void setPostImgUrl(String postImgUrl) {
+//		this.postImgUrl = postImgUrl;
+//	}
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
@@ -101,6 +104,12 @@ public class ShowPostDTO {
 	}
 	public void setViewCount(Integer viewCount) {
 		this.viewCount = viewCount;
+	}
+	public List<String> getImagePaths() {
+		return imagePaths;
+	}
+	public void setImagePaths(List<String> imagePaths) {
+		this.imagePaths = imagePaths;
 	}
     
 

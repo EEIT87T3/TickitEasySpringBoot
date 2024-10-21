@@ -1,5 +1,7 @@
 package com.eeit87t3.tickiteasy.post.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +22,7 @@ public class PostImagesEntity {
 	private String imagePath;
 
 	@ManyToOne
+	@JsonIgnore
 	@JoinColumn(name = "postID", nullable = false) // 設置外鍵
 	private PostEntity post; // 對應的 PostEntity
 	

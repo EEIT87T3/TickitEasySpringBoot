@@ -49,7 +49,7 @@ public class PostService {
             dto.setPostContent(post.getPostContent());
             dto.setCategoryName(post.getPostCategory() != null ? post.getPostCategory().getCategoryName() : "N/A");
             dto.setTagName(post.getPostTag() != null ? post.getPostTag().getTagName() : "N/A");
-            dto.setPostImgUrl(post.getPostImgUrl() != null ? post.getPostImgUrl() : "N/A");
+//            dto.setPostImgUrl(post.getPostImgUrl() != null ? post.getPostImgUrl() : "N/A");
             dto.setLikesCount(post.getLikesCount() );
             dto.setViewCount(post.getViewCount() );
             dto.setStatus(post.getStatus());
@@ -75,7 +75,7 @@ public class PostService {
         dto.setCategoryId(post.getPostCategory().getCategoryId());
         dto.setTagName(post.getPostTag() != null ? post.getPostTag().getTagName() : null);
         dto.setTagId(post.getPostTag() != null ? post.getPostTag().getTagId() : null);
-        dto.setPostImgUrl(post.getPostImgUrl());
+//        dto.setPostImgUrl(post.getPostImgUrl());
         dto.setStatus(post.getStatus());
         dto.setPostTime(post.getPostTime()); // 或者轉換為你需要的格式
         dto.setEditTime(post.getEditTime()); // 或者轉換為你需要的格式

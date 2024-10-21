@@ -49,8 +49,8 @@ public class PostEntity {
 	@Column(name = "postContent")
 	private String postContent;
 	
-	@Column(name = "postImgUrl")
-	private String postImgUrl;
+//	@Column(name = "postImgUrl")
+//	private String postImgUrl;
 	
 	@CreationTimestamp
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
@@ -108,14 +108,18 @@ public class PostEntity {
 //    private static final String DEFAULT_PROFILE_PIC = "/images/default-avatar.png"; // 預設頭貼路徑
 //	
 	public PostEntity() {
-		super();
+	
+	}
+
+	public PostEntity(Integer postID) {
+		this.postID = postID;
 	}
 
 	public Integer getPostID() {return postID;}
 	public Integer getMemberID() {return memberID;}
 	public String getPostTitle() {return postTitle;}
 	public String getPostContent() {return postContent;}
-	public String getPostImgUrl() {return postImgUrl;}
+//	public String getPostImgUrl() {return postImgUrl;}
 	public Timestamp getPostTime() {return postTime;}
 	public Integer getLikesCount() {return likesCount;}
 	public Integer getViewCount() {return viewCount;}
@@ -150,7 +154,7 @@ public class PostEntity {
 	public void setMemberID(Integer memberID) {this.memberID = memberID;}
 	public void setPostTitle(String postTitle) {this.postTitle = postTitle;}
 	public void setPostContent(String postContent) {this.postContent = postContent;}
-	public void setPostImgUrl(String postImgUrl) {this.postImgUrl = postImgUrl;}
+//	public void setPostImgUrl(String postImgUrl) {this.postImgUrl = postImgUrl;}
 	public void setPostTime(Timestamp postTime) {this.postTime = postTime;}
 	public void setLikesCount(Integer likesCount) {this.likesCount = likesCount;}
 	public void setViewCount(Integer viewCount) {this.viewCount = viewCount;}
