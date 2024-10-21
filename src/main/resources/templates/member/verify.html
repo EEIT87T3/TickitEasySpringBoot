@@ -4,6 +4,7 @@
 <head>
     <meta th:replace="~{commons/userHead}">
     <title>帳號驗證 - TickitEasy</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
 
     <style>
 
@@ -80,14 +81,14 @@
             <div class="alert alert-success" role="alert">
                 <p th:text="${message}"></p>
                 <p>您現在可以點擊下方按鈕登入。</p>
-                <a th:href="@{/member/login}" class="btn-login">登入</a>
+                <a th:href="@{/login}" class="btn-login">登入</a>
             </div>
         </div>
         <div th:if="${status == 'error'}">
             <div class="alert alert-danger" role="alert">
                 <p th:text="${message}"></p>
                 <p>請確認您的驗證連結是否正確，或聯繫客服獲取幫助。</p>
-                <a th:href="@{/member/login}" class="btn-login">返回登入頁面</a>
+                <a th:href="@{/login}" class="btn-login">返回登入頁面</a>
             </div>
         </div>
     </div>

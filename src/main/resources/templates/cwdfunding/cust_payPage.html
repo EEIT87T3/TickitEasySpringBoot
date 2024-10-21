@@ -45,6 +45,11 @@
         background-color: #000; /*設定背景色來顯示顏色*/
         border: none; /* 移除默認邊框 */
       }
+      .img-plan {
+        max-width: 80%;
+        height: auto;
+        border-radius: 5px;
+      }
     </style>
     <meta th:replace="~{commons/userHead}" />
     <title>付款頁面</title>
@@ -67,17 +72,19 @@
         </div>
         <div class="col-md-7 ms-4 ps-4 mt-2">
           <div
+            id="fundProject"
             class="fw-semibold custom-medium-text custom-letter-spacing mb-3"
             th:text="${fundPlan.fundProj.title}"
+            th:data-project-id="${fundPlan.fundProj.projectID}"
           ></div>
           <div class="d-flex align-items-end">
             <p
               class="py-0 pe-2 mb-0 custom-NT fw-bolder"
-              th:text="'NT$ '+${fundPlan.fundProj.currentAmount}"
+              th:text="'NT$ ' + ${#numbers.formatInteger(fundPlan.fundProj.currentAmount, 1, 'COMMA')}"
             ></p>
             <small
               class="py-0 mb-1 custom-small-text"
-              th:text="'/ 目標 NT$ '+${fundPlan.fundProj.targetAmount}"
+              th:text="'/ 目標 NT$ ' + ${#numbers.formatInteger(fundPlan.fundProj.targetAmount, 1, 'COMMA')}"
             ></small>
           </div>
         </div>
@@ -101,7 +108,7 @@
               ></p>
               <h5
                 class="card-title fw-bolder pb-1"
-                th:text="'NT$ '+${fundPlan.planUnitPrice}"
+                th:text="'NT$ ' + ${#numbers.formatInteger(fundPlan.planUnitPrice, 1, 'COMMA')}"
               ></h5>
               <p
                 class="card-text custom-letter-spacing custom-small-text2 pb-2"
@@ -121,7 +128,7 @@
               <div
                 id="unitPrice"
                 class="col-8 text-end"
-                th:text="'NT$ '+${fundPlan.planUnitPrice}+'元'"
+                th:text="'NT$ ' + ${#numbers.formatInteger(fundPlan.planUnitPrice, 1, 'COMMA')}"
                 th:data-value="${fundPlan.planUnitPrice}"
               ></div>
             </div>
@@ -143,13 +150,13 @@
             </div>
           </div>
         </div>
-        <div class="col-md-7 ms-4 ps-4">
+        <div class="col-md-7 ms-4 ps-4 pt-3">
           <div class="box-2">
             <div class="box-inner-2">
               <div>
-                <p class="fw-bold">付款資訊</p>
+                <p class="fw-bold fs-5">付款資訊</p>
               </div>
-              <form action="">
+              <form action="" class="pt-4">
                 <div class="mb-3">
                   <p class="dis fw-bold mb-2">Email address</p>
                   <input

@@ -132,6 +132,21 @@ public class MemberService {
         }
     }
 
+    //密碼變更
+    @Transactional
+    public void changePassword(String email, String currentPassword, String newPassword) {
+        Member member = findByEmail(email);
+        if (member == null) {
+            throw new IllegalArgumentException("會員不存在");
+        }
+        
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            throw new IllegalArgumentException("當前密碼不正確");
+        }
+        
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
+    }
     
     
     /**************後台*********************/

@@ -68,6 +68,14 @@ public class TestController {
 	}
 	
 	/**
+	 * 會員中心模板測試。
+	 */
+	@GetMapping("test/member-template")
+	public String testMemberTemplate() {
+		return "test/memberTemplate";
+	}
+	
+	/**
 	 * Image Controller: 圖片上傳測試。
 	 */
 	@PostMapping("/test/image")
