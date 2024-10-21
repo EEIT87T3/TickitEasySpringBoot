@@ -156,7 +156,20 @@
         function checkout() {
             const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0); // 計算總金額
             localStorage.setItem('totalAmount', totalAmount); // 儲存總金額到 localStorage
-            window.location.href = '/付款頁面'; // 跳轉到付款頁面
+
+            // 將商品 ID、數量和名稱儲存到 localStorage
+            const itemsToCheckout = cartItems.map(item => ({
+                productID: item.productID,
+                productName: item.productName, // 加入商品名稱
+                productQuantity: item.quantity,
+                productAmount: item.price * item.quantity
+            }));
+
+            console.log('總金額:', totalAmount); // 印出總金額
+            console.log('結帳商品:', itemsToCheckout); // 印出結帳商品資訊
+
+            localStorage.setItem('checkoutItems', JSON.stringify(itemsToCheckout)); // 儲存商品資訊
+            window.location.href = '../order/ClientSideProdOrderCheckOutCart'; // 跳轉到付款頁面
             alert('去付款~'); // 提示會員結帳
         }
 

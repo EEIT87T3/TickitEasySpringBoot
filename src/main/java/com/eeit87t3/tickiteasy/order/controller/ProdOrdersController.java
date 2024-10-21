@@ -183,10 +183,12 @@ public class ProdOrdersController {
 		@CrossOrigin(origins = "http://127.0.0.1:5500")
 		@PostMapping("ECPay")
 		@ResponseBody
-		public String ECPay(@RequestBody CartItem cartItem) {
-			String form = prodOrdersService.ECPay(cartItem);
-			
-			return form;
+		public String ECPay(@RequestBody Map<String, Object> requestData) {
+			List lists = (List)requestData.get("checkoutItems");
+//			String form = prodOrdersService.ECPay(cartItem);
+			Double totalAmount =(Double) requestData.get("totalAmount");
+			System.out.println(totalAmount);
+			return null;
 		}
 		
 		//綠界回傳
@@ -257,6 +259,9 @@ public class ProdOrdersController {
 			return null;
 		}
 		
-		
-
+		//前台結帳頁面
+		@GetMapping("ClientSideProdOrderCheckOutCart")
+		public String ClientSideProdOrderCheckOutCart() {
+			return "/order/ClientSideProdOrderCheckOutCart";
+		}
 }
