@@ -28,7 +28,8 @@
 }
 
 .progress-bar {
-  background: #000;
+  /* background: #000; */
+  background-color: #5f46e8 !important;
 }
 
 .purple-text {

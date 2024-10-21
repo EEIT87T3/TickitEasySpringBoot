@@ -127,7 +127,8 @@
         // 計算(結束日期-開始日期)的天數，並填入id="daysLeft"中
         let daysLeft = document.querySelector("#daysLeft");
         let timeSpan = document.querySelector("#time-span");
-        console.log(daysLeft);
+
+        const currentDate = new Date();
         const startDate = new Date(
           daysLeft.getAttribute("data-startdate").replace(" ", "T")
         );
@@ -135,10 +136,13 @@
           daysLeft.getAttribute("data-enddate").replace(" ", "T")
         );
 
-        const timeDiff = endDate - startDate;
+        const timeDiff = endDate - currentDate;
         const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-        daysLeft.textContent = daysDiff + " 天";
-
+        if (daysDiff > 0) {
+          daysLeft.textContent = daysDiff + " 天";
+        } else {
+          daysLeft.textContent = "募資結束";
+        }
         // 格式化日期：2024-10-16 14:30
         let formattedStartDate = dateFormatter(
           daysLeft.getAttribute("data-startdate").replace(" ", "T")
@@ -195,13 +199,13 @@
               <div
                 id="targetAmount"
                 class="extra-small"
-                th:text="'目標 NT$ ' + ${fundProjDTO.targetAmount}"
+                th:text="'目標 NT$ ' + ${#numbers.formatInteger(fundProjDTO.targetAmount, 1, 'COMMA')}"
                 th:data-targetamount="${fundProjDTO.targetAmount}"
               ></div>
               <div
                 id="currentAmount"
                 class="fs-4 fw-bolder"
-                th:text="'NT$ ' + ${fundProjDTO.currentAmount}"
+                th:text="'NT$ ' + ${#numbers.formatInteger(fundProjDTO.currentAmount, 1, 'COMMA')}"
                 th:data-currentamount="${fundProjDTO.currentAmount}"
               ></div>
               <div>
@@ -272,7 +276,7 @@
                     ></p>
                     <h5
                       class="card-title fw-bolder pb-1"
-                      th:text="'NT$ '+${aFundPlan.planUnitPrice}"
+                      th:text="'NT$ ' + ${#numbers.formatInteger(aFundPlan.planUnitPrice, 1, 'COMMA')}"
                     ></h5>
                     <p
                       class="card-text custom-letter-spacing custom-small-text2 pb-2"
