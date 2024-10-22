@@ -51,6 +51,20 @@ $(document).ready(function () {
     requestLinePay();
   });
 
+  //一鍵填入btn
+
+  document
+    .getElementById("autofillBtn")
+    .addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("email").value = "demo@example.com";
+      document.getElementById("phone").value = "0912345678";
+      document.getElementById("city").value = "3";
+      document.getElementById("district").value = "3";
+      document.getElementById("district").value = "3";
+      document.getElementById("addressDetail").value = "新生路二段 421 號";
+    });
+
   function requestLinePay() {
     axios
       .post("http://localhost:8080/TickitEasy/api/linepay/request", {

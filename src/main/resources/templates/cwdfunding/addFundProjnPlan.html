@@ -71,8 +71,8 @@
                       <select
                         class="form-select form-select-sm w-25 text-end"
                         aria-label="Default select example"
-                        name="categoryID"
-                        id="categoryID"
+                        name="categoryId"
+                        id="categoryId"
                       >
                         <option selected></option>
                         <th:block th:each=" aCategory : ${categories}">
@@ -93,8 +93,8 @@
                       <select
                         class="form-select form-select-sm w-25 text-end"
                         aria-label="Default select example"
-                        name="tagID"
-                        id="tagID"
+                        name="tagId"
+                        id="tagId"
                       >
                         <option selected></option>
                         <th:block th:each=" aTag : ${tags}">
@@ -198,9 +198,9 @@
                     </td>
                     <td class="col-8">
                       <input
-                        id="image"
+                        id="imageFile"
                         type="file"
-                        name="image"
+                        name="imageFile"
                         class="form-control w-50"
                       />
                       <input id="hiddenImage" type="hidden" value="demo.jpg" />

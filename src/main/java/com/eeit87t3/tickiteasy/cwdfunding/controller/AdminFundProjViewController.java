@@ -63,9 +63,9 @@ public class AdminFundProjViewController {
 	public String addProjPage(Model model) {
 		List<CategoryEntity> categories = categoryService.findFundProjCategoryList();
 		List<TagEntity> tags = tagService.findFundProjTagList();
-		String topProject = projService.findTopProject();
+		//String topProject = projService.findTopProject();
 
-		model.addAttribute("projectID", topProject);
+		//model.addAttribute("projectID", topProject);
 		model.addAttribute("categories", categories);
 		model.addAttribute("tags", tags);
 		return "cwdfunding/addFundProjnPlan";

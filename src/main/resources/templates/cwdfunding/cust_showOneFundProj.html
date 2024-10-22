@@ -231,11 +231,6 @@
               </div>
             </div>
           </div>
-          <!-- <small class="custom-letter-spacing extra-small mb-3">
-				挑戰 -
-				最小！最薄！最能收！雙面感應不可少！滿足最多「想要」的證件套～識別證、門禁卡、交通卡，感應最俐落
-				× 名片、證件、行事曆，口袋收納更方便：）
-			  </small> -->
           <hr class="hr-thick" />
           <small
             id="time-span"
@@ -254,8 +249,40 @@
     <div class="container">
       <div class="row custom-row px-5 pt-3 pb-5 mb-5">
         <!-- Content Section -->
-        <div class="col-md-8 ps-4 ms-2 mt-2">
-          <p th:text="${fundProjDTO.description}"></p>
+        <div class="col-md-8 ps-4 ms-2 mt-2 mx-3">
+          <p class="my-3 fs-5 fw-medium custom-letter-spacing">介紹</p>
+          <p
+            class="mt-3 mb-5 custom-small-text2 custom-letter-spacing"
+            th:text="${fundProjDTO.description}"
+          ></p>
+          <br /><br /><br />
+          <p class="my-3 fs-5 fw-medium custom-letter-spacing">風險與挑戰</p>
+          <p class="my-3 custom-small-text2 custom-letter-spacing">
+            在團隊努力下，本產品已經非常接近量產。在預購結束後，預計約 30
+            天內，廠商即可開始每週出貨。我們將依序分階段出貨到所有贊助者手中，後續進度將會持續更新於TickitEasy頁面與粉絲專頁上。
+            即使如此，預購計畫還是可能有各式意外事件（如：生產意外、清關延誤、物流延後等）導致出貨延後。當您贊助此計畫即同意承擔此風險，並也接受各種可能延遲出貨之變因，若無法接受可能（不一定會發生）延遲出貨，請在計劃期間點選「贊助紀錄」，找到「修改/查看紀錄」，在此處贊助細節頁面的「取消贊助並退款」按鈕來取消贊助或退款，嘖嘖會透過您贊助時的原付款方式退還您所支持的金額（不包含虛擬帳號轉帳交易手續費）。若在計劃時限之外申請取消贊助，請直接聯繫雙全客服。
+            依照消費者保護法的規定，您享有商品貨到次日起七天猶豫期的權益，針對產品因原物料瑕疵或是生產製造瑕疵，而導致無法正常使用，將提供更換的維修服務方式。
+          </p>
+          <br />
+          <br />
+          <p class="my-3 fs-5 fw-medium custom-letter-spacing">退換貨規則</p>
+          <p class="my-3 custom-small-text2 custom-letter-spacing">
+            根據消費者保護法之規定，您享有商品 7
+            天猶豫期的權益（由您收到貨的次日起起算,
+            含國定例假日）。商品如有瑕疵問題，經本公司檢驗判定非人為因素之損傷，無條件退換貨的售後服務。
+            待本公司確認貨品已取回，並檢視無誤後，會為您盡速辦理後續的退款或換貨。
+            退換貨接受標準 若非商品瑕疵，因個人衛生用品恕不接受退換貨。
+            無條件退換貨須符合下述條件其中一項：
+            <br />
+            <br />
+            1.實際收到的商品與所訂購商品不符合。 <br />
+            2.產品包裝內配件不齊全或商品規格與外包裝說明不符合。 <br />
+            3.商品有瑕疵或於運送過程中有損壞者。 <br />
+            4.商品退換貨必須整筆訂單一起辦理退貨，且商品為全新狀態且完整包裝（含商品本體、配件、贈品、保證書、原廠包裝及所有附隨文件或資料），恕無法部分退貨。
+            <br />
+            5.到貨商品超過七天(含假日)以上，恕不接受退換貨。 <br />
+            ＊商品退貨必須回復您收到時的原始狀態，包括原廠包裝、商品、配件、贈品及所有附隨文件等皆須完整無損，若已使用過或任何一樣物件缺少、破損，將不受理退貨。
+          </p>
         </div>
 
         <!-- Plan  -->
