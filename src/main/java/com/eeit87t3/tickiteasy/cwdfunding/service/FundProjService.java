@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -153,7 +154,21 @@ public class FundProjService {
 			dto.setTagId(fundProj.getFundTag().getTagId());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
-			//dto.setFundplanList.set(fundProj.getFundPlan());
+	        // 將 FundPlan 轉換為 FundPlanDTO 列表
+	        List<FundPlanDTO> planDTOList = fundProj.getFundPlan().stream().map(plan -> {
+	            FundPlanDTO planDTO = new FundPlanDTO();
+	            planDTO.setPlanID(plan.getPlanID());
+	            planDTO.setPlanTitle(plan.getPlanTitle());
+	            planDTO.setPlanContent(plan.getPlanContent());
+	            planDTO.setPlanUnitPrice(plan.getPlanUnitPrice());
+	            planDTO.setPlanTotalAmount(plan.getPlanTotalAmount());
+	            planDTO.setPlanBuyAmount(plan.getPlanBuyAmount());
+	            planDTO.setPlanImage(plan.getPlanImage());
+	            planDTO.setProjectID(fundProj.getProjectID()); // 關聯的 projectID
+	            return planDTO;
+	        }).collect(Collectors.toList());
+	        
+	        dto.setFundplanList(planDTOList);
 			return dto;
 		});
 		return dto;
