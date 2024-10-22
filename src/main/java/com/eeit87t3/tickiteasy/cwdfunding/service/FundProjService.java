@@ -92,36 +92,6 @@ public class FundProjService {
 			
 	}
 	
-	/* 新增募資活動方案 */
-	public FundPlan savePlan(FundPlanDTO fundPlanDTO) {
-		FundPlan newFundPlan = new FundPlan();
-		FundProj fundProj = new FundProj();
-		//先用projectID找出對應到的FundProj實體，之後再塞進plan
-		try {
-			System.out.println("傳進來的dto projectID:"+fundPlanDTO.getProjectID());
-			Optional<FundProj> optional = fundProjRepo.findById(fundPlanDTO.getProjectID());
-			 fundProj = optional.get();
-			 if (fundProj != null) {			 
-				 System.out.println("fundProj的ID"+fundProj.getProjectID());
-			 }
-			 else {
-				 System.out.println("沒有這個專案！");
-			 }
-		} catch (Exception e) {
-		}
-
-		
-        // 設定FundPlan屬性
-		newFundPlan.setFundProj(fundProj);
-		newFundPlan.setPlanTitle(fundPlanDTO.getPlanTitle());
-		newFundPlan.setPlanUnitPrice(fundPlanDTO.getPlanUnitPrice());
-		newFundPlan.setPlanTotalAmount(fundPlanDTO.getPlanTotalAmount());
-		newFundPlan.setPlanBuyAmount(fundPlanDTO.getPlanBuyAmount());
-		newFundPlan.setPlanImage(fundPlanDTO.getPlanImage());
-		newFundPlan.setPlanContent(fundPlanDTO.getPlanContent());
-		
-		return fundPlanRepo.save(newFundPlan);
-	}
 	
 
 	/* 查詢全部（id升冪、以category搜索）：分頁 */
@@ -199,7 +169,7 @@ public class FundProjService {
 	
 	/* 查詢project最新單筆的projectID */ 
 	public String findTopProject() {
-		return String.valueOf(fundProjRepo.findTopProjectById().getProjectID()+1);
+		return String.valueOf(fundProjRepo.findTopProjectById().getProjectID());
 	}
 	
 

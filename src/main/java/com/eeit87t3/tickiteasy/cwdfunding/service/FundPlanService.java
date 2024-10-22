@@ -30,12 +30,13 @@ public class FundPlanService {
 	public FundPlan savePlan(FundPlanDTO fundPlanDTO) {
 		FundPlan newFundPlan = new FundPlan();
 		FundProj fundProj = new FundProj();
+		fundProj = null;
 		//先用projectID找出對應到的FundProj實體，之後再塞進plan
 		try {
 			System.out.println("傳進來的dto projectID:"+fundPlanDTO.getProjectID());
 			Optional<FundProj> optional = fundProjRepo.findById(fundPlanDTO.getProjectID());
-			 fundProj = optional.get();
-			 if (fundProj != null) {			 
+			 if (optional.isPresent()) {			 
+				 fundProj = optional.get();
 				 System.out.println("fundProj的ID"+fundProj.getProjectID());
 			 }
 			 else {

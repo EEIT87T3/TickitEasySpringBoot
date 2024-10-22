@@ -118,6 +118,9 @@ public class AdminFundProjAPIController {
 				/*
 				 * 處理FundPlan
 				 */			
+					
+					/* 找出最新方案的ID */
+					int newestProjectID = Integer.parseInt(projService.findTopProject());
 	
 					String baseNamePlan = null;
 					String pathStringPlan = null;
@@ -138,7 +141,7 @@ public class AdminFundProjAPIController {
 							e.printStackTrace();
 						}
 						/* 2. 和資料庫互動  */
-						fundPlanDTO.setProjectID(fundProjDTO.getProjectID()); // 將projectID一同傳入fundPlan
+						fundPlanDTO.setProjectID(newestProjectID); // 將projectID一同傳入fundPlan
 						planService.savePlan(fundPlanDTO);
 					}
 					
