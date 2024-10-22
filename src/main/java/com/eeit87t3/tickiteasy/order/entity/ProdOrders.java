@@ -93,7 +93,7 @@ public class ProdOrders {
 	public Timestamp  getOrderDate() {
 		return orderDate;
 	}
-	public void setOrderDate(Timestamp  orderDate) {
+	public void setOrderDate(Timestamp orderDate) {
 		this.orderDate = orderDate;
 	}
 	public String getPayments() {
@@ -149,6 +149,12 @@ public class ProdOrders {
 	}
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+	public List<ProdOrderDetails> getProdOrderDetailsBean() {
+		return prodOrderDetailsBean;
+	}
+	public void setProdOrderDetailsBean(List<ProdOrderDetails> prodOrderDetailsBean) {
+		this.prodOrderDetailsBean = prodOrderDetailsBean;
 	}
 	@Override
 	public String toString() {

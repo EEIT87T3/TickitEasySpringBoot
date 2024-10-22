@@ -5,24 +5,36 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.admin.service.AdminService;
+import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.order.entity.CheckoutPaymentRequestForm;
+import com.eeit87t3.tickiteasy.order.entity.ProdOrderDetails;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 import com.eeit87t3.tickiteasy.order.entity.ProductForm;
 import com.eeit87t3.tickiteasy.order.entity.ProductPackageForm;
@@ -139,37 +151,77 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		return por.findByMemberId(number, pageable);
 	}
 	
-	
 	@Autowired
-	private ProductService productService;
-	
+	ProductService productService;
+	//串接綠界ECPay
 	@Override
-	public String ECPay(CartItem cartItem) { //串接綠界
-		ProductEntity productById = productService.findProductById(cartItem.getId());
-		String totalAmount = String.valueOf(productById.getPrice()*cartItem.getCount());
+	public String ECPay(List<Map<String,Object>> lists,String totalAmount) { 
+		//lists內放productID、productName、productQuantity、productAmount
+		StringBuilder itemNameBuilder  = new StringBuilder() ; //串接商品明細
+		for(Map<String,Object> list : lists) {
+			itemNameBuilder.append(list.get("productName")).append("#"); //綠界需要	
+		}
+		if(itemNameBuilder.length() > 0) {
+			itemNameBuilder.setLength(itemNameBuilder.length() - 1);
+		}
+		String itemname = itemNameBuilder.toString();
 		
 		AllInOne all = new AllInOne("");
 		AioCheckOutALL obj = new AioCheckOutALL();
 		obj.setMerchantTradeNo("Tickit" + System.currentTimeMillis()); //訂單編號均為唯一值，不可重複使用。 字數20
-		obj.setMerchantTradeDate("2024/10/15 16:05:23");  //格式為：yyyy/MM/dd HH:mm:ss
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		String formatTime = simpleDateFormat.format(new Date(System.currentTimeMillis()));
+		obj.setMerchantTradeDate(formatTime);  //格式為：yyyy/MM/dd HH:mm:ss
 		obj.setTotalAmount(totalAmount); //交易金額 String類型
 		obj.setTradeDesc("test Description"); //交易描述
-		obj.setItemName("TestItem"); //商品名稱
-		obj.setReturnURL("https://eff8-114-25-181-102.ngrok-free.app/TickitEasy/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
+		obj.setItemName(itemname); //商品名稱
+		obj.setReturnURL("https://9fe3-36-227-50-63.ngrok-free.app/TickitEasy/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
 		obj.setNeedExtraPaidInfo("N"); //額外的付款資訊
-		obj.setClientBackURL("<http://192.168.1.37:8080/>"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
-		InvoiceObj invoiceObj = new InvoiceObj();
+		obj.setClientBackURL("http://localhost:8080/TickitEasy/user/product"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
+				
+		String form = all.aioCheckOut(obj, null);
 		
-		String form = all.aioCheckOut(obj, invoiceObj);
 		
-		return form;
+		ProdOrders prodOrders = new ProdOrders();//prodOrders 資料庫新增
+		Member member = new Member();
+		member.setMemberID(5);
+		prodOrders.setMember(member);
+		String orderDate = obj.getMerchantTradeDate().replace("/","-");
+		prodOrders.setOrderDate(Timestamp.valueOf(orderDate));
+		prodOrders.setStatus("未付款");
+		prodOrders.setPaymenInfo(obj.getMerchantTradeNo());
+		prodOrders.setTotalAmount(Integer.parseInt(obj.getTotalAmount()));
+		ProdOrders prodOrderSave = por.save(prodOrders);
+		
+		List<ProdOrderDetails> listsProdOrderDetails = new ArrayList<>(); //prodOrderDetails 資料庫新增
+		for(Map<String,Object> list : lists) {
+			ProdOrderDetails prodOrderDetails = new ProdOrderDetails();
+			Integer productID = (Integer)list.get("productID"); //產品ID
+			ProductEntity productById = productService.findProductById(productID);
+			Integer prodproductQuantityuct = (Integer)list.get("productQuantity"); //產品數量
+			
+			prodOrderDetails.setProdOrder(prodOrderSave);
+			prodOrderDetails.setProductId(productID);
+			prodOrderDetails.setPrice(productById.getPrice());
+			prodOrderDetails.setQuantity(prodproductQuantityuct);
+			listsProdOrderDetails.add(prodOrderDetails);		
+		}
+		
+		prodOrderSave.setProdOrderDetailsBean(listsProdOrderDetails);
+		por.save(prodOrderSave);
+		
+        return form;
+	}
+	//透過訂單號碼查詢
+	public ProdOrders findBypaymentInfo(String paymentInfo) {
+		return por.findBypaymentInfo(paymentInfo);
 	}
 	
 	@Autowired
 	private JavaMailSender javaMailSender;
 	@Autowired
 	private AdminService adminService;
-	
+	//寄gmail信
 	public void emailSend(Integer memberId,String merchantTradeNo,String tradeDate,String tradeAmt,String paymentType) throws MessagingException { //寄信
 		Optional<Admin> adminById = adminService.getAdminById(memberId); //後續透過會員id找到會員信箱並寄出
 		

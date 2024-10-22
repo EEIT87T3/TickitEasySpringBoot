@@ -157,7 +157,7 @@
             <div class="step active">填寫資料</div>
         </div>
         
-        <form>
+        <form method="post">
             <input type="hidden" id="checkoutItemsField" name="checkoutItems">
             <input type="hidden" id="totalAmountField" name="totalAmount">
             <div class="contact-info">
@@ -184,7 +184,7 @@
                         <input type="text" id="address" name="address" required >
                     </div></br>
                     <div class="form-group">
-                        <select class="form-select" aria-label="Default select example">
+                        <select class="form-select" name="paymentMethod" aria-label="Default select example">
                             <option selected>選擇付款方式</option>  
                             <option value="creditcart">信用卡</option>
                             <option value="linepay">LinePay</option>
@@ -194,18 +194,17 @@
                 </div>
             </div>
 
-
-
+            <button type="submit" class="submit-btn">確認提交表單</button>
+            <button type="button" class="submit-btn" id="takeeasy">一鍵輸入</button>
         </form>
-        <button type="submit" class="submit-btn">確認提交表單</button>
-        <button type="submit" class="submit-btn" id="takeeasy">一鍵輸入</button>
+
     </div>
     <script>
         const totalAmount = localStorage.getItem("totalAmount"); //商品總金額
         const checkoutItems = JSON.parse(localStorage.getItem("checkoutItems")); //商品資訊
-
+        const checkoutItemsJson = JSON.stringify(checkoutItems)
         // 將資料填入隱藏的表單字段
-        document.getElementById('checkoutItemsField').value = checkoutItems;
+        document.getElementById('checkoutItemsField').value = checkoutItemsJson;
         document.getElementById('totalAmountField').value = totalAmount;
 
         //載入購物車資料
@@ -230,7 +229,8 @@
         }
 
         document.querySelector('.submit-btn').addEventListener('click',function(e){ //提交表單按鈕
-            
+            document.querySelector('form').action = window.location.href + "../../../order/ECPay"
+
         })        
 
         document.querySelector('#takeeasy').addEventListener('click',function(e){ //一件輸入按鈕

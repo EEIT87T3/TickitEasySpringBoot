@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.order.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,6 @@ public interface ProdOrdersService {
 	public Page<ProdOrders> findByProdOrdersId(Integer number, Integer id,Integer records);
 	public Page<ProdOrders> findByMemberId(Integer number, Integer id,Integer records);
 	
-	public String ECPay(CartItem cartItem);
+	public String ECPay(List<Map<String,Object>> lists,String totalAmount);
 	
 }

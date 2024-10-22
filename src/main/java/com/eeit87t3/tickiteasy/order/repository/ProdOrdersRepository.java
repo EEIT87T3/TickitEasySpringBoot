@@ -32,4 +32,8 @@ public interface ProdOrdersRepository extends JpaRepository<ProdOrders, Integer>
 	//查詢訂單狀態 已付款
 	@Query(value = "SELECT * FROM ProdOrders WHERE status = '未付款'", nativeQuery = true)
 	public List<ProdOrders> findByStatusNotPaid();
+	
+	//透過訂單號碼查詢
+	@Query(value = "SELECT * FROM ProdOrders WHERE paymentInfo = :paymentInfo", nativeQuery = true)
+	public ProdOrders findBypaymentInfo(String paymentInfo);
 }

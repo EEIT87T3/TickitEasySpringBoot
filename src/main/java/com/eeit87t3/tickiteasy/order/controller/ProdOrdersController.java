@@ -21,9 +21,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
@@ -40,6 +46,10 @@ import com.eeit87t3.tickiteasy.order.service.Impl.ProdOrdersServiceImpl;
 import com.eeit87t3.tickiteasy.product.entity.CartItem;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ecpay.payment.integration.AllInOne;
 import ecpay.payment.integration.domain.AioCheckOutALL;
@@ -180,15 +190,26 @@ public class ProdOrdersController {
 
 		
 		//串接綠界
-		@CrossOrigin(origins = "http://127.0.0.1:5500")
 		@PostMapping("ECPay")
 		@ResponseBody
-		public String ECPay(@RequestBody Map<String, Object> requestData) {
-			List lists = (List)requestData.get("checkoutItems");
-//			String form = prodOrdersService.ECPay(cartItem);
-			Double totalAmount =(Double) requestData.get("totalAmount");
-			System.out.println(totalAmount);
-			return null;
+		public String ECPay(
+				@RequestParam("checkoutItems") String checkoutItem,
+                @RequestParam("totalAmount") String totalAmount,
+                @RequestParam("name") String name,
+                @RequestParam("email") String email,
+                @RequestParam("phone") String phone,
+                @RequestParam("address") String address,
+                @RequestParam("paymentMethod") String paymentMethod,
+                Model model) throws JsonMappingException, JsonProcessingException {
+			ObjectMapper objectMapper = new ObjectMapper();
+		 	List<Map<String,Object>> checkoutItems  = objectMapper.readValue(checkoutItem, List.class);
+		 	String form = prodOrdersService.ECPay(checkoutItems, totalAmount);
+
+		 	String html = "<html><body>" + form + 
+	                  "<script type='text/javascript'>document.forms[0].submit();</script>" +
+	                  "</body></html>";
+
+			return html;
 		}
 		
 		//綠界回傳
@@ -204,13 +225,9 @@ public class ProdOrdersController {
 	        String paymentType = paymentResult.get("PaymentType");//（付款方式）
 	        String tradeDate = paymentResult.get("TradeDate"); //（訂單成立時間）
 
-	        if(Integer.valueOf(rtnCode) == 1) {
-	        	 
+	        if("1".equals(rtnCode)) {//如果綠界回傳1 代表交易成功
 	        	prodOrdersService.emailSend(5,merchantTradeNo,tradeDate,tradeAmt,paymentType); //memberId先填死測試
-	        	ProdOrders prodOrders = new ProdOrders();
-	        	Member member = new Member();
-				member.setMemberID(5);
-	        	prodOrders.setMember(member); //memberId先填死測試
+	        	ProdOrders prodOrders = prodOrdersService.findBypaymentInfo(merchantTradeNo);
 	        	tradeDate = tradeDate.replace("/", "-");
 	        	prodOrders.setOrderDate(Timestamp.valueOf(tradeDate));
 	        	prodOrders.setPayments(paymentType);
