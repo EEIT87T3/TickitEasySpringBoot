@@ -5,6 +5,9 @@ $(document).ready(function () {
   const planID = document
     .getElementById("planTitle")
     .getAttribute("data-plan-id");
+  const projectID = document
+    .getElementById("fundProject")
+    .getAttribute("data-project-id");
 
   //監聽加碼欄位，同時變動加碼金額&總金額
   const bonusInput = document.getElementById("bonusInput");
@@ -30,7 +33,7 @@ $(document).ready(function () {
     }
     bonusValue = parseInt(bonusValue); // 確保是數字類型
     bonusResult.value = bonusValue;
-    bonusResult.textContent = `+ NT$ ${bonusValue}元`;
+    bonusResult.textContent = `+ NT$ ${bonusValue.toLocaleString()}元`;
 
     updateTotalAmount();
   });
@@ -39,7 +42,7 @@ $(document).ready(function () {
   function updateTotalAmount() {
     totalAmountValue = unitPriceValue + parseInt(bonusValue);
     totalAmount.value = totalAmountValue;
-    totalAmount.textContent = ` NT$ ${totalAmountValue}元`;
+    totalAmount.textContent = ` NT$ ${totalAmountValue.toLocaleString()}元`;
   }
 
   const linePayButton = document.getElementById("linePayButton");
@@ -48,12 +51,27 @@ $(document).ready(function () {
     requestLinePay();
   });
 
+  //一鍵填入btn
+
+  document
+    .getElementById("autofillBtn")
+    .addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("email").value = "demo@example.com";
+      document.getElementById("phone").value = "0912345678";
+      document.getElementById("city").value = "3";
+      document.getElementById("district").value = "3";
+      document.getElementById("district").value = "3";
+      document.getElementById("addressDetail").value = "新生路二段 421 號";
+    });
+
   function requestLinePay() {
     axios
       .post("http://localhost:8080/TickitEasy/api/linepay/request", {
+        projectID: projectID,
+        planID: planID,
         amount: totalAmountValue,
         currency: "TWD",
-        orderId: "EXAMPLE_ORDER_20230422_1000001",
         packages: [
           {
             id: "1",

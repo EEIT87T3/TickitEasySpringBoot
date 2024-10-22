@@ -19,29 +19,34 @@
       $(document).ready(function () {
         let output = document.getElementById("outputBlock");
         let progressBars = document.querySelectorAll(".progress-bar");
-        let daysLefts = document.querySelectorAll("[data-startdate]");
+        let daysLefts = document.querySelectorAll("[data-enddate]");
         let categorySelector = document.getElementById("categoryID");
 
         // 動態填入 1.剩餘天數 2.募資進度
         daysLefts.forEach(function (element) {
-          const startDate = new Date(
-            element.getAttribute("data-startdate").replace(" ", "T")
-          );
+          const currentDate = new Date();
+
           const endDate = new Date(
             element.getAttribute("data-enddate").replace(" ", "T")
           );
 
-          const timeDiff = endDate - startDate;
+          const timeDiff = endDate - currentDate;
           const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-          element.textContent = daysDiff + " 天";
+          if (daysDiff > 0) {
+            element.textContent = daysDiff + " 天";
+          } else {
+            element.textContent = "募資結束";
+          }
         });
 
         progressBars.forEach(function (element) {
           const targetAmount = element.getAttribute("data-targetamount");
           const currentAmount = element.getAttribute("data-currentamount");
-          const nowProgress =
-            (parseInt(currentAmount) / parseInt(targetAmount)) * 100;
+          const nowProgress = (
+            (parseInt(currentAmount) / parseInt(targetAmount)) *
+            100
+          ).toFixed(0);
           element.style.width = nowProgress + "%";
 
           // 找到與該進度條相鄰的 small 標籤，並設置其文本為當前進度百分比
@@ -225,7 +230,7 @@
                   <div class="text-start">
                     <small
                       class="fw-semibold custom-small-text"
-                      th:text="'NT$ '+${aFundProj.currentAmount}"
+                      th:text="'NT$ '+${#numbers.formatInteger(aFundProj.currentAmount, 1, 'COMMA')}"
                     ></small>
                   </div>
                   <div class="text-end">

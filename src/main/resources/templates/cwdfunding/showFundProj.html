@@ -53,18 +53,30 @@
           pageData.content.forEach((el) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `<td> ${el.projectID} </td>
-             <td nowrap> <a href="/TickitEasy/admin/fundproject/${el.projectID}">${el.title}</a></td>
-             <!-- <td class="text-truncate" style="max-width: 150px; nowrap"> ${el.description}</td> -->
+             <td nowrap> <a href="/TickitEasy/admin/fundproject/${
+               el.projectID
+             }">${el.title}</a></td>
+             <!-- <td class="text-truncate" style="max-width: 150px; nowrap"> ${
+               el.description
+             }</td> -->
              <!-- <td> ${el.image} </td> -->
              <td> ${el.startDate} </td>
              <td> ${el.endDate} </td>
-             <td class="text-end"> ${el.targetAmount} </td>
-             <td class="text-end"> ${el.currentAmount} </td>
-             <td> ${el.threshold} </td>
-             <td> ${el.postponeDate} </td>
+             <td class="text-end"> ${Number(
+               el.targetAmount
+             ).toLocaleString()} </td>
+             <td class="text-end"> ${Number(
+               el.currentAmount
+             ).toLocaleString()} </td>
              <td> ${el.categoryName} </td>
-             <td> <a href="/TickitEasy/admin/fundproject/${el.projectID}/edit"><button class="btn btn-edit" data-projectID="${el.projectID}"><i class="fa-solid fa-pen-to-square" style="color: #64d93a;"></i></button></a>
-             <button class="btn btn-delete" data-projectID="${el.projectID}"><i class="fa-solid fa-trash" style="color: #ff5c5c;"></i></button> </td>`;
+             <td> <a href="/TickitEasy/admin/fundproject/${
+               el.projectID
+             }/edit"><button class="btn btn-edit" data-projectID="${
+              el.projectID
+            }"><i class="fa-solid fa-pen-to-square" style="color: #64d93a;"></i></button></a>
+             <button class="btn btn-delete" data-projectID="${
+               el.projectID
+             }"><i class="fa-solid fa-trash" style="color: #ff5c5c;"></i></button> </td>`;
             output.append(tr);
           });
           // 印頁數 (pageData.totalPages)
@@ -168,8 +180,6 @@
           <th scope="col">結束時間</th>
           <th scope="col">目標金額</th>
           <th scope="col">目前金額</th>
-          <th scope="col">門檻</th>
-          <th scope="col">展延日期</th>
           <th scope="col">分類</th>
           <th scope="col">操作</th>
         </thead>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+
+    <meta th:replace="~{commons/memberHead}">
+	<title>網頁標題</title>
+	<script>
+		$(document).ready(function () {
+			
+			// 這裡是 JavaScript 內容
+			
+		});
+	</script>
+</head>
+
+<body>
+	<div th:replace="~{commons/memberHeader}"></div>
+    
+	<!-- 這裡是網頁內容 -->
+	<h2>網頁標題</h2>
+
+    <div th:replace="~{commons/memberFooter}"></div>
+</body>
+
+</html>

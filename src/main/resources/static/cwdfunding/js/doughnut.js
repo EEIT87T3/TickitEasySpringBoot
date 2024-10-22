@@ -6,7 +6,10 @@ $(document).ready(function () {
   const currentAmount = document
     .getElementById("currentAmount")
     .getAttribute("data-currentamount");
-  const nowProgress = (parseInt(currentAmount) / parseInt(targetAmount)) * 100;
+  const nowProgress = (
+    (parseInt(currentAmount) / parseInt(targetAmount)) *
+    100
+  ).toFixed(0);
   let leftProgress;
   if (100 - nowProgress >= 0) {
     leftProgress = 100 - nowProgress;

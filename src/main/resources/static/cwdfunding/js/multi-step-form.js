@@ -85,20 +85,6 @@ $(document).ready(function () {
     return false;
   });
 
-  // 初始化範圍條的值 (從 Thymeleaf 渲染的 input 初始值取得)
-  let initialVal = $("#threshold").val();
-  document.getElementById("valBox").innerHTML = initialVal;
-
-  // 使<input type="range">的數值即時顯示在頁面上
-  function showVal(newVal) {
-    document.getElementById("valBox").innerHTML = newVal;
-  }
-
-  // 即時更新範圍條數值
-  $("#threshold").on("input", function () {
-    showVal(this.value); // 每次範圍條變動都會更新顯示值
-  });
-
   // 步驟3: 填方案內容
   $("#planAmountSelect").change(function () {
     selectedValue = $(this).val();
@@ -130,7 +116,8 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="text"
-                                  name="planTitles"
+                                  id="planTitles"
+                                  name="fundplanList[${i}].planTitle"
                                   id="title"
                                   class="form-control borderhidden bg-light-subtle text-start m-0 p-0 w-50"
                                 />
@@ -143,7 +130,8 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="number"
-                                  name="planUnitPrices"
+                                  id="planUnitPrices"
+                                  name="fundplanList[${i}].planUnitPrice"
                                   class="form-control w-25 text-end"
                                   min="0"
                                 />
@@ -156,7 +144,8 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="number"
-                                  name="planTotalAmounts"
+                                  id="planTotalAmounts"
+                                  name="fundplanList[${i}].planTotalAmount"
                                   placeholder="0"
                                   class="form-control w-25 text-end"
                                   min="0"
@@ -170,12 +159,12 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="number"
-                                  name="planBuyAmounts"
+                                  id="planBuyAmounts"
                                   placeholder="0"
                                   class="form-control w-25 text-end"
                                   disabled
                                 />
-                                <input type="hidden" name="planBuyAmounts" value="0" />
+                                <input type="hidden" name="fundplanList[${i}].planBuyAmount" value="0" />
                               </td>
                             </tr>
                             <tr>
@@ -185,7 +174,7 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="file"
-                                  name="planImages"
+                                  name="fundplanList[${i}].planImageFile"
                                   class="form-control w-50"
                                 />
                               </td>
@@ -199,7 +188,8 @@ $(document).ready(function () {
                               <td class="col-2" colspan="2">
                                 <textarea
                                   rows="2"
-                                  name="planContents"
+                                  id="planContents"
+                                  name="fundplanList[${i}].planContent"
                                   maxlength="50"
                                   class="form-control bg-light-subtle w-75"
                                 ></textarea>
@@ -210,19 +200,40 @@ $(document).ready(function () {
   }
 
   // 一鍵輸入：募資活動頁面
-  // document
-  //   .getElementById("autofillBtnProj")
-  //   .addEventListener("click", function () {
-  //     document.getElementById("title").value = "test";
-  //     document.getElementById("category").value = "6";
-  //     document.getElementById("tag").value = "4";
-  //     document.getElementById("targetAmount").value = "50000";
-  //     document.getElementById("currentAmount").value = "0";
-  //     document.getElementById("threshold").value = "0.5";
-  //     document.getElementById("image").value = "test.jpg";
-  //     document.getElementById("description").value = "test測試測試";
-  //   });
+  const now = new Date();
 
+  const month = now.getMonth() + 1; // 月份是从0开始的，所以要加1
+  const day = now.getDate();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const titleWithTime = `test${month}${day}${hours}${minutes}${seconds}`;
+  document
+    .getElementById("autofillBtnProj")
+    .addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("title").value = titleWithTime;
+      document.getElementById("categoryId").value = "6";
+      document.getElementById("tagId").value = "4";
+      document.getElementById("targetAmount").value = "50000";
+      document.getElementById("currentAmount").value = "0";
+      document.getElementById("description").value = "test測試測試";
+      document.getElementById("startDate").value = "2024-06-13T01:00";
+      document.getElementById("endDate").value = "2024-11-08T16:30";
+      // document.getElementById("image").src =
+      //   "/TickitEasy/images/cwdfunding/demo.jpg";
+    });
+  // 一鍵輸入：募資活動頁面
+  document
+    .getElementById("autofillBtnPlan")
+    .addEventListener("click", function (e) {
+      e.preventDefault();
+      document.getElementById("planTitles").value = "planAA";
+      document.getElementById("planUnitPrices").value = "1000";
+      document.getElementById("planTotalAmounts").value = "200";
+      document.getElementById("planBuyAmounts").value = "0";
+      document.getElementById("planContents").value = "test內容";
+    });
   // 監聽送出按鈕
   submitBtn.addEventListener("click", function () {
     submitForm();
@@ -242,6 +253,8 @@ $(document).ready(function () {
     // 創建一個 FormData 物件，將表單資料自動打包
     const form = document.getElementById("msform");
     const formData = new FormData(form);
+    // 將所有input的value取出，加進json object
+
     spinner();
     // 使用 Axios 發送 POST 請求
     axios
