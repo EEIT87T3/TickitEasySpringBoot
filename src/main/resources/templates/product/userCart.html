@@ -348,7 +348,7 @@
 
             // 將要結帳的活動票券購物車儲存到 localStorage
             const ticketTypesCartToCheckout = Object.values(JSON.parse(localStorage.getItem("ticketTypesCart")));
-            localStorage.setItem('checkoutItems', JSON.stringify(ticketTypesCartToCheckout));
+            localStorage.setItem('ticketTypesCartToCheckout', JSON.stringify(ticketTypesCartToCheckout));
 
             // 將要結帳的周邊商品購物車儲存到 localStorage
             const itemsToCheckout = cartItems.map(item => ({
