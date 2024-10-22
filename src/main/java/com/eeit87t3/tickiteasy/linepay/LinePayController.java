@@ -46,12 +46,6 @@ public class LinePayController {
 	
 
 	
-	// line pay頁面，付款成功會導向至這裡
-	@GetMapping("/test/linepay/requestOK")
-	public String linepayReqOK() {
-		return "cwdfunding/fundprojects";
-	}
-	
 	
 	// line pay畫面，付款失敗會導向至這裡
 	@GetMapping("/test/linepay/requestNO")

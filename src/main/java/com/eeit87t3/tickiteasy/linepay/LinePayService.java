@@ -116,7 +116,7 @@ public class LinePayService {
 
 		    // Add the redirect URLs
 		    Map<String, String> redirectUrls = new HashMap<>();
-		    redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/test/linepay/requestOK");
+		    redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/fundprojects");
 		    redirectUrls.put("cancelUrl", "http://localhost:8080/TickitEasy/test/linepay/requestNO");
 		    form.put("redirectUrls", redirectUrls);
 
@@ -173,7 +173,7 @@ public class LinePayService {
 		 
 			 /* 添加key=redirectUrls給linefullForm */
 			 Map<String, String> redirectUrls = new HashMap<>();
-			 redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/test/linepay/requestOK");
+			 redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/fundprojects");
 			 redirectUrls.put("cancelUrl", "http://localhost:8080/TickitEasy/test/linepay/requestNO");
 			 linefullForm.put("redirectUrls", redirectUrls);
 			 
