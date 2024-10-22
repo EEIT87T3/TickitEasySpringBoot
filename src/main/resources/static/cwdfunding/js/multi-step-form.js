@@ -117,7 +117,7 @@ $(document).ready(function () {
                                 <input
                                   type="text"
                                   id="planTitles"
-                                  name="planTitles"
+                                  name="fundplanList[${i}].planTitle"
                                   id="title"
                                   class="form-control borderhidden bg-light-subtle text-start m-0 p-0 w-50"
                                 />
@@ -131,7 +131,7 @@ $(document).ready(function () {
                                 <input
                                   type="number"
                                   id="planUnitPrices"
-                                  name="planUnitPrices"
+                                  name="fundplanList[${i}].planUnitPrice"
                                   class="form-control w-25 text-end"
                                   min="0"
                                 />
@@ -145,7 +145,7 @@ $(document).ready(function () {
                                 <input
                                   type="number"
                                   id="planTotalAmounts"
-                                  name="planTotalAmounts"
+                                  name="fundplanList[${i}].planTotalAmount"
                                   placeholder="0"
                                   class="form-control w-25 text-end"
                                   min="0"
@@ -160,12 +160,11 @@ $(document).ready(function () {
                                 <input
                                   type="number"
                                   id="planBuyAmounts"
-                                  name="planBuyAmounts"
                                   placeholder="0"
                                   class="form-control w-25 text-end"
                                   disabled
                                 />
-                                <input type="hidden" name="planBuyAmounts" value="0" />
+                                <input type="hidden" name="fundplanList[${i}].planBuyAmount" value="0" />
                               </td>
                             </tr>
                             <tr>
@@ -175,7 +174,7 @@ $(document).ready(function () {
                               <td class="col-8">
                                 <input
                                   type="file"
-                                  name="planImages"
+                                  name="fundplanList[${i}].planImageFile"
                                   class="form-control w-50"
                                 />
                               </td>
@@ -190,7 +189,7 @@ $(document).ready(function () {
                                 <textarea
                                   rows="2"
                                   id="planContents"
-                                  name="planContents"
+                                  name="fundplanList[${i}].planContent"
                                   maxlength="50"
                                   class="form-control bg-light-subtle w-75"
                                 ></textarea>
@@ -201,13 +200,21 @@ $(document).ready(function () {
   }
 
   // 一鍵輸入：募資活動頁面
+  const now = new Date();
+
+  const month = now.getMonth() + 1; // 月份是从0开始的，所以要加1
+  const day = now.getDate();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const titleWithTime = `test${month}${day}${hours}${minutes}${seconds}`;
   document
     .getElementById("autofillBtnProj")
     .addEventListener("click", function (e) {
       e.preventDefault();
-      document.getElementById("title").value = "test";
-      document.getElementById("categoryID").value = "6";
-      document.getElementById("tagID").value = "4";
+      document.getElementById("title").value = titleWithTime;
+      document.getElementById("categoryId").value = "6";
+      document.getElementById("tagId").value = "4";
       document.getElementById("targetAmount").value = "50000";
       document.getElementById("currentAmount").value = "0";
       document.getElementById("description").value = "test測試測試";
@@ -246,6 +253,8 @@ $(document).ready(function () {
     // 創建一個 FormData 物件，將表單資料自動打包
     const form = document.getElementById("msform");
     const formData = new FormData(form);
+    // 將所有input的value取出，加進json object
+
     spinner();
     // 使用 Axios 發送 POST 請求
     axios

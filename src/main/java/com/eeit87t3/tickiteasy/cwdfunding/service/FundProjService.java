@@ -22,6 +22,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlanDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
@@ -54,79 +55,71 @@ public class FundProjService {
 	}
 	
 	/* 新增募資活動 */
-	public FundProj saveProj(
-			 String title,
-			 String categoryID,
-			 String tagID,
-			 String startDateStr,
-			 String endDateStr,
-			 String targetAmount,
-			 String currentAmount,
-			 String threshold,
-			 String postponeDateStr,
-			 String filename,
-			 String description
-			) {
+	public FundProj saveProj(FundProjDTO fundProjDTO) {
 		FundProj proj = new FundProj();
 		
+		System.out.println("新增service開始");
 		//先用categoryID找出對應到的category實體，之後再塞進proj 
-		Optional<CategoryEntity> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
+		Optional<CategoryEntity> coptional = categoryRepo.findById(Integer.valueOf(fundProjDTO.getCategoryId()));
 		CategoryEntity category = coptional.get();
 		//先用tagID找出對應到的tag實體，之後再塞進proj 
-		Optional<TagEntity> toptional = tagRepo.findById(Integer.valueOf(tagID));
+		Optional<TagEntity> toptional = tagRepo.findById(Integer.valueOf(fundProjDTO.getTagId()));
 		TagEntity tag = toptional.get();
 		
         // 將請求中的日期先格式化再轉換成LocalDateTime
         // 定義datetime-local格式
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
-        // 將字符串轉換為LocalDateTime
-        LocalDateTime startDateTime = LocalDateTime.parse(startDateStr, formatter);
-        LocalDateTime endDateTime = LocalDateTime.parse(endDateStr, formatter);
-        LocalDateTime postponeDateTime = LocalDateTime.parse(postponeDateStr, formatter);
+        // fundProjDTO.getStartDate().format(formatter): 將startDate格式化成formatter格式的字串
+        // LocalDateTime.parse(＿＿＿, formatter): 將＿＿轉型成LocalDateTime
+        LocalDateTime startDateTime = LocalDateTime.parse(fundProjDTO.getStartDate().format(formatter),formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(fundProjDTO.getEndDate().format(formatter),formatter);
         
         // 設定FundProjBean屬性，日期轉成.sql.TimeStamp
-        proj.setTitle(title);
-        proj.setDescription(description);
-        proj.setImage(filename);
+        proj.setTitle(fundProjDTO.getTitle());
+        proj.setDescription(fundProjDTO.getDescription());
+        proj.setImage(fundProjDTO.getImage());
         proj.setStartDate(Timestamp.valueOf(startDateTime));
         proj.setEndDate(Timestamp.valueOf(endDateTime));
-        proj.setTargetAmount(targetAmount);
-        proj.setCurrentAmount(currentAmount);
-        proj.setThreshold(threshold);
-        proj.setPostponeDate(Timestamp.valueOf(postponeDateTime));
+        proj.setTargetAmount(fundProjDTO.getTargetAmount());
+        proj.setCurrentAmount(fundProjDTO.getCurrentAmount());
         proj.setFundCategory(category);
         proj.setFundTag(tag);
+        System.out.println(proj.getTitle());
+		System.out.println("新增service結束");
+
 		return fundProjRepo.save(proj);
 			
 	}
 	
 	/* 新增募資活動方案 */
-	public FundPlan savePlan(
-			String projectID,
-			String title,
-			String unitPrice,
-			String totalAmount,
-			String buyAmount,
-			String image,
-			String content
-			) {
+	public FundPlan savePlan(FundPlanDTO fundPlanDTO) {
 		FundPlan newFundPlan = new FundPlan();
-		
+		FundProj fundProj = new FundProj();
 		//先用projectID找出對應到的FundProj實體，之後再塞進plan
-		Optional<FundProj> optional = fundProjRepo.findById(Integer.valueOf(projectID));
-		FundProj fundProj = optional.get();
+		try {
+			System.out.println("傳進來的dto projectID:"+fundPlanDTO.getProjectID());
+			Optional<FundProj> optional = fundProjRepo.findById(fundPlanDTO.getProjectID());
+			 fundProj = optional.get();
+			 if (fundProj != null) {			 
+				 System.out.println("fundProj的ID"+fundProj.getProjectID());
+			 }
+			 else {
+				 System.out.println("沒有這個專案！");
+			 }
+		} catch (Exception e) {
+		}
+
 		
         // 設定FundPlan屬性
 		newFundPlan.setFundProj(fundProj);
-		newFundPlan.setPlanTitle(title);
-		newFundPlan.setPlanUnitPrice(unitPrice);
-		newFundPlan.setPlanTotalAmount(totalAmount);
-		newFundPlan.setPlanBuyAmount(buyAmount);
-		newFundPlan.setPlanImage(image);
-		newFundPlan.setPlanContent(content);
+		newFundPlan.setPlanTitle(fundPlanDTO.getPlanTitle());
+		newFundPlan.setPlanUnitPrice(fundPlanDTO.getPlanUnitPrice());
+		newFundPlan.setPlanTotalAmount(fundPlanDTO.getPlanTotalAmount());
+		newFundPlan.setPlanBuyAmount(fundPlanDTO.getPlanBuyAmount());
+		newFundPlan.setPlanImage(fundPlanDTO.getPlanImage());
+		newFundPlan.setPlanContent(fundPlanDTO.getPlanContent());
 		
-		System.out.println("savePlann is here");
 		return fundPlanRepo.save(newFundPlan);
 	}
 	
@@ -152,9 +145,12 @@ public class FundProjService {
 			dto.setEndDate(fundProj.getEndDate().toLocalDateTime());
 			dto.setTargetAmount(fundProj.getTargetAmount());
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
-			dto.setThreshold(fundProj.getThreshold());
-			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
-			dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
+			dto.setThreshold(fundProj.getThreshold() != null ? fundProj.getThreshold() : "N/A");
+	        // 處理 postponeDate 可能為 null 的情況
+	        if (fundProj.getPostponeDate() != null) {
+	            dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+	        }
+	        dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
 			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
@@ -176,15 +172,18 @@ public class FundProjService {
 			dto.setEndDate(fundProj.getEndDate().toLocalDateTime());
 			dto.setTargetAmount(fundProj.getTargetAmount());
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
-			dto.setThreshold(fundProj.getThreshold());
-			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+			dto.setThreshold(fundProj.getThreshold() != null ? fundProj.getThreshold() : "N/A");
+	        // 處理 postponeDate 可能為 null 的情況
+	        if (fundProj.getPostponeDate() != null) {
+	            dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+	        }
 			dto.setCategoryId(fundProj.getFundCategory().getCategoryId());
 			dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
 			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
 			dto.setTagId(fundProj.getFundTag().getTagId());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
-			dto.setFundplanList(fundProj.getFundPlan());
+			//dto.setFundplanList.set(fundProj.getFundPlan());
 			return dto;
 		});
 		return dto;
