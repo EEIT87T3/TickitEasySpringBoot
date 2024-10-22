@@ -6,7 +6,8 @@
     <!-- 在這裡放要引入的 CSS 與 JS library -->
 
     <meta th:replace="~{commons/memberHead}">
-	<title>網頁標題</title>
+    <script th:src="@{/member/js/memberProfile.js}"></script>
+	<title>TickitEasy 會員資料修改</title>
 	<script>
 		$(document).ready(function () {
 			
@@ -20,7 +21,7 @@
 	<div th:replace="~{commons/memberHeader}"></div>
     
 	<!-- 這裡是網頁內容 -->
-    <h2>修改資料</h2>
+    <h2>修改個人資料</h2>
     <form id="editProfileForm">
         <div class="mb-3">
             <label for="profilePic" class="form-label">頭貼</label>
