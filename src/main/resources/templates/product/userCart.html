@@ -4,25 +4,80 @@
 <head>
 
     <!-- 在這裡放要引入的 CSS 與 JS library -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="/TickitEasy/event/js/utils.js"></script>
+    <script src="/TickitEasy/event/js/ticketTypesCart.js"></script>
 
     <meta th:replace="~{commons/userHead}">
     <title>購物車</title>
-    <script>
-        $(document).ready(function () {
+    <style>
+        /* 隱藏 .tickettype-quantity 的 input:number 右方增減箭頭 */
 
-            // 這裡是 JavaScript 內容
-
-        });
-    </script>
+        .tickettype-quantity::-webkit-inner-spin-button,
+        .tickettype-quantity::-webkit-outer-spin-button {
+            -webkit-appearance: none;  /* Chrome, Safari, Edge */
+            margin: 0;  /* 去掉 margin */
+        }
+    
+        .tickettype-quantity {
+            -moz-appearance: textfield;  /* Firefox */
+            appearance: none;  /* 其他瀏覽器 */
+        }
+    </style>
 </head>
 
 <body>
     <div th:replace="~{commons/userHeader}"></div>
 
     <!--  這裡是網頁內容 >-->
-    <!--<h1>購物車</h1>-->
     <div class="container mt-5">
-        <div id="cartItems"></div>
+        <h1>購物車</h1>
+        <div class="bg-secondary-subtle rounded p-3 mt-3">
+            <h3>活動票券</h3>
+            <div id="tickettypes-cart" class="p-3 d-flex flex-column gap-2">
+                <div class="d-flex justify-content-center align-item-center border border-secondary rounded p-3">
+                    <span>（目前購物車內沒有活動票券）</span>
+                </div>
+                <div class="row border border-secondary bg-light rounded p-3">
+                    <div class="col-2 p-0">
+                        <div class="ratio ratio-16x9">
+                            <img class="rounded object-fit-cover" src="/TickitEasy/images/event/EventPicDefault.png" alt="（活動名稱）">
+                        </div>
+                    </div>
+                    <div class="col-4 d-flex flex-column gap-1 align-items-center justify-content-center">
+                        <div class="w-100">
+                            <span class="fs-5 event-name">（活動名稱）</span>
+                        </div>
+                        <div class="w-100">
+                            <span class="fs-6 tickettype-name">（票種名稱）</span>
+                        </div>
+                    </div>
+                    <div class="col-2 d-flex justify-content-center align-items-center">
+                        <span>價格：<span class="price">500</span>&nbsp;元</span>
+                    </div>
+                    <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
+                        <div>剩餘數量：<span class="quantityLeft">100</span></div>
+                        <!-- TODO 剩餘數量計算 -->
+                        <div class="input-group">
+                            <button class="minus btn btn-outline-secondary">-</button>
+                            <input type="number" class="tickettype-quantity form-control text-center" min="0" value="0">
+                            <button class="plus btn btn-outline-secondary">+</button>
+                        </div>
+                    </div>
+                    <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
+                        <div>總計：<span class="totalPrice">100</span>&nbsp;元</div>
+                        <button class="add-to-cart btn btn-danger">移除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-secondary-subtle rounded p-3 mt-3">
+            <h3>周邊商品</h3>
+            <div id="cartItems"></div>
+        </div>
         <div class="card mt-3">
             <div class="card-body">
                 <h5>購物明細</h5>
@@ -34,8 +89,124 @@
     </div>
 
     <div th:replace="~{commons/userFooter}"></div>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <template id="tickettype-cartitem-template">
+        <div class="row border border-secondary bg-light rounded p-3">
+            <div class="col-2 p-0">
+                <div class="ratio ratio-16x9">
+                    <img class="event-pic rounded object-fit-cover" src="/TickitEasy/images/event/EventPicDefault.png" alt="（活動名稱）">
+                </div>
+            </div>
+            <div class="col-4 d-flex flex-column gap-1 align-items-center justify-content-center">
+                <div class="w-100">
+                    <span class="fs-5 event-name">（活動名稱）</span>
+                </div>
+                <div class="w-100">
+                    <span class="fs-6 tickettype-name">（票種名稱）</span>
+                </div>
+            </div>
+            <div class="col-2 d-flex justify-content-center align-items-center">
+                <span>價格：<span class="tickettype-price">500</span>&nbsp;元</span>
+            </div>
+            <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
+                <div>剩餘數量：<span class="tickettype-quantity-available">100</span></div>
+                <!-- TODO 剩餘數量計算 -->
+                <div class="input-group">
+                    <button class="tickettype-minus btn btn-outline-secondary">-</button>
+                    <input type="number" class="tickettype-quantity form-control text-center" min="0" readonly value="0">
+                    <button class="tickettype-plus btn btn-outline-secondary">+</button>
+                </div>
+            </div>
+            <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
+                <div>總計：<span class="tickettype-total-price">100</span>&nbsp;元</div>
+                <button class="tickettype-remove btn btn-danger">移除</button>
+            </div>
+        </div>
+    </template>
+    <template id="no-tickettype-cartitem-template">
+		<div class="d-flex justify-content-center align-item-center border border-secondary rounded p-3 bg-light">
+			<span>（目前購物車內沒有活動票券）</span>
+		</div>
+	</template>
+
     <script>
+        // ========== 活動票券購物車 ==========
+
+        function loadTicketTypesCart() {
+            const tickettypesCartDiv = document.getElementById("tickettypes-cart");
+            tickettypesCartDiv.innerHTML = "";  // 清空活動票券購物車畫面內容
+
+            // 取得活動票券購物車
+            const ticketTypesCartValuesArray = Object.values(JSON.parse(localStorage.getItem("ticketTypesCart")));
+            
+            if (ticketTypesCartValuesArray.length == 0) {  // 活動票券購物車為空
+                tickettypesCartDiv.append(document.getElementById("no-tickettype-cartitem-template").content.cloneNode(true));
+            } else {
+                ticketTypesCartValuesArray.forEach((ticketTypeCartItem) => {
+                    const tickettypeCartitemTemplate = document.getElementById("tickettype-cartitem-template").content.cloneNode(true);
+
+                    // 活動主圖
+                    const eventPicImg = tickettypeCartitemTemplate.querySelector(".event-pic");
+                    eventPicImg.setAttribute("alt", ticketTypeCartItem.eventName);
+                    if (ticketTypeCartItem.eventPic != null) {
+                        eventPicImg.setAttribute("src", contextPath + ticketTypeCartItem.eventPic);
+                    }
+
+                    // 活動名稱
+                    tickettypeCartitemTemplate.querySelector(".event-name").textContent = ticketTypeCartItem.eventName;
+                    
+                    // 票種名稱
+                    tickettypeCartitemTemplate.querySelector(".tickettype-name").textContent = ticketTypeCartItem.typeName;
+                    
+                    // 價格
+                    tickettypeCartitemTemplate.querySelector(".tickettype-price").textContent = ticketTypeCartItem.price;
+
+                    // 剩餘可購買數量
+                    tickettypeCartitemTemplate.querySelector(".tickettype-quantity-available").textContent = ticketTypeCartItem.quantityAvailable;
+
+                    // 購物車內數量
+                    tickettypeCartitemTemplate.querySelector(".tickettype-quantity").value = Number(ticketTypeCartItem.quantity);
+
+                    // 總價
+                    tickettypeCartitemTemplate.querySelector(".tickettype-total-price").textContent = ticketTypeCartItem.totalPrice;
+                    
+
+                    // 增加與減少數量按鈕
+                    tickettypeCartitemTemplate.querySelector(".tickettype-plus").addEventListener("click", () => {
+                        if (Number(ticketTypeCartItem.quantity) < Number(ticketTypeCartItem.quantityAvailable)) {
+                            ticketTypesCartChange(ticketTypeCartItem.ticketTypeID, 1);
+                            // 重新渲染並計算總價與總金額
+                            loadTicketTypesCart();
+                            updateTotals()
+                        }
+                    });
+                    tickettypeCartitemTemplate.querySelector(".tickettype-minus").addEventListener("click", () => {
+                        if (Number(ticketTypeCartItem.quantity) > 1) {
+                            ticketTypesCartChange(ticketTypeCartItem.ticketTypeID, -1);
+                            // 重新渲染並計算總價與總金額
+                            loadTicketTypesCart();
+                            updateTotals()
+                        }
+                    });
+
+                    // 移除按鈕
+                    tickettypeCartitemTemplate.querySelector(".tickettype-remove").addEventListener("click", () => {
+                        ticketTypesCartRemove(ticketTypeCartItem.ticketTypeID);
+                        // 重新渲染並計算總價與總金額
+                        loadTicketTypesCart();
+                        updateTotals()
+                    });
+
+
+                    // append 進畫面的活動票券區塊
+                    tickettypesCartDiv.append(tickettypeCartitemTemplate);
+                });
+            }
+        }
+
+
+        // ========== 周邊商品購物車 ==========
+
         let cartItems = []; // 用來儲存購物車中的商品
 
         // 加載購物車內容
@@ -83,14 +254,6 @@
             });
         }
 
-        // 更新總數量和總金額
-        function updateTotals() {
-            const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0); // 計算總數量
-            const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0); // 計算總金額
-
-            document.getElementById('totalQuantity').textContent = totalQuantity; // 更新總數量顯示
-            document.getElementById('totalAmount').textContent = totalAmount.toFixed(0); // 更新總金額顯示
-        }
 
         // 更新特定商品的數量
         function updateQuantity(productId, newQuantity) {
@@ -148,20 +311,80 @@
             updateTotals(); // 更新總數量和金額
         }
 		
-		
+
+
+        // ========== 計算總數量與總金額 ==========
+        let cartTotalQuantity = 0;
+        let cartTotalAmount = 0;
+        function updateTotals() {
+            // 活動票券總數
+            const tickettypeTotalQuantity = ticketTypesCartTotalQuantity();
+            // 活動票券總金額
+            const tickettypeTotalAmount = ticketTypesCartTotalAmount()
+
+            // 周邊商品總數
+            const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0); // 計算總數量
+            // 周邊商品總金額
+            const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0); // 計算總金額
+
+            cartTotalQuantity = tickettypeTotalQuantity + totalQuantity;
+            cartTotalAmount = tickettypeTotalAmount + totalAmount;
+
+            // 顯示在畫面上
+            document.getElementById('totalQuantity').textContent = cartTotalQuantity; // 更新總數量顯示
+            document.getElementById('totalAmount').textContent = cartTotalAmount.toFixed(0); // 更新總金額顯示
+        }
+
+
+
+		// ========== 去結帳～ ==========
         // 結帳邏輯 在checkout 函數內寫結帳邏輯，並將總金額傳遞到付款頁面
         //在付款頁面，你可以這樣抓取總金額：const totalAmount = localStorage.getItem('totalAmount'); // 從 localStorage 取得總金額
         //document.getElementById('totalAmountDisplay').textContent = `$${totalAmount}`; // 顯示在付款頁面
 
         function checkout() {
-            const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0); // 計算總金額
-            localStorage.setItem('totalAmount', totalAmount); // 儲存總金額到 localStorage
-            window.location.href = '/付款頁面'; // 跳轉到付款頁面
-            alert('去付款~'); // 提示會員結帳
+            // 儲存總金額到 localStorage
+            localStorage.setItem('totalAmount', cartTotalAmount);
+
+            // 將要結帳的活動票券購物車儲存到 localStorage
+            const ticketTypesCartToCheckout = Object.values(JSON.parse(localStorage.getItem("ticketTypesCart")));
+            localStorage.setItem('checkoutItems', JSON.stringify(ticketTypesCartToCheckout));
+
+            // 將要結帳的周邊商品購物車儲存到 localStorage
+            const itemsToCheckout = cartItems.map(item => ({
+                productID: item.productID,
+                productName: item.productName, // 加入商品名稱
+                productQuantity: item.quantity,
+                productAmount: item.price * item.quantity
+            }));
+            localStorage.setItem('checkoutItems', JSON.stringify(itemsToCheckout)); // 儲存商品資訊
+
+
+            Swal.fire({
+                title: '確定要前往付款嗎？',
+                text: `總金額：${cartTotalAmount} 元`,
+                icon: 'warning',
+                showCancelButton: true, // 顯示取消按鈕
+                confirmButtonText: '確定',
+                cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 如果用戶點擊了確定按鈕
+                    window.location.href = '../order/ClientSideProdOrderCheckOutCart';
+                } else if (result.isDismissed) {
+                    // 如果用戶點擊了取消按鈕或關閉了對話框
+                    console.log('付款被取消');
+                }
+            });
         }
 
-        // 頁面加載時初始化購物車
-        window.onload = loadCart; // 當頁面加載完成時加載購物車
+
+        // ========== 頁面載入完成後執行 ==========
+        $(document).ready(function () {
+            loadTicketTypesCart();  // 載入活動票券購物車
+            loadCart();  // 載入周邊商品購物車
+            updateTotals()  // 載入目前的總數量與總金額
+        });
     </script>
 </body>
 
