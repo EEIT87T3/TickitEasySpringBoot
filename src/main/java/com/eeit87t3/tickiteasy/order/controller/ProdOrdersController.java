@@ -193,6 +193,7 @@ public class ProdOrdersController {
 		@PostMapping("ECPay")
 		@ResponseBody
 		public String ECPay(
+				@RequestParam("ticketTypesCartToCheckoutJson") String ticketTypesCartToCheckoutJson,
 				@RequestParam("checkoutItems") String checkoutItem,
                 @RequestParam("totalAmount") String totalAmount,
                 @RequestParam("name") String name,
@@ -201,9 +202,12 @@ public class ProdOrdersController {
                 @RequestParam("address") String address,
                 @RequestParam("paymentMethod") String paymentMethod,
                 Model model) throws JsonMappingException, JsonProcessingException {
+			
 			ObjectMapper objectMapper = new ObjectMapper();
-		 	List<Map<String,Object>> checkoutItems  = objectMapper.readValue(checkoutItem, List.class);
-		 	String form = prodOrdersService.ECPay(checkoutItems, totalAmount);
+			List<Map<String,Object>> ticketTypesCartToCheckoutJsons  = objectMapper.readValue(ticketTypesCartToCheckoutJson, List.class); //將json轉成list
+			System.out.println(ticketTypesCartToCheckoutJsons); //test
+		 	List<Map<String,Object>> checkoutItems  = objectMapper.readValue(checkoutItem, List.class); //將json轉成list
+		 	String form = prodOrdersService.ECPay(ticketTypesCartToCheckoutJsons,checkoutItems, totalAmount);
 
 		 	String html = "<html><body>" + form + 
 	                  "<script type='text/javascript'>document.forms[0].submit();</script>" +

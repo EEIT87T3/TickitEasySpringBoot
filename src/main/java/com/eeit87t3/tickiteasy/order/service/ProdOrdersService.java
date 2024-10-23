@@ -24,6 +24,6 @@ public interface ProdOrdersService {
 	public Page<ProdOrders> findByProdOrdersId(Integer number, Integer id,Integer records);
 	public Page<ProdOrders> findByMemberId(Integer number, Integer id,Integer records);
 	
-	public String ECPay(List<Map<String,Object>> lists,String totalAmount);
+	public String ECPay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount);
 	
 }
