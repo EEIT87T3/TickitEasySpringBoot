@@ -1,5 +1,6 @@
 package com.eeit87t3.tickiteasy.product.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -87,6 +88,29 @@ public class UserProductService {
         // 注意：詳細圖片在這裡不設置，而是在 findProductById 方法中設置
         return dto;
     }
+    
+    // 查詢推薦商品
+    @Transactional
+    public List<ProductDTO> findRecommendedProducts(Integer productID) {
+        // 先取得當前商品以獲取其tagId
+        Optional<ProductEntity> currentProduct = productRepo.findById(productID);
+        
+        if (currentProduct.isPresent() && currentProduct.get().getProductTag() != null) {
+            Integer tagId = currentProduct.get().getProductTag().getTagId();
+            
+            // 查詢推薦商品
+            List<ProductEntity> recommendedProducts = productRepo
+                .findRecommendedProductsByTag(tagId, productID);
+            
+            // 轉換為DTO
+            return recommendedProducts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        }
+        
+        return new ArrayList<>();
+    }
+    
 	
     //加入購物車
     public ProductCartItemEntity addToCart(Integer productID, Integer quantity) {

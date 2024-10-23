@@ -5,12 +5,14 @@
     <meta th:replace="~{commons/adminHead}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" th:href="@{/product/productStyle.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    
     <title>商品管理</title>
 </head>
 
 <body>
     <div th:replace="~{commons/adminHeader}"></div>
-    <div class="container mt-5">
         <h1>商品管理</h1>
          <div class="row mb-3">
     <div class="col-md-6">
@@ -35,7 +37,7 @@
                     <th>標籤</th>
                     <th>商品名稱</th>
                     <th>商品圖片</th>
-                    <th>商品描述</th>
+                    <!--  <th>商品描述</th>-->
                     <th>價格</th>
                     <th>庫存</th>
                     <th>新增日期</th>
@@ -51,11 +53,11 @@
         <div id="pagination" class="pagination justify-content-center">
             <!-- 分頁按鈕將在這裡動態插入 -->
         </div>
-    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script th:inline="javascript">
         let currentPage = 1;
@@ -125,12 +127,12 @@
                     <td>${product.productTag ? product.productTag.tagName : ''}</td>
                     <td>${product.productName}</td>
                     <td><img src="${imageUrl}" alt="商品圖片" style="width: 120px; height: 60px; object-fit: cover;"></td>
-                    <td>${product.productDesc}</td>
+                    
                     <td>${product.price}</td>
                     <td>${product.stock}</td>
                     <td>${formatDate(product.createdDate)}</td>
                     <td>
-                        <select class="form-select" aria-label="Default select example" data-product-id="${product.productID}">
+                        <select class="form-select status-select" aria-label="Default select example" data-product-id="${product.productID}">
                             <option value="1" ${product.status == 1 ? 'selected' : ''}>上架</option>
                             <option value="0" ${product.status == 0 ? 'selected' : ''}>下架</option>
                             <option value="2" ${product.status == 2 ? 'selected' : ''}>補貨中</option>
@@ -160,14 +162,27 @@
                         status: parseInt(newStatus)
                     })
                     .then(response => {
-                        console.log('Status updated successfully:', response.data);
-                    })
-                    .catch(error => {
-                        console.error('Error updating status:', error);
-                    });
+                console.log('Status updated successfully:', response.data);
+                Swal.fire({
+                    position: 'center',
+                    icon: "success",
+                    title: "商品狀態修改成功",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            })
+            .catch(error => {
+                console.error('Error updating status:', error);
+                Swal.fire({
+                    icon: "error",
+                    title: "更新失敗",
+                    text: "請稍後再試！",
+                    position: 'center' // 置中
                 });
             });
-        }
+        });
+    });
+}
 
         function renderPagination() {
             paginationDiv.innerHTML = '';
