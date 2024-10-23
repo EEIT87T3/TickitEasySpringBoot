@@ -35,6 +35,7 @@ import com.eeit87t3.tickiteasy.admin.service.AdminService;
 import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.event.service.TicketTypesProcessingService;
 import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.order.entity.CheckoutPaymentRequestForm;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrderDetails;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
@@ -43,7 +44,6 @@ import com.eeit87t3.tickiteasy.order.entity.ProductPackageForm;
 import com.eeit87t3.tickiteasy.order.entity.RedirectUrls;
 import com.eeit87t3.tickiteasy.order.repository.ProdOrdersRepository;
 import com.eeit87t3.tickiteasy.order.service.ProdOrdersService;
-import com.eeit87t3.tickiteasy.product.entity.CartItem;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -157,9 +157,11 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 	ProductService productService;
 	@Autowired
 	TicketTypesProcessingService ticketTypesProcessingService;
+	@Autowired
+	MemberService memberService;
 	//串接綠界ECPay
 	@Override
-	public String ECPay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount) { 
+	public String ECPay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount,String memberEmail) { 
 		//lists內放productID、productName、productQuantity、productAmount
 		StringBuilder itemNameBuilder  = new StringBuilder() ; //串接商品明細
 		for(Map<String,Object> list : ticketTypesCartToCheckoutJson) {
@@ -189,9 +191,8 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		String form = all.aioCheckOut(obj, null);
 		
 		ProdOrders prodOrders = new ProdOrders();//prodOrders 資料庫新增
-		Member member = new Member();
-		member.setMemberID(5);
-		prodOrders.setMember(member);
+		Member memberByEmail = memberService.findByEmail(memberEmail);
+		prodOrders.setMember(memberByEmail);
 		String orderDate = obj.getMerchantTradeDate().replace("/","-");
 		prodOrders.setOrderDate(Timestamp.valueOf(orderDate));
 		prodOrders.setStatus("未付款");

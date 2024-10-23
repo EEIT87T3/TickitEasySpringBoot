@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,9 +44,9 @@ import org.springframework.web.client.RestTemplate;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 import com.eeit87t3.tickiteasy.order.service.Impl.ProdOrdersServiceImpl;
-import com.eeit87t3.tickiteasy.product.entity.CartItem;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
+import com.eeit87t3.tickiteasy.util.JWTUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -189,6 +190,8 @@ public class ProdOrdersController {
 		}
 
 		
+		@Autowired
+		JWTUtil jwtUtil;
 		//串接綠界
 		@PostMapping("ECPay")
 		@ResponseBody
@@ -201,13 +204,15 @@ public class ProdOrdersController {
                 @RequestParam("phone") String phone,
                 @RequestParam("address") String address,
                 @RequestParam("paymentMethod") String paymentMethod,
+                @RequestParam("jwtToken") String jwtToken, // token
                 Model model) throws JsonMappingException, JsonProcessingException {
+			String memberEmail = jwtUtil.getEmailFromToken(jwtToken);
+			
 			
 			ObjectMapper objectMapper = new ObjectMapper();
 			List<Map<String,Object>> ticketTypesCartToCheckoutJsons  = objectMapper.readValue(ticketTypesCartToCheckoutJson, List.class); //將json轉成list
-			System.out.println(ticketTypesCartToCheckoutJsons); //test
 		 	List<Map<String,Object>> checkoutItems  = objectMapper.readValue(checkoutItem, List.class); //將json轉成list
-		 	String form = prodOrdersService.ECPay(ticketTypesCartToCheckoutJsons,checkoutItems, totalAmount);
+		 	String form = prodOrdersService.ECPay(ticketTypesCartToCheckoutJsons,checkoutItems, totalAmount,memberEmail);
 
 		 	String html = "<html><body>" + form + 
 	                  "<script type='text/javascript'>document.forms[0].submit();</script>" +

@@ -160,6 +160,7 @@
         </div>
         
         <form method="post">
+            <input type="hidden" id="jwtToken" name="jwtToken">
         	<input type="hidden" id="ticketTypesCartToCheckoutJson" name="ticketTypesCartToCheckoutJson">
             <input type="hidden" id="checkoutItemsField" name="checkoutItems">
             <input type="hidden" id="totalAmountField" name="totalAmount">
@@ -212,7 +213,7 @@
         document.getElementById('ticketTypesCartToCheckoutJson').value = ticketTypesCartToCheckoutJson;
         document.getElementById('checkoutItemsField').value = checkoutItemsJson;
         document.getElementById('totalAmountField').value = totalAmount;
-
+        document.getElementById('jwtToken').value = localStorage.getItem("jwtToken");
         // 載入銓彥購物車資料
         if(ticketTypesCartToCheckoutJson != null){
             const table = document.querySelector('table');
@@ -249,16 +250,21 @@
             table.appendChild(tr);
         }
 
-        document.querySelector('.submit-btn').addEventListener('click',function(e){ //提交表單按鈕
-            document.querySelector('form').action = window.location.href + "../../../order/ECPay"
-
-        })        
+            document.querySelector('.submit-btn').addEventListener('click',function(e){ //提交表單按鈕
+                localStorage.removeItem("cart");
+                localStorage.removeItem("checkoutItems");
+                localStorage.removeItem("ticketTypesCart");
+                localStorage.removeItem("ticketTypesCartToCheckout");
+                localStorage.removeItem("totalAmount");
+                document.querySelector('form').action = window.location.href + "../../../order/ECPay"
+            }
+        )        
 
         document.querySelector('#takeeasy').addEventListener('click',function(e){ //一件輸入按鈕
-            console.log(ticketTypesCartToCheckout);
-            console.log(ticketTypesCartToCheckoutJson);
+            console.log(localStorage.getItem('checkoutItems'));
             console.log(checkoutItems);
             console.log(checkoutItemsJson);
+            
             
             document.querySelector('#name').value = '王小明';
             document.querySelector('#email').value = 'sososo8819@gmail.com';
