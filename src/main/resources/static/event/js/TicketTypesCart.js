@@ -1,7 +1,7 @@
 // ========== 購物車行為 ==========
 
 // 加入購物車
-function ticketTypesCartAdd(ticketType, quantity) {
+function ticketTypesCartAdd(ticketType, quantityAvailable, quantity) {
     const ticketTypesCart = JSON.parse(localStorage.getItem("ticketTypesCart"));
     if (ticketTypesCart[ticketType.ticketTypeID]) {  // 此票種已經存在於購物車內
         ticketTypesCartChange(ticketType.ticketTypeID, quantity);
@@ -13,11 +13,11 @@ function ticketTypesCartAdd(ticketType, quantity) {
             typeName: ticketType.typeName,
             price: ticketType.price,
             quantity: quantity,
-            quantityAvailable: 100,  // 暫時寫死
+            quantityAvailable: quantityAvailable,
             totalPrice: ticketType.price * quantity
         };
+        localStorage.setItem("ticketTypesCart", JSON.stringify(ticketTypesCart))
     }
-    localStorage.setItem("ticketTypesCart", JSON.stringify(ticketTypesCart))
 }
 
 // 自購物車移除
@@ -71,58 +71,4 @@ $(document).ready(function () {
             localStorage.setItem("ticketTypesCart", JSON.stringify({}));
         }
     })();
-
-
-
-
-
-
-    // ========== 測試 ==========
-    (() => {
-        console.log("==========")
-
-        console.log("ticketTypesCart");
-        console.log(JSON.parse(localStorage.getItem("ticketTypesCart")));
-        
-    //     console.log("ticketTypesCartChange(1, 1)")
-    //     ticketTypesCartChange(1, 1);
-        
-    //     console.log("ticketTypesCart");
-    //     console.log(JSON.parse(localStorage.getItem("ticketTypesCart")));
-        
-    //     console.log("ticketTypesCartChange(1, -5)")
-    //     ticketTypesCartChange(1, -5);
-
-    //     console.log("ticketTypesCart");
-    //     console.log(JSON.parse(localStorage.getItem("ticketTypesCart")));
-    })();
-
-    
-    
-    // const checkoutTicketTypeCart = [
-    //     {
-    //         ticketTypeID: 1,
-    //         eventName: "活動01",
-    //         ticketTypeName: "票種01",
-    //         eventPic: "/image/event/1.jpg",
-    //         quantity: 3,
-    //         price: 100,
-    //         totalPrice: 300
-    //     },
-    //     {
-    //         ticketTypeID: 2,
-    //         eventName: "活動01",
-    //         ticketTypeName: "票種02",
-    //         eventPic: "/image/event/1.jpg",
-    //         quantity: 2,
-    //         price: 120,
-    //         totalPrice: 240
-    //     },
-    // ];
-    
-    // localStorage.setItem("ticketTypeCart", JSON.stringify(ticketTypeCart));
-
-
-
-
 });
