@@ -188,10 +188,10 @@
                 }
             });
 
-            // 定時輪詢，每隔 30 秒刷新一次表格數據
+            // 定時輪詢，每隔 10 秒刷新一次表格數據
             setInterval(function () {
                 table.ajax.reload(null, false); // false 表示保持當前頁面
-            }, 10000); // 30000 毫秒 = 30 秒
+            }, 10000); // 10000 毫秒 = 10 秒
 
             // 監聽手動刷新按鈕的點擊事件
             $('#refreshButton').on('click', function () {

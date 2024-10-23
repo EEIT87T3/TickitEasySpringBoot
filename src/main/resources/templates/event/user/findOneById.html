@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
+	<link rel="stylesheet" href="/TickitEasy/event/css/findOneById.css">
+	<script src="/TickitEasy/event/js/utils.js"></script>
+	<script src="/TickitEasy/event/js/ticketTypesCart.js"></script>
+	<script src="/TickitEasy/event/js/findOneById.js"></script>
+
+    <meta th:replace="~{commons/userHead}">
+	<title>[[${titleEventName}]]</title>
+</head>
+
+<body>
+	<div th:replace="~{commons/userHeader}"></div>
+    
+	<!--  這裡是網頁內容 -->
+	<div class="container py-4 px-3">
+		<h1 class="mb-3" style="padding-top: 1rem !important;">[[${titleEventName}]]</h1>
+		<div id="event-content">
+			<!-- spinner -->
+			<div class="d-flex justify-content-center align-item-center m-5">
+				<div class="spinner-border" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <div th:replace="~{commons/userFooter}"></div>
+
+	<template id="event-content-template">
+		<div class="row my-4">
+			<div class="col-8">
+				<img class="w-100 rounded" id="event-pic" src="/TickitEasy/images/event/EventPicDefault.png" alt="活動名稱">
+			</div>
+			<div class="col-4">
+				Lorem ipsum dolor, sit amet consectetur adipisicing elit. Molestias maiores perspiciatis accusantium pariatur molestiae et error sint neque, quaerat perferendis incidunt consectetur fugiat totam nostrum repellendus cum magni recusandae repellat doloribus voluptatum ex quidem omnis atque odit. Vero alias, rem tempora maiores nam cumque laboriosam inventore, ipsa aperiam eveniet facilis tenetur quos ea voluptatem sint est at provident iste exercitationem corporis neque adipisci ullam quidem. Quis quibusdam perspiciatis fugiat dolore, quia corrupti, et sunt, omnis dolorem pariatur asperiores ut adipisci temporibus delectus beatae corporis inventore! Quos, voluptatem. Quibusdam, consequatur et quam accusamus sapiente beatae asperiores! Pariatur, vitae ut explicabo esse illum quaerat, at aliquid ullam minus animi quis fugit consequatur alias. Ipsa doloribus corporis doloremque, labore laborum earum non placeat exercitationem natus laudantium autem, necessitatibus alias, dolorum fugiat unde sit veniam dolore dignissimos totam illo aliquid. Nobis nemo non consequatur repellat, sequi minima saepe omnis id esse dicta aperiam iure tenetur natus repudiandae, ipsum nam laudantium quam, atque vitae at ipsa! Saepe fugiat totam necessitatibus nostrum suscipit repellendus molestiae impedit numquam et. Delectus facilis, beatae accusantium dicta fugit fugiat sunt accusamus ut fuga voluptatibus velit eaque tempore vitae, eius natus suscipit voluptates impedit. Optio, eos molestiae architecto veniam ex nulla.
+			</div>
+		</div>
+		<div class="my-4">
+			<h3 class="mb-2">活動介紹</h3>
+			<div id="event-desc">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quasi alias quos ipsum repellat ratione commodi dolores dicta, iure, ab corporis nulla sit temporibus hic architecto aliquid eius pariatur officia cum possimus reprehenderit! Et ullam qui iusto quisquam explicabo error sequi id ut eum eveniet beatae neque libero vero alias earum amet rem deserunt vitae saepe totam facilis, atque necessitatibus eligendi. Non mollitia voluptas laborum tempore! Inventore ab, quam, minus officia eum exercitationem laudantium illum itaque magni aperiam molestias rerum perferendis, expedita impedit. Tempore accusamus aut possimus fuga quam. Placeat adipisci temporibus quis error laborum vero eum libero a, aut quisquam quam maxime nostrum eligendi tempora nobis atque unde? Voluptatum numquam cupiditate iusto temporibus officia beatae consequuntur voluptates saepe ea consequatur exercitationem accusantium minima, ex harum, quisquam ab voluptate quos eligendi. Dolorum, voluptas quis. Ipsam, nihil molestias. Earum ratione, animi eligendi eius beatae sapiente et exercitationem quam dignissimos deleniti ea deserunt debitis repellendus odit, illo placeat. Adipisci nesciunt, corrupti iure perferendis voluptatibus cum magni, voluptas quam tempore quisquam ratione odit sunt. Quisquam deleniti earum cumque excepturi unde odio eveniet perferendis officia sint dolores! Pariatur adipisci temporibus aperiam unde eius modi possimus dolore illum similique dolorum esse accusantium sint, ipsa rem ducimus id? Iusto quam nemo accusamus, cum eius placeat dignissimos dolores hic illo eveniet nostrum, excepturi natus quaerat voluptate perferendis itaque, aperiam nesciunt voluptatibus ipsa fugit. Odit, eveniet. In velit reiciendis amet reprehenderit totam incidunt fuga, aut itaque recusandae rem excepturi beatae eveniet odio aspernatur aliquid nemo dolorem ipsa quo mollitia eligendi sed error? Hic recusandae accusantium rem nesciunt sit cupiditate, sint vel rerum similique sapiente ad nisi corrupti doloribus excepturi officia totam odio eum! Qui architecto tempore labore nemo totam voluptate sequi veritatis repellendus eum est sint dignissimos alias, exercitationem voluptatum recusandae quaerat inventore quibusdam cum vero nam. Exercitationem, dignissimos placeat nulla corporis numquam similique assumenda maxime autem. Aperiam illum minima odit voluptas perferendis distinctio dolorum officia! Totam reiciendis itaque sit autem, provident illum maiores exercitationem architecto aspernatur iste esse repudiandae quidem doloremque sapiente, dignissimos sed non magni ut quos impedit unde consequatur accusantium! Dolore perspiciatis hic sit error officia blanditiis rem corporis aperiam, eligendi natus pariatur veritatis a ratione, necessitatibus voluptates recusandae inventore deleniti voluptatibus sequi. Facere cumque mollitia sequi reprehenderit unde, placeat repudiandae nam quas, maiores magni accusantium assumenda excepturi at cupiditate labore, laudantium sint totam quia facilis odio quidem! Tempora facere, aliquam libero commodi maxime consectetur pariatur doloribus at inventore delectus nisi dolorum doloremque quos, sequi molestiae numquam assumenda, suscipit magni saepe voluptatibus. Illum amet sequi quibusdam saepe hic assumenda exercitationem repellendus veniam porro, tempore libero, commodi ipsam impedit perspiciatis. Beatae, ad? Nostrum impedit quas officiis. Consequuntur dolorem vel voluptatem debitis illum natus laborum, asperiores, vero, repellendus molestiae rerum suscipit expedita? Nobis atque, labore officiis voluptatum quia voluptatibus dolore eius? Quas, beatae eaque! Iure nisi magnam vero facere accusantium! Incidunt explicabo, cum voluptates quasi quos nesciunt perferendis? Odit cupiditate fuga sed, nam iste, maiores quo distinctio earum magnam tenetur laboriosam aspernatur corrupti quis minus commodi id illum?</div>
+		</div>
+		<div class="my-4" id="tickettypes-content">
+			<h3 class="mb-2">票種列表</h3>
+			<div class="d-flex flex-column gap-2" id="tickettype-content">
+			</div>
+		</div>
+	</template>
+
+	<template id="tickettype-template">
+		<div class="row border border-secondary rounded p-3">
+			<div class="col-6 d-flex flex-column gap-1 align-items-center justify-content-center">
+				<div class="w-100">
+					<span class="fs-5 tickettype-name">（票種名稱）</span>
+				</div>
+				<div class="w-100">
+					售票期間：
+					<span>2024 年 10 月 25 日 11:00</span>
+					<span class="mx-1">～</span>
+					<span>2024 年 10 月 26 日 11:00</span>
+				</div>
+			</div>
+			<div class="col-2 d-flex justify-content-center align-items-center">
+				<span>價格：<span class="price">500</span></span>
+			</div>
+			<div class="col-2 d-flex justify-content-center align-items-center">
+				<span>剩餘數量：<span class="quantityLeft">100</span></span>
+				<!-- TODO 剩餘數量計算 -->
+			</div>
+			<div class="col-2 d-flex flex-column gap-1 align-items-center justify-content-center">
+				<div class="input-group">
+					<button class="minus btn btn-outline-secondary">-</button>
+					<input type="number" class="quantity form-control text-center" min="0" readonly value="0">
+					<button class="plus btn btn-outline-secondary">+</button>
+				</div>
+				<button class="add-to-cart btn btn-primary mt-1">加入購物車</button>
+			</div>
+		</div>
+	</template>
+
+	<template id="no-tickettype-template">
+		<div class="d-flex justify-content-center align-item-center border border-secondary rounded p-3">
+			<span>（目前無票種）</span>
+		</div>
+	</template>
+</body>
+
+</html>

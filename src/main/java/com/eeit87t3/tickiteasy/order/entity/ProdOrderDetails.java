@@ -35,80 +35,102 @@ public class ProdOrderDetails {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prodOrderID")
     private ProdOrders prodOrder;
+    
 
     // 構造函數
     public ProdOrderDetails() {
     }
 
-    // Getter 和 Setter 方法
-    public Integer getProdOrderDetailId() {
-        return prodOrderDetailId;
-    }
 
-    public void setProdOrderDetailId(Integer prodOrderDetailId) {
-        this.prodOrderDetailId = prodOrderDetailId;
-    }
+	public Integer getProdOrderDetailId() {
+		return prodOrderDetailId;
+	}
 
-    public Integer getProductId() {
-        return productId;
-    }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
+	public void setProdOrderDetailId(Integer prodOrderDetailId) {
+		this.prodOrderDetailId = prodOrderDetailId;
+	}
 
-    public Integer getPrice() {
-        return price;
-    }
 
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
+	public Integer getProductId() {
+		return productId;
+	}
 
-    public Integer getQuantity() {
-        return quantity;
-    }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
+	public void setProductId(Integer productId) {
+		this.productId = productId;
+	}
 
-    public String getContent() {
-        return content;
-    }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
+	public Integer getPrice() {
+		return price;
+	}
 
-    public Date getReviewTime() {
-        return reviewTime;
-    }
 
-    public void setReviewTime(Date reviewTime) {
-        this.reviewTime = reviewTime;
-    }
+	public void setPrice(Integer price) {
+		this.price = price;
+	}
 
-    public Integer getScore() {
-        return score;
-    }
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
+	public Integer getQuantity() {
+		return quantity;
+	}
 
-    public ProdOrders getProdOrders() {
-        return prodOrder;
-    }
 
-    public void setProdOrders(ProdOrders prodOrders) {
-        this.prodOrder = prodOrders;
-    }
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
 
-    // toString 方法
-    @Override
-    public String toString() {
-        return "ProdOrderDetails [prodOrderDetailId=" + prodOrderDetailId + ", productId=" + productId + ", price=" + price
-                + ", quantity=" + quantity + ", content=" + content + ", reviewTime=" + reviewTime + ", score=" + score + "]";
-    }
+
+	public String getContent() {
+		return content;
+	}
+
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+
+	public Date getReviewTime() {
+		return reviewTime;
+	}
+
+
+	public void setReviewTime(Date reviewTime) {
+		this.reviewTime = reviewTime;
+	}
+
+
+	public Integer getScore() {
+		return score;
+	}
+
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
+
+
+	public ProdOrders getProdOrder() {
+		return prodOrder;
+	}
+
+
+	public void setProdOrder(ProdOrders prodOrder) {
+		this.prodOrder = prodOrder;
+	}
+
+
+	@Override
+	public String toString() {
+		return "ProdOrderDetails [prodOrderDetailId=" + prodOrderDetailId + ", productId=" + productId + ", price="
+				+ price + ", quantity=" + quantity + ", content=" + content + ", reviewTime=" + reviewTime + ", score="
+				+ score + ", prodOrder=" + prodOrder + "]";
+	}
+
+
+
+
+    
 }

@@ -1,13 +1,16 @@
 package com.eeit87t3.tickiteasy.order.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
+import com.eeit87t3.tickiteasy.product.entity.CartItem;
 
 public interface ProdOrdersService {
 	public ProdOrders saveOrder(ProdOrders prodOrders); //INSERT 新增 依照ProdOrders
@@ -20,10 +23,7 @@ public interface ProdOrdersService {
 	public Page<ProdOrders> findByDate(String number,Integer id,Integer records);
 	public Page<ProdOrders> findByProdOrdersId(Integer number, Integer id,Integer records);
 	public Page<ProdOrders> findByMemberId(Integer number, Integer id,Integer records);
-//	public ProdOrdersBean selectByShippingId(int shippingID);//SELECT 單筆搜尋 2.依照shippingID
-//	
-//	public List<ProdOrdersBean> selectAllByMemberId(int memberIDParameter); //SELECTALL 多筆搜尋 2.依照memberID
-//	public List<ProdOrdersBean> selectAllByOrderDate(Date orderDate); //SELECTALL 多筆搜尋 3.依照orderDate
-//	public List<ProdOrdersBean> selectAllByStatus(String status);//SELECTALL 多筆搜尋 4.依照status
-//	public List<ProdOrdersBean> selectAllByShippingStatus(String shippingStatus);//SELECTALL 多筆搜尋 5.依照shippingStatus
+	
+	public String ECPay(List<Map<String,Object>> lists,String totalAmount);
+	
 }

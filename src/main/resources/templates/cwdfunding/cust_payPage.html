@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
   <head>
+    <meta th:replace="~{commons/userHead}" />
     <!-- 在這裡放要引入的 CSS 與 JS library -->
     <link
       rel="stylesheet"
@@ -50,8 +51,12 @@
         height: auto;
         border-radius: 5px;
       }
+      .custom-btn {
+        color: #ffffffe8;
+        border: 10px;
+        background-color: #b197fc !important;
+      }
     </style>
-    <meta th:replace="~{commons/userHead}" />
     <title>付款頁面</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
@@ -158,63 +163,63 @@
               </div>
               <form action="" class="pt-4">
                 <div class="mb-3">
-                  <p class="dis fw-bold mb-2">Email address</p>
-                  <input
-                    class="form-control"
-                    type="email"
-                    value="luke@skywalker.com"
-                  />
+                  <p class="dis fw-bold mb-2">電子信箱</p>
+                  <input id="email" class="form-control" type="email" />
                 </div>
                 <div>
-                  <div class="my-3">
-                    <div class="d-flex justify-content-start">
-                      <p class="dis fw-bold mb-2 me-2">加碼贊助</p>
-                      <p class="custom-small-text2 text-secondary mt-1">
-                        (選擇)
-                      </p>
-                    </div>
-                    <input
-                      class="form-control"
-                      type="number"
-                      id="bonusInput"
-                      value="0"
-                    />
-                  </div>
                   <div class="address">
-                    <p class="dis fw-bold mb-3">Billing address</p>
-                    <select
-                      class="form-select"
-                      aria-label="Default select example"
-                    >
-                      <option selected hidden>United States</option>
-                      <option value="1">India</option>
-                      <option value="2">Australia</option>
-                      <option value="3">Canada</option>
-                    </select>
+                    <p class="dis fw-bold mb-3">地址</p>
                     <div class="d-flex">
+                      <select
+                        id="city"
+                        class="form-select"
+                        aria-label="Default select example"
+                      >
+                        <option selected hidden>縣市</option>
+                        <option value="1">台北市</option>
+                        <option value="2">新北市</option>
+                        <option value="3">桃園市</option>
+                      </select>
+                      <select
+                        id="district"
+                        class="form-select"
+                        aria-label="Default select example"
+                      >
+                        <option selected hidden>鄉鎮區</option>
+                        <option value="1">大園區</option>
+                        <option value="2">桃園區</option>
+                        <option value="3">中壢區</option>
+                        <option value="4">八德區</option>
+                        <option value="3">平鎮區</option>
+                      </select>
+                    </div>
+                    <div>
                       <input
-                        class="form-control zip"
+                        id="addressDetail"
+                        class="form-control"
                         type="text"
-                        placeholder="ZIP"
-                      />
-                      <input
-                        class="form-control state"
-                        type="text"
-                        placeholder="State"
                       />
                     </div>
                     <div class="my-3">
-                      <p class="dis fw-bold mb-2">VAT Number</p>
+                      <p class="dis fw-bold mb-2">手機</p>
                       <div class="inputWithcheck">
-                        <input
-                          class="form-control"
-                          type="text"
-                          value="GB012345B9"
-                        />
-                        <span class="fas fa-check"></span>
+                        <input id="phone" class="form-control" type="text" />
                       </div>
                     </div>
-
+                    <div class="my-4">
+                      <div class="d-flex justify-content-start">
+                        <p class="dis fw-bold mb-2 me-2">加碼贊助</p>
+                        <p class="custom-small-text2 text-secondary mt-1">
+                          (選擇)
+                        </p>
+                      </div>
+                      <input
+                        class="form-control"
+                        type="number"
+                        id="bonusInput"
+                        value="0"
+                      />
+                    </div>
                     <div class="form-check mt-5">
                       <div
                         class="d-flex justify-content-start align-items-center"
@@ -249,6 +254,15 @@
                           ></i>
                         </button>
                       </div>
+                    </div>
+                    <div class="my-4">
+                      <button
+                        type="button"
+                        id="autofillBtn"
+                        class="btn custom-btn fw-semibold"
+                      >
+                        一鍵填入
+                      </button>
                     </div>
                   </div>
                 </div>
