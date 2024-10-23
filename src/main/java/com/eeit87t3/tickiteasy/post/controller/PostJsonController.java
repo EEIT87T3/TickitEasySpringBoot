@@ -225,15 +225,23 @@ public class PostJsonController {
 
 			// 保存到資料庫之前，先保存 newPost 以獲得 postID
 			PostEntity createdPost = postService.insert(newPost);
-
+			Integer postID = createdPost.getPostID();
+			
 			// 處理圖片上傳
 			if (imageFiles != null && imageFiles.length > 0) {
-				postImageService.uploadImages(imageFiles, createdPost.getPostID());
+				postImageService.uploadImages(imageFiles, postID);
 			} else {
 
 			}
 
-			return ResponseEntity.ok("貼文新增成功！");
+			// 構建回應物件
+		    Map<String, Object> response = new HashMap<>();
+		    response.put("message", "貼文新增成功！");
+		    response.put("postID", postID);
+
+		    return ResponseEntity.ok(response);  // 返回 JSON 物件，包含 postID
+		    
+//			return ResponseEntity.ok("貼文新增成功！");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return new ResponseEntity<>("圖片上傳失敗", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -270,6 +278,7 @@ public class PostJsonController {
 		if (isDeleted) {
 			response.put("success", true);
 			response.put("message", "貼文已成功刪除");
+//			response.put("postID", postID);
 			return ResponseEntity.ok(response);
 		} else {
 			response.put("success", false);

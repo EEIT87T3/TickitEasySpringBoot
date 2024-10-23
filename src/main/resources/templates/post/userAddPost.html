@@ -213,7 +213,7 @@
             // const index = uploadedImages.indexOf(files[i]);
             if (index > -1) {
               uploadedImages.splice(index, 1);
-         
+
             }
           });
 
@@ -271,8 +271,13 @@
         }
       })
         .then(response => {
-          alert("貼文新增成功！");
-          window.location.href = '/TickitEasy/user/post/PostList'; // 跳轉到貼文列表頁
+          if (response.data && response.data.postID) {  // 確認回應包含 postID
+            const postID = response.data.postID;  // 抓取生成的 postID
+            alert("貼文新增成功！");
+            window.location.href = `/TickitEasy/user/post/${postID}`;  // 使用生成的 postID 跳轉
+          } else {
+            alert("新增成功，但無法取得貼文 ID。");
+          }
         })
         .catch(error => {
           console.error("新增貼文失敗:", error);

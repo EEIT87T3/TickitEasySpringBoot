@@ -135,11 +135,14 @@
 
         // 刪除貼文
         document.getElementById('delete-btn').addEventListener('click', function () {
+            
             if (confirm("確定要刪除此貼文嗎？")) {
+
                 axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
-                    .then(response => {
+                .then(response => {
+                        
                         alert('貼文已刪除');
-                        window.location.href = '/TickitEasy/user/post/PostList'; // 刪除後返回列表頁
+                        window.location.href =  `/TickitEasy/user/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
                     })
                     .catch(error => {
                         console.error('Error deleting post:', error);
