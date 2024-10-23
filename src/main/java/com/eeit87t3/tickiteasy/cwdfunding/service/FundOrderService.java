@@ -1,5 +1,7 @@
 package com.eeit87t3.tickiteasy.cwdfunding.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +42,7 @@ public class FundOrderService {
 		        break; 
 		    }
 		}
-		
+		String memberID = form.get("memberID").toString();
 		String totalAmountString = form.get("amount").toString();
 		String projectIDString =   form.get("projectID").toString();
 		String planIDString =  form.get("planID").toString();
@@ -51,6 +53,7 @@ public class FundOrderService {
 		String tickitID = fullForm.get("orderId").toString();
 		
 		FundOrder fundOrder = new FundOrder();
+		fundOrder.setMemberID(Integer.parseInt(memberID));
 		fundOrder.setFundProj(fundProjRepository.findById(Integer.parseInt(projectIDString)).get());
 		fundOrder.setFundPlan(fundPlanRepository.findById(Integer.parseInt(planIDString)).get());
 		fundOrder.setBonus(Integer.parseInt(bonusString));
@@ -59,4 +62,32 @@ public class FundOrderService {
 		
 		fundOrderRepository.save(fundOrder);
 	}
+	
+//	public void saveFundOrderTest(Integer memberID,  Map<String, Object> fullForm) {
+//		
+//		String bonusString = fullForm.get("bonus").toString();
+//		String totalAmountString = fullForm.get("amount").toString();
+//		String projectIDString =   fullForm.get("projectID").toString();
+//		String planIDString =  fullForm.get("planID").toString();
+//		
+//		 /* 添加tickitID*/
+//		 LocalDateTime now = LocalDateTime.now();
+//		 
+//		 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss"); // 使用 DateTimeFormatter 自定義格式
+//		 String formattedDateTime = now.format(formatter);
+//		 String tickitID = "tickit" + formattedDateTime;		 	
+//		
+//		/* 從fullForm取出資料 */
+//		
+//		
+//		FundOrder fundOrder = new FundOrder();
+//		fundOrder.setMemberID(memberID);
+//		fundOrder.setFundProj(fundProjRepository.findById(Integer.parseInt(projectIDString)).get());
+//		fundOrder.setFundPlan(fundPlanRepository.findById(Integer.parseInt(planIDString)).get());
+//		fundOrder.setBonus(Integer.parseInt(bonusString));
+//		fundOrder.setTotalAmount(Integer.parseInt(totalAmountString));
+//		fundOrder.setTickitID(tickitID);
+//		
+//		fundOrderRepository.save(fundOrder);
+//	}
 }

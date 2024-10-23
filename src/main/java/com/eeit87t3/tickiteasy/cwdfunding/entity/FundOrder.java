@@ -24,6 +24,9 @@ public class FundOrder {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer orderID;
 	
+	@Column(name = "memberID")
+	private Integer memberID; 
+	
 	@Column(name = "tickitID")
 	private String tickitID;
 	
@@ -54,6 +57,14 @@ public class FundOrder {
 
 	public void setOrderID(Integer orderID) {
 		this.orderID = orderID;
+	}
+
+	public Integer getMemberID() {
+		return memberID;
+	}
+
+	public void setMemberID(Integer memberID) {
+		this.memberID = memberID;
 	}
 
 	public String getTickitID() {

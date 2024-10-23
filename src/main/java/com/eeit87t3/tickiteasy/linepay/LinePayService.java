@@ -148,7 +148,18 @@ public class LinePayService {
 //	 }
 	 public Map<String, Object> lineformMaker(Map<String, Object> form){
 		 
-			/* Stream API: 把form轉換成linefullForm */
+			/* Stream API: 把form轉換成linefullForm 
+			 * {
+			 * 		amount:
+			 *      currency:
+			 *      packages:
+			 * 		redirectUrls:
+			 * 		orderId:
+			 * }
+			 * 
+			 * 
+			 * */
+		   
 			 
 			 String[] keysToExtract = {"amount", "currency","packages"}; //指定form裡要提取出來的key
 		 
