@@ -36,7 +36,7 @@ public class FundOrder {
 	@Column(name = "totalAmount")
 	private Integer totalAmount;
 	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss EE", timezone = "UTC+8")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "UTC+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") // 檢查進來的時間，並做格式化
 	@Column(name = "orderDate")
 	private Timestamp orderDate;

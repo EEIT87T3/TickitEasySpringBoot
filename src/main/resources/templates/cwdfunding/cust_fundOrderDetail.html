@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+    <style>
+      .custom-big-text {
+        font-size: 1.3rem;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css"
+    />
+    <meta th:replace="~{commons/memberHead}" />
+    <title>TickitEasy｜募資紀錄</title>
+    <script>
+      $(document).ready(function () {
+        // 這裡是 JavaScript 內容
+      });
+    </script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/memberHeader}"></div>
+    <!-- 這裡是網頁內容 -->
+    <h2>募資明細</h2>
+    <table class="table table-borderless">
+      <thead>
+        <tr class="border-bottom">
+          <th class="fw-medium">
+            <i class="fa-solid fa-tag" style="color: #ffb44d"></i> 訂單資訊
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="pe-5 text-body-secondary">訂單編號</td>
+          <td class="pe-5" th:text="${order.tickitID}"></td>
+          <td class="pe-5 text-body-secondary">訂購日期</td>
+          <td th:text="${#dates.format(order.orderDate, 'yyyy-MM-dd')}"></td>
+        </tr>
+        <tr>
+          <td class="pe-5 text-body-secondary">付款方式</td>
+          <td class="pe-5">LINE Pay</td>
+          <td class="pe-5 text-body-secondary">加碼金額</td>
+          <td th:text="'NT '+${order.bonus}+'元'"></td>
+        </tr>
+        <tr>
+          <td class="pe-5 text-body-secondary">應繳總金額</td>
+          <td
+            class="custom-big-text fw-semibold"
+            th:text="'NT '+${order.totalAmount}+'元'"
+          ></td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table table-borderless pt-3">
+      <thead>
+        <tr class="border-bottom">
+          <th class="fw-medium">
+            <i class="fa-solid fa-tag" style="color: #ffb44d"></i> 募資清單
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="pe-0 me-0">
+            <img th:src="@{${order.fundProj.image}}" style="width: 150px" />
+          </td>
+          <td
+            class="pe-5 text-center d-flex flex-column justify-content-center align-items-start"
+          >
+            <div th:text="${order.fundProj.title}" style="flex-grow: 1"></div>
+            <div
+              th:text="${order.fundPlan.planTitle}"
+              style="flex-grow: 1"
+            ></div>
+          </td>
+          <td
+            class="pe-5"
+            th:text="'價格 NT.'+${order.fundPlan.planUnitPrice}"
+          ></td>
+        </tr>
+      </tbody>
+    </table>
+    <div th:replace="~{commons/memberFooter}"></div>
+  </body>
+</html>

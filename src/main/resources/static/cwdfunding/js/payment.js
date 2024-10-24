@@ -18,7 +18,7 @@ $(document).ready(async function () {
       return rmemberID;
     } catch (error) {
       console.error("獲取會員資料時發生錯誤:", error);
-      return null;
+      return error;
     }
   }
 
