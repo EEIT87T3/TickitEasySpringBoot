@@ -43,7 +43,7 @@ public class UserFundProjViewController {
 	@GetMapping("/fundprojects")
 	public String showProjPage(@RequestParam(value = "p", defaultValue = "1") Integer pageNumber, @RequestParam(required = false) Integer categoryID, Model model) {
 		Integer pageSize = 9;
-		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber, pageSize, categoryID);
+		Page<FundProjDTO> page = projService.findFundProjByPageAndStatus(pageNumber, pageSize, categoryID);
 		List<CategoryEntity> categories = categoryService.findFundProjCategoryList();
 		List<TagEntity> tags = tagService.findFundProjTagList();
 

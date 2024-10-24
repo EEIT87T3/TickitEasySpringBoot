@@ -47,7 +47,7 @@ public class UserFundProjAPIController {
 	public Page<FundProjDTO> findByPageApi(@RequestParam(defaultValue = "1") Integer pageNumber,
 			@RequestParam(required = false) Integer categoryID,Model model) {
 		Integer pageSize = 9;
-		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber, pageSize, categoryID);
+		Page<FundProjDTO> page = projService.findFundProjByPageAndStatus(pageNumber, pageSize, categoryID);
 		return page;
 	}
 

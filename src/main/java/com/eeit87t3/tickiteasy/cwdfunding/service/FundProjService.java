@@ -95,6 +95,42 @@ public class FundProjService {
 	
 	
 
+	/* 前台查詢全部（id升冪、以category搜索）：分頁 */
+	public Page<FundProjDTO> findFundProjByPageAndStatus(Integer pageNumber, Integer size, Integer categoryID){
+		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"projectID");
+		Page<FundProj> fundProjPage = null;
+		
+		if ( categoryID != null) {
+			fundProjPage = fundProjRepo.findProjectByCategoryAndStatus(categoryID, pgb);
+		}else {
+			fundProjPage = fundProjRepo.findProjectByStatus(pgb);
+		}
+		//Page內建map()方法，可將A實體轉換成B實體
+		Page<FundProjDTO> dtoPage= fundProjPage.map(fundProj ->{
+			FundProjDTO dto = new FundProjDTO();
+			dto.setProjectID(fundProj.getProjectID());
+			dto.setTitle(fundProj.getTitle());
+			dto.setDescription(fundProj.getDescription());
+			dto.setImage(fundProj.getImage());
+			dto.setStartDate(fundProj.getStartDate().toLocalDateTime());
+			dto.setEndDate(fundProj.getEndDate().toLocalDateTime());
+			dto.setTargetAmount(fundProj.getTargetAmount());
+			dto.setCurrentAmount(fundProj.getCurrentAmount());
+			dto.setThreshold(fundProj.getThreshold() != null ? fundProj.getThreshold() : "N/A");
+	        // 處理 postponeDate 可能為 null 的情況
+	        if (fundProj.getPostponeDate() != null) {
+	            dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+	        }
+	        dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
+			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
+			dto.setTagString(fundProj.getFundTag().getTagString());
+			dto.setTagName(fundProj.getFundTag().getTagName());
+			dto.setStatus(fundProj.getStatus());
+			return dto;
+		});
+		return dtoPage;
+	}
+
 	/* 查詢全部（id升冪、以category搜索）：分頁 */
 	public Page<FundProjDTO> findFundProjByPage(Integer pageNumber, Integer size, Integer categoryID){
 		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"projectID");
@@ -125,6 +161,8 @@ public class FundProjService {
 			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
+			dto.setStatus(fundProj.getStatus());
+
 			return dto;
 		});
 		return dtoPage;
@@ -169,6 +207,8 @@ public class FundProjService {
 	        }).collect(Collectors.toList());
 	        
 	        dto.setFundplanList(planDTOList);
+			dto.setStatus(fundProj.getStatus());
+
 			return dto;
 		});
 		return dto;
@@ -310,5 +350,20 @@ public class FundProjService {
 		newFundPlan.setPlanContent(content);
 		
 		return fundPlanRepo.save(newFundPlan);
+	}
+	
+	/* 編輯募資活動的上下架狀態 */
+	public boolean editStatusById(Integer projectID, Integer updatedStatus) {
+		Optional<FundProj> optional = fundProjRepo.findById(projectID);
+		try {
+			if(optional.isPresent()) {
+				FundProj fundProj = optional.get();
+				fundProj.setStatus(updatedStatus);
+				fundProjRepo.save(fundProj);
+				return true;
+			}
+		}catch (Exception e) {
+		}
+		return false;
 	}
 }
