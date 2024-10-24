@@ -1,6 +1,5 @@
 package com.eeit87t3.tickiteasy.linepay;
 
-import java.security.KeyStore.Entry;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,17 +13,13 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.qos.logback.core.joran.conditional.IfAction;
 
 @Service
 public class LinePayService {
@@ -124,31 +119,21 @@ public class LinePayService {
 		 
 	 }
 	 
-//	 public Map<String, Object> formMaker(Map<String, Object> form){
-//		 	Map<String, Object> fullForm = new HashMap<String, Object>();
-//		 	fullForm = null;
-//		 	// Add tickitID 
-//	        LocalDateTime now = LocalDateTime.now();
-//
-//	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss"); // 使用 DateTimeFormatter 自定義格式
-//	        String formattedDateTime = now.format(formatter);
-//		 	String tickitID = "tickit" + formattedDateTime;		 	
-//		 	form.put("orderId", tickitID);
-//		 
-//		    // Add the redirect URLs
-//		    Map<String, String> redirectUrls = new HashMap<>();
-//		    redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/test/linepay/requestOK");
-//		    redirectUrls.put("cancelUrl", "http://localhost:8080/TickitEasy/test/linepay/requestNO");
-//		    form.put("redirectUrls", redirectUrls);
-//		    
-//		    fullForm = form;
-//		    
-//		    return fullForm;
-//		 
-//	 }
+
 	 public Map<String, Object> lineformMaker(Map<String, Object> form){
 		 
-			/* Stream API: 把form轉換成linefullForm */
+			/* Stream API: 把form轉換成linefullForm 
+			 * {
+			 * 		amount:
+			 *      currency:
+			 *      packages:
+			 * 		redirectUrls:
+			 * 		orderId:
+			 * }
+			 * 
+			 * 
+			 * */
+		   
 			 
 			 String[] keysToExtract = {"amount", "currency","packages"}; //指定form裡要提取出來的key
 		 

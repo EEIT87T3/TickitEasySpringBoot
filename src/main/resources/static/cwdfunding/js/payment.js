@@ -1,4 +1,27 @@
-$(document).ready(function () {
+$(document).ready(async function () {
+  let memberID = await getMemberProfile();
+  // 獲取會員資料
+  async function getMemberProfile() {
+    if (!Auth.isLoggedIn()) {
+      Auth.logout();
+      return;
+    }
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/TickitEasy/member/api/fundproject/getMemberID",
+        {
+          headers: { Authorization: `Bearer ${Auth.getToken()}` },
+        }
+      );
+      console.log("API 回應:", response.data);
+      let rmemberID = response.data.memberID;
+      return rmemberID;
+    } catch (error) {
+      console.error("獲取會員資料時發生錯誤:", error);
+      return error;
+    }
+  }
+
   const planTitle = document
     .getElementById("planTitle")
     .getAttribute("data-plan-title");
@@ -68,6 +91,7 @@ $(document).ready(function () {
   function requestLinePay() {
     axios
       .post("http://localhost:8080/TickitEasy/api/linepay/request", {
+        memberID: memberID,
         projectID: projectID,
         planID: planID,
         amount: totalAmountValue,
