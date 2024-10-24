@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+
+    <meta th:replace="~{commons/memberHead}" />
+    <title>TickitEasy｜募資紀錄</title>
+    <script>
+      $(document).ready(function () {
+        // 這裡是 JavaScript 內容
+      });
+    </script>
+    <script th:src="@{/cwdfunding/js/fundOrderList.js}"></script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/memberHeader}"></div>
+    <!-- 這裡是網頁內容 -->
+    <h2>募資紀錄</h2>
+    <table class="table table-striped">
+      <thead>
+        <th>訂單編號</th>
+        <th>訂購日期</th>
+        <th>加碼金額</th>
+        <th>訂單總金額</th>
+      </thead>
+      <tbody id="outputBlock"></tbody>
+    </table>
+    <div id="spinnerBlock"></div>
+    <div class="text-end" id="pageBtnBlock"></div>
+    <div th:replace="~{commons/memberFooter}"></div>
+  </body>
+</html>

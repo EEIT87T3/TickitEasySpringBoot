@@ -229,18 +229,18 @@
 						<label class="text-end me-3" style="width: 100px;">類別</label>
 						<select class="form-select" id="category">
 							<option value="" selected>（全部）</option>
-							<option value="1">One</option>
-							<option value="2">Two</option>
-							<option value="3">Three</option>
+							<th:block th:each="category: ${categoryList}">
+								<option th:value="${category.categoryString}">[[${category.categoryName}]]</option>
+							</th:block>
 						</select>
 					</div>
 					<div class="d-flex align-items-center mb-2">
 						<label class="text-end me-3" style="width: 100px;">標籤</label>
 						<select class="form-select" id="tag">
 							<option value="" selected>（全部）</option>
-							<option value="1">One</option>
-							<option value="2">Two</option>
-							<option value="3">Three</option>
+							<th:block th:each="tag: ${tagList}">
+								<option th:value="${tag.tagString}">[[${tag.tagName}]]</option>
+							</th:block>
 						</select>
 					</div>
 					<div class="d-flex align-items-center">

@@ -80,13 +80,12 @@ public class AdminFundProjAPIController {
 		}
 	}
 
-	
+	/* [API] 新增募資活動 */
 	@ResponseBody
 	@PostMapping("/api/fundproject")
 	public ResponseEntity<Map<String, Object>> addProject(@ModelAttribute FundProjDTO fundProjDTO) {
 				// response定義
 		    Map<String, Object> response = new HashMap<>();
-		    
 		    try {
 				/*
 				 * 處理FundProj
