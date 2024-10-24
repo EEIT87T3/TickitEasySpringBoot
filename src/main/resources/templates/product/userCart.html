@@ -342,23 +342,23 @@
         //document.getElementById('totalAmountDisplay').textContent = `$${totalAmount}`; // 顯示在付款頁面
 
         function checkout() {
-            // 儲存總金額到 localStorage
+            // 儲存購物車內 小梁+銓彥 總金額到 localStorage
             localStorage.setItem('totalAmount', cartTotalAmount);
-
             // 將要結帳的活動票券購物車儲存到 localStorage
             const ticketTypesCartToCheckout = Object.values(JSON.parse(localStorage.getItem("ticketTypesCart")));
             localStorage.setItem('ticketTypesCartToCheckout', JSON.stringify(ticketTypesCartToCheckout));
-
             // 將要結帳的周邊商品購物車儲存到 localStorage
             const itemsToCheckout = cartItems.map(item => ({
-                productID: item.productID,
-                productName: item.productName, // 加入商品名稱
-                productQuantity: item.quantity,
-                productAmount: item.price * item.quantity
+                productID: item.productID, //產品ID
+                productName: item.productName, // 產品名稱
+                productPrice: item.price, // 產品價格
+                productQuantity: item.quantity, // 該產品總數量
+                productAmount: item.price * item.quantity // 產品 * 該產品總數量 = 該產品總金額
             }));
-            localStorage.setItem('checkoutItems', JSON.stringify(itemsToCheckout)); // 儲存商品資訊
-
-
+            // 將itemsToCheckout存成json返回給後端
+            localStorage.setItem('checkoutItems', JSON.stringify(itemsToCheckout));         
+          
+            // 顯示確認對話框
             Swal.fire({
                 title: '確定要前往付款嗎？',
                 text: `總金額：${cartTotalAmount} 元`,

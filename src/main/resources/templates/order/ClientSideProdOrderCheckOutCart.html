@@ -149,6 +149,7 @@
         <table>
             <tr>
                 <th>商品名稱</th>
+                <th>單價</th>
                 <th>數量</th>
                 <th>金額</th>
             </tr>
@@ -159,6 +160,8 @@
         </div>
         
         <form method="post">
+            <input type="hidden" id="jwtToken" name="jwtToken">
+        	<input type="hidden" id="ticketTypesCartToCheckoutJson" name="ticketTypesCartToCheckoutJson">
             <input type="hidden" id="checkoutItemsField" name="checkoutItems">
             <input type="hidden" id="totalAmountField" name="totalAmount">
             <div class="contact-info">
@@ -202,19 +205,38 @@
     </div>
     <script>
         const totalAmount = localStorage.getItem("totalAmount"); //商品總金額
-        const checkoutItems = JSON.parse(localStorage.getItem("checkoutItems")); //商品資訊
-        const checkoutItemsJson = JSON.stringify(checkoutItems)
+        const checkoutItems = JSON.parse(localStorage.getItem("checkoutItems")); //小梁購物車資訊
+        const checkoutItemsJson = JSON.stringify(checkoutItems) //小梁購物車資訊轉JSON
+        const ticketTypesCartToCheckout = JSON.parse(localStorage.getItem("ticketTypesCartToCheckout")); //銓彥購物車資訊
+        const ticketTypesCartToCheckoutJson = JSON.stringify(ticketTypesCartToCheckout) //小梁購物車資訊轉JSON
         // 將資料填入隱藏的表單字段
+        document.getElementById('ticketTypesCartToCheckoutJson').value = ticketTypesCartToCheckoutJson;
         document.getElementById('checkoutItemsField').value = checkoutItemsJson;
         document.getElementById('totalAmountField').value = totalAmount;
+        document.getElementById('jwtToken').value = localStorage.getItem("jwtToken");
+        // 載入銓彥購物車資料
+        if(ticketTypesCartToCheckoutJson != null){
+            const table = document.querySelector('table');
+            ticketTypesCartToCheckout.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.eventName}</td>
+                    <td>${item.price}</td>
+                    <td>${item.quantity}</td>
+                    <td>$${item.totalPrice}</td>
+                `;
+                table.appendChild(tr);
+            });
+        }
 
-        //載入購物車資料
+        // 載入小梁購物車資料
         if (checkoutItems && totalAmount) { 
             const table = document.querySelector('table');
             checkoutItems.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${item.productName}</td>
+                    <td>${item.productPrice}</td>
                     <td>${item.productQuantity}</td>
                     <td>$${item.productAmount}</td>
                 `;
@@ -222,19 +244,28 @@
             });
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="text-danger">總金額</td>
-                <td></td>
-                <td class="text-danger">$${totalAmount}</td>
+                <td class="text-danger text-center" colspan="3">總金額: </td>
+                <td class="text-danger ">$${totalAmount}</td>
             `;
             table.appendChild(tr);
         }
 
-        document.querySelector('.submit-btn').addEventListener('click',function(e){ //提交表單按鈕
-            document.querySelector('form').action = window.location.href + "../../../order/ECPay"
-
-        })        
+            document.querySelector('.submit-btn').addEventListener('click',function(e){ //提交表單按鈕
+                localStorage.removeItem("cart");
+                localStorage.removeItem("checkoutItems");
+                localStorage.removeItem("ticketTypesCart");
+                localStorage.removeItem("ticketTypesCartToCheckout");
+                localStorage.removeItem("totalAmount");
+                document.querySelector('form').action = window.location.href + "../../../order/ECPay"
+            }
+        )        
 
         document.querySelector('#takeeasy').addEventListener('click',function(e){ //一件輸入按鈕
+            console.log(localStorage.getItem('checkoutItems'));
+            console.log(checkoutItems);
+            console.log(checkoutItemsJson);
+            
+            
             document.querySelector('#name').value = '王小明';
             document.querySelector('#email').value = 'sososo8819@gmail.com';
             document.querySelector('#phone').value = '0987654321';

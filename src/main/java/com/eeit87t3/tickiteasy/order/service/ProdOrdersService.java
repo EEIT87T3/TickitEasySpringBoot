@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
-import com.eeit87t3.tickiteasy.product.entity.CartItem;
 
 public interface ProdOrdersService {
 	public ProdOrders saveOrder(ProdOrders prodOrders); //INSERT 新增 依照ProdOrders
@@ -24,6 +23,6 @@ public interface ProdOrdersService {
 	public Page<ProdOrders> findByProdOrdersId(Integer number, Integer id,Integer records);
 	public Page<ProdOrders> findByMemberId(Integer number, Integer id,Integer records);
 	
-	public String ECPay(List<Map<String,Object>> lists,String totalAmount);
+	public String ECPay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount,String memberEmail);
 	
 }
