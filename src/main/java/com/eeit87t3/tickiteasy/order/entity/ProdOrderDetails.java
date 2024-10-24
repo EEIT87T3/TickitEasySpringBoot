@@ -2,6 +2,7 @@ package com.eeit87t3.tickiteasy.order.entity;
 
 import java.sql.Date;
 
+import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 
 import jakarta.persistence.*;
@@ -31,6 +32,15 @@ public class ProdOrderDetails {
     
     @Column(name = "score")
     private Integer score;
+
+    @Column(name = "ticketTypeID")
+    private Integer ticketTypeId;
+    
+    @Column(name = "ticketPrice")
+    private Integer ticketPrice;
+    
+    @Column(name = "ticketQuantity")
+    private Integer ticketQuantity;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prodOrderID")
@@ -50,17 +60,6 @@ public class ProdOrderDetails {
 	public void setProdOrderDetailId(Integer prodOrderDetailId) {
 		this.prodOrderDetailId = prodOrderDetailId;
 	}
-
-
-	public Integer getProductId() {
-		return productId;
-	}
-
-
-	public void setProductId(Integer productId) {
-		this.productId = productId;
-	}
-
 
 	public Integer getPrice() {
 		return price;
@@ -122,15 +121,56 @@ public class ProdOrderDetails {
 	}
 
 
+	public Integer getProductId() {
+		return productId;
+	}
+
+
+	public void setProductId(Integer productId) {
+		this.productId = productId;
+	}
+
+
+	public Integer getTicketTypeId() {
+		return ticketTypeId;
+	}
+
+
+	public void setTicketTypeId(Integer ticketTypeId) {
+		this.ticketTypeId = ticketTypeId;
+	}
+
+
+	public Integer getTicketPrice() {
+		return ticketPrice;
+	}
+
+
+	public void setTicketPrice(Integer ticketPrice) {
+		this.ticketPrice = ticketPrice;
+	}
+
+
+	public Integer getTicketQuantity() {
+		return ticketQuantity;
+	}
+
+
+	public void setTicketQuantity(Integer ticketQuantity) {
+		this.ticketQuantity = ticketQuantity;
+	}
+
+
 	@Override
 	public String toString() {
 		return "ProdOrderDetails [prodOrderDetailId=" + prodOrderDetailId + ", productId=" + productId + ", price="
 				+ price + ", quantity=" + quantity + ", content=" + content + ", reviewTime=" + reviewTime + ", score="
-				+ score + ", prodOrder=" + prodOrder + "]";
+				+ score + ", ticketTypeId=" + ticketTypeId + ", ticketPrice=" + ticketPrice + ", ticketQuantity="
+				+ ticketQuantity + ", prodOrder=" + prodOrder + "]";
 	}
 
 
-
+	
 
     
 }
