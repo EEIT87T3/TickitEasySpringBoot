@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
-import com.eeit87t3.tickiteasy.product.entity.CartItem;
 
 public interface ProdOrdersService {
 	public ProdOrders saveOrder(ProdOrders prodOrders); //INSERT 新增 依照ProdOrders

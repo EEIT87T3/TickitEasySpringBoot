@@ -41,7 +41,6 @@ import com.eeit87t3.tickiteasy.order.entity.ProductPackageForm;
 import com.eeit87t3.tickiteasy.order.entity.RedirectUrls;
 import com.eeit87t3.tickiteasy.order.repository.ProdOrdersRepository;
 import com.eeit87t3.tickiteasy.order.service.ProdOrdersService;
-import com.eeit87t3.tickiteasy.product.entity.CartItem;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;

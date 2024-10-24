@@ -43,7 +43,6 @@ import org.springframework.web.client.RestTemplate;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 import com.eeit87t3.tickiteasy.order.service.Impl.ProdOrdersServiceImpl;
-import com.eeit87t3.tickiteasy.product.entity.CartItem;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
