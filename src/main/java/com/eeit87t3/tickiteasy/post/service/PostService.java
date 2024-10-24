@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -79,8 +80,16 @@ public class PostService {
             return dto;
         }).collect(Collectors.toList());
     }
-    public Page<ShowPostDTO> getPostsByCategory(Integer categoryId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<ShowPostDTO> getPostsByCategory(Integer categoryId, int page, int size ,String sortBy, String orderBy) {
+    	Sort sort ;
+
+        // 設定排序方向
+        if (orderBy.equalsIgnoreCase(Sort.Direction.ASC.name())) {
+            sort = Sort.by(sortBy).ascending();
+        } else {
+            sort = Sort.by(sortBy).descending();
+        }
+    	Pageable pageable = PageRequest.of(page, size, sort);
         Page<PostEntity> postPage = postRepo.findByPostCategory_CategoryId(categoryId, pageable);
 
         return postPage.map(this::convertToShowPostDTO);

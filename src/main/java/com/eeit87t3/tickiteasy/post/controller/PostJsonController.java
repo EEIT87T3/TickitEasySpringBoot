@@ -96,9 +96,11 @@ public class PostJsonController {
 	public ResponseEntity<Page<ShowPostDTO>> getPostsByCategory(
 			@PathVariable Integer categoryId,
 			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size) {
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "postID") String sortBy, 
+		    @RequestParam(defaultValue = "desc") String orderBy) {
 
-		Page<ShowPostDTO> posts = postService.getPostsByCategory(categoryId, page, size);
+		Page<ShowPostDTO> posts = postService.getPostsByCategory(categoryId, page, size,sortBy, orderBy);
 		return ResponseEntity.ok(posts);
 	}
 
