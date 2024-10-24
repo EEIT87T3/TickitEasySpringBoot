@@ -17,6 +17,7 @@ import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.entity.Member.MemberStatus;
 import com.eeit87t3.tickiteasy.member.repository.MemberRepository;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
+import com.eeit87t3.tickiteasy.util.OAuthLoginRequest;
 
 import jakarta.transaction.Transactional;
 
@@ -148,6 +149,51 @@ public class MemberService {
         memberRepository.save(member);
     }
     
+ // 第三方登入，僅保留 Google 登入邏輯
+    @Transactional
+    public Optional<String> oauthLogin(OAuthLoginRequest request) {
+        Member member;
+        
+        // 根據提供者ID查找會員
+        if ("google".equals(request.getProvider())) {
+            member = findByGoogleId(request.getProviderId());
+        } else {
+            throw new IllegalArgumentException("不支援的登入提供者");
+        }
+
+        // 如果會員不存在，創建新會員
+        if (member == null) {
+            member = createOAuthMember(request);
+        }
+
+        // 生成 JWT Token
+        String token = jwtUtil.generateToken(member.getEmail());
+        return Optional.of(token);
+    }
+
+    private Member createOAuthMember(OAuthLoginRequest request) {
+        // 檢查信箱是否已被使用
+        Member existingMember = findByEmail(request.getEmail());
+        if (existingMember != null) {
+            return existingMember;
+        }
+
+        // 創建新會員
+        Member newMember = new Member();
+        newMember.setEmail(request.getEmail());
+        newMember.setName(request.getName());
+        newMember.setNickname(request.getName());
+        newMember.setRegisterDate(LocalDate.now());
+        newMember.setStatus(Member.MemberStatus.已驗證);  // OAuth登入的用戶直接設為已驗證
+
+        newMember.setGoogleId(request.getProviderId());  // 設置 Google ID
+        return memberRepository.save(newMember);
+    }
+
+    // 根據 Google ID 查找會員
+    public Member findByGoogleId(String googleId) {
+        return memberRepository.findByGoogleId(googleId);
+    }
     
     /**************後台*********************/
 

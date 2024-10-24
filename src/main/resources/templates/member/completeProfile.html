@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta th:replace="~{commons/userHead}">
+    <title>完善資料 - TickitEasy</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        .complete-profile-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label.required::after {
+            content: '*';
+            color: red;
+            margin-left: 4px;
+        }
+
+        .btn-submit {
+            background-color: var(--main-blue-purple);
+            color: #fff;
+            width: 100%;
+            padding: 10px;
+            font-size: 1.2rem;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--dark-purple);
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{commons/userHeader}"></div>
+
+    <div class="complete-profile-container">
+        <h2 class="text-center mb-4">完善個人資料</h2>
+        <p class="text-muted text-center mb-4">請補充以下必要資料以完成註冊</p>
+
+        <form id="completeProfileForm">
+            <div class="mb-3">
+                <label for="nickname" class="form-label required">暱稱</label>
+                <input type="text" class="form-control" id="nickname" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="name" class="form-label required">姓名</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="birthDate" class="form-label required">生日</label>
+                <input type="date" class="form-control" id="birthDate" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label required">手機號碼</label>
+                <input type="tel" class="form-control" id="phone" required 
+                       pattern="^09\d{8}$" placeholder="格式：0912345678">
+            </div>
+
+            <button type="submit" class="btn btn-submit">提交資料</button>
+        </form>
+    </div>
+
+    <div th:replace="~{commons/userFooter}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/Token/auth.js}"></script>
+    <script th:src="@{/member/js/completeProfile.js}"></script>
+</body>
+</html>

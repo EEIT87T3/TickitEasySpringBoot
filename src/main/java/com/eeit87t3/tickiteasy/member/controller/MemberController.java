@@ -5,6 +5,8 @@ import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.test.EmailService;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
+import com.eeit87t3.tickiteasy.util.OAuthLoginRequest;
+import com.eeit87t3.tickiteasy.util.ProfileValidator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +152,95 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    
+    @PostMapping("/oauth/login")
+    public ResponseEntity<Map<String, Object>> oauthLogin(@RequestBody OAuthLoginRequest request) {
+        // 處理第三方登入
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<String> token = memberService.oauthLogin(request);
+            
+            if (token.isPresent()) {
+                Member member = memberService.findByEmail(request.getEmail());
+                boolean needsCompletion = ProfileValidator.needsProfileCompletion(member);
+                
+                response.put("status", "success");
+                response.put("token", token.get());
+                response.put("needsCompletion", needsCompletion);
+
+                if (needsCompletion) {
+                    Map<String, Boolean> missingFields = new HashMap<>();
+                    missingFields.put("phone", member.getPhone() == null || member.getPhone().trim().isEmpty());
+                    missingFields.put("birthDate", member.getBirthDate() == null);
+                    missingFields.put("name", member.getName() == null || member.getName().trim().isEmpty());
+                    missingFields.put("nickname", member.getNickname() == null || member.getNickname().trim().isEmpty());
+                    response.put("missingFields", missingFields);
+                }
+                
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("status", "error");
+                response.put("message", "第三方登入失敗");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        } catch (IllegalArgumentException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            logger.error("第三方登入失敗：{}", e.getMessage());
+            response.put("status", "error");
+            response.put("message", "登入過程中發生錯誤");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+   
+    //檢查會員資料狀態
+    @GetMapping("/profile/status")
+    public ResponseEntity<Map<String, Object>> getProfileStatus(
+            @RequestHeader("Authorization") String authHeader) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // 從 Token 中獲取 email
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtil.getEmailFromToken(token);
+            Member member = memberService.findByEmail(email);
+            
+            if (member == null) {
+                response.put("status", "error");
+                response.put("message", "找不到會員資料");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            
+            // 檢查資料狀態
+            boolean isComplete = ProfileValidator.isProfileComplete(member);
+            boolean needsCompletion = ProfileValidator.needsProfileCompletion(member);
+            
+            response.put("status", "success");
+            response.put("isComplete", isComplete);
+            response.put("needsCompletion", needsCompletion);
+            
+            // 如果資料不完整,告訴前端缺少哪些資料
+            if (!isComplete) {
+                Map<String, Boolean> missingFields = new HashMap<>();
+                missingFields.put("phone", member.getPhone() == null || member.getPhone().trim().isEmpty());
+                missingFields.put("birthDate", member.getBirthDate() == null);
+                missingFields.put("name", member.getName() == null || member.getName().trim().isEmpty());
+                missingFields.put("nickname", member.getNickname() == null || member.getNickname().trim().isEmpty());
+                response.put("missingFields", missingFields);
+            }
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            logger.error("檢查資料狀態時發生錯誤：{}", e.getMessage());
+            response.put("status", "error");
+            response.put("message", "檢查資料狀態時發生錯誤");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
  // 處理會員登出（JWT為無狀態性，後端不用處理，只需要用前端刪除Token)
     @GetMapping("/logout")
     public ResponseEntity<Map<String, String>> logout() {
@@ -227,7 +318,7 @@ public class MemberController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            if (phone == null || !phone.matches("^\\d{10}$")) {
+            if (phone == null || !phone.matches("^09\\d{8}$")) {  // 改為09開頭的手機號碼格式
                 response.put("error", "請輸入有效的手機號碼");
                 return ResponseEntity.badRequest().body(response);
             }

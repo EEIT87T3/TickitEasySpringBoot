@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>服務條款 - TickitEasy</title>
+    <div th:replace="~{commons/userHead}"></div>
+    <style>
+        .terms-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .terms-section {
+            margin-bottom: 2rem;
+        }
+        .terms-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{commons/userHeader}"></div>
+
+    <div class="terms-container">
+        <h1 class="mb-4">服務條款</h1>
+
+        <div class="terms-section">
+            <h3>1. 服務範圍</h3>
+            <p>TickitEasy提供以下服務：</p>
+            <ul>
+                <li>活動票券銷售和管理</li>
+                <li>活動資訊發布平台</li>
+                <li>會員帳戶管理</li>
+                <li>客戶服務支援</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3>2. 會員義務</h3>
+            <p>會員同意：</p>
+            <ul>
+                <li>提供真實準確的個人資料</li>
+                <li>妥善保管帳號密碼</li>
+                <li>不得從事非法或違規活動</li>
+                <li>遵守平台相關規範</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3>3. 票券政策</h3>
+            <p>關於票券購買和使用：</p>
+            <ul>
+                <li>票券一經售出，除法律規定外不得退換</li>
+                <li>請勿進行票券轉售或非法交易</li>
+                <li>應遵守活動主辦方的相關規定</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3>4. 智慧財產權</h3>
+            <p>本平台的所有內容均受保護：</p>
+            <ul>
+                <li>網站內容的著作權歸屬本公司</li>
+                <li>未經許可不得複製或散布</li>
+                <li>使用者發布內容需確保無侵權</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3>5. 免責聲明</h3>
+            <p>本公司不承擔以下責任：</p>
+            <ul>
+                <li>活動內容的真實性和品質</li>
+                <li>因不可抗力造成的服務中斷</li>
+                <li>使用者間的糾紛</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h3>6. 帳戶終止</h3>
+            <p>在以下情況下可能終止帳戶：</p>
+            <ul>
+                <li>違反服務條款</li>
+                <li>提供虛假資訊</li>
+                <li>從事非法活動</li>
+                <li>長期未使用帳戶</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <p class="text-muted">最後更新日期：2024年3月1日</p>
+        </div>
+    </div>
+
+    <div th:replace="~{commons/userFooter}"></div>
+</body>
+</html>
