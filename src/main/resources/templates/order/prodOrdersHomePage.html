@@ -32,7 +32,7 @@
 		}
 
 		table {
-			width: 1600px;
+			width: 1550px;
 			border-collapse: collapse;
 		}
 
@@ -125,7 +125,7 @@
 
 							<tr align="center" th:each="prodOrders : ${allPage.content}">
 								<td th:text="${prodOrders.prodOrderID}" />
-								<td th:text="${prodOrders.memberID}" />
+								<td th:text="${prodOrders.member.memberID}" />
 								<td th:text="${prodOrders.orderDate}" />
 								<td th:text="${prodOrders.payments}" />
 								<td th:text="${prodOrders.paymenInfo}" />
@@ -230,7 +230,7 @@
 					tbody.innerHTML += `
 					<tr align="center">
 						<td>${prodOrders.prodOrderID}</td>
-						<td>${prodOrders.memberID}</td>
+						<td>${prodOrders.member.memberID}</td>
 						<td>${prodOrders.orderDate}</td>
 						<td>${prodOrders.payments}</td>
 						<td>${prodOrders.paymenInfo}</td>

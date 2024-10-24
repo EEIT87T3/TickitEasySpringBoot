@@ -2,6 +2,7 @@ package com.eeit87t3.tickiteasy.order.entity;
 
 import java.sql.Date;
 
+import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 
 import jakarta.persistence.*;
@@ -31,84 +32,145 @@ public class ProdOrderDetails {
     
     @Column(name = "score")
     private Integer score;
+
+    @Column(name = "ticketTypeID")
+    private Integer ticketTypeId;
+    
+    @Column(name = "ticketPrice")
+    private Integer ticketPrice;
+    
+    @Column(name = "ticketQuantity")
+    private Integer ticketQuantity;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prodOrderID")
     private ProdOrders prodOrder;
+    
 
     // 構造函數
     public ProdOrderDetails() {
     }
 
-    // Getter 和 Setter 方法
-    public Integer getProdOrderDetailId() {
-        return prodOrderDetailId;
-    }
 
-    public void setProdOrderDetailId(Integer prodOrderDetailId) {
-        this.prodOrderDetailId = prodOrderDetailId;
-    }
+	public Integer getProdOrderDetailId() {
+		return prodOrderDetailId;
+	}
 
-    public Integer getProductId() {
-        return productId;
-    }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
+	public void setProdOrderDetailId(Integer prodOrderDetailId) {
+		this.prodOrderDetailId = prodOrderDetailId;
+	}
 
-    public Integer getPrice() {
-        return price;
-    }
+	public Integer getPrice() {
+		return price;
+	}
 
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
+	public void setPrice(Integer price) {
+		this.price = price;
+	}
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 
-    public String getContent() {
-        return content;
-    }
+	public Integer getQuantity() {
+		return quantity;
+	}
 
-    public void setContent(String content) {
-        this.content = content;
-    }
 
-    public Date getReviewTime() {
-        return reviewTime;
-    }
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
 
-    public void setReviewTime(Date reviewTime) {
-        this.reviewTime = reviewTime;
-    }
 
-    public Integer getScore() {
-        return score;
-    }
+	public String getContent() {
+		return content;
+	}
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
 
-    public ProdOrders getProdOrders() {
-        return prodOrder;
-    }
+	public void setContent(String content) {
+		this.content = content;
+	}
 
-    public void setProdOrders(ProdOrders prodOrders) {
-        this.prodOrder = prodOrders;
-    }
 
-    // toString 方法
-    @Override
-    public String toString() {
-        return "ProdOrderDetails [prodOrderDetailId=" + prodOrderDetailId + ", productId=" + productId + ", price=" + price
-                + ", quantity=" + quantity + ", content=" + content + ", reviewTime=" + reviewTime + ", score=" + score + "]";
-    }
+	public Date getReviewTime() {
+		return reviewTime;
+	}
+
+
+	public void setReviewTime(Date reviewTime) {
+		this.reviewTime = reviewTime;
+	}
+
+
+	public Integer getScore() {
+		return score;
+	}
+
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
+
+
+	public ProdOrders getProdOrder() {
+		return prodOrder;
+	}
+
+
+	public void setProdOrder(ProdOrders prodOrder) {
+		this.prodOrder = prodOrder;
+	}
+
+
+	public Integer getProductId() {
+		return productId;
+	}
+
+
+	public void setProductId(Integer productId) {
+		this.productId = productId;
+	}
+
+
+	public Integer getTicketTypeId() {
+		return ticketTypeId;
+	}
+
+
+	public void setTicketTypeId(Integer ticketTypeId) {
+		this.ticketTypeId = ticketTypeId;
+	}
+
+
+	public Integer getTicketPrice() {
+		return ticketPrice;
+	}
+
+
+	public void setTicketPrice(Integer ticketPrice) {
+		this.ticketPrice = ticketPrice;
+	}
+
+
+	public Integer getTicketQuantity() {
+		return ticketQuantity;
+	}
+
+
+	public void setTicketQuantity(Integer ticketQuantity) {
+		this.ticketQuantity = ticketQuantity;
+	}
+
+
+	@Override
+	public String toString() {
+		return "ProdOrderDetails [prodOrderDetailId=" + prodOrderDetailId + ", productId=" + productId + ", price="
+				+ price + ", quantity=" + quantity + ", content=" + content + ", reviewTime=" + reviewTime + ", score="
+				+ score + ", ticketTypeId=" + ticketTypeId + ", ticketPrice=" + ticketPrice + ", ticketQuantity="
+				+ ticketQuantity + ", prodOrder=" + prodOrder + "]";
+	}
+
+
+	
+
+    
 }

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KKTIX - 我的票券</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            color: white;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .nav-items {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-item {
+            color: white;
+            text-decoration: none;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+        }
+        .search-input {
+            padding: 5px;
+            border: none;
+            border-radius: 3px 0 0 3px;
+        }
+        .search-button {
+            background-color: #45a049;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 0 3px 3px 0;
+            cursor: pointer;
+        }
+        .user-menu {
+            margin-left: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .tab.active {
+            border-bottom: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+        .content {
+            text-align: center;
+            color: #666;
+        }
+        .search-form {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .search-input-large {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px 0 0 3px;
+        }
+        .search-select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 0;
+        }
+        .search-button-large {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 0 3px 3px 0;
+            cursor: pointer;
+        }
+        .app-download {
+            background-color: #e8f5e9;
+            padding: 10px;
+            text-align: center;
+            margin-top: 20px;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">KKTIX</div>
+            <nav class="nav-items">
+                <a href="#" class="nav-item">我的票券</a>
+                <a href="#" class="nav-item">探索活動</a>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="搜尋活動">
+                    <button class="search-button">Q</button>
+                </div>
+                <a href="#" class="nav-item">建立活動</a>
+                <a href="#" class="nav-item">選擇組織 ▼</a>
+            </nav>
+            <div class="user-menu">tony475767 ▼</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active">票券綜覽</div>
+            <div class="tab">接收票券</div>
+        </div>
+        <h1>我的票券</h1>
+        <div class="content">
+            <p>您沒有任何票券</p>
+            <p>您可以搜尋最近舉辦的活動，或看看我們的推薦。</p>
+            <form class="search-form">
+                <input type="text" class="search-input-large" placeholder="活動名稱、主辦單位或關鍵字">
+                <select class="search-select">
+                    <option>所有可報名的活動</option>
+                </select>
+                <button class="search-button-large">搜尋</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-download">
+        下載 KKTIX App，隨時活動一手掌握。
+    </div>
+</body>
+</html>

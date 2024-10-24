@@ -9,12 +9,6 @@
 
     <meta th:replace="~{commons/userHead}">
 	<title>探索活動</title>
-	<style>
-		.card-img-top {
-			width: 100%;
-			height: calc(358.4px * 9 / 16);  /* 想用寬度計算 16 : 9 的相應高度，但是不知道怎麼寫；暫時用寫死的方式呈現。 */
-		}
-	</style>
 	<script>
 		$(document).ready(function () {
 
@@ -235,18 +229,18 @@
 						<label class="text-end me-3" style="width: 100px;">類別</label>
 						<select class="form-select" id="category">
 							<option value="" selected>（全部）</option>
-							<option value="1">One</option>
-							<option value="2">Two</option>
-							<option value="3">Three</option>
+							<th:block th:each="category: ${categoryList}">
+								<option th:value="${category.categoryString}">[[${category.categoryName}]]</option>
+							</th:block>
 						</select>
 					</div>
 					<div class="d-flex align-items-center mb-2">
 						<label class="text-end me-3" style="width: 100px;">標籤</label>
 						<select class="form-select" id="tag">
 							<option value="" selected>（全部）</option>
-							<option value="1">One</option>
-							<option value="2">Two</option>
-							<option value="3">Three</option>
+							<th:block th:each="tag: ${tagList}">
+								<option th:value="${tag.tagString}">[[${tag.tagName}]]</option>
+							</th:block>
 						</select>
 					</div>
 					<div class="d-flex align-items-center">
@@ -291,7 +285,9 @@
 	<template id="event-card-template">
 		<div class="col d-flex justify-content-center mb-3">
 			<a class="card h-100 custom-card">
-				<img src="/TickitEasy/images/event/5_f0264110-1cc9-41cc-b8e5-69cb80bd8b8d.png" class="card-img-top" alt="..."/>
+				<div class="ratio ratio-16x9">
+					<img class="card-img-top object-fit-cover" alt="..."/>
+				</div>
 				<div class="card-body">
 					<div class="card-title fw-semibold fs-5">活動名稱</div>
 					<div>

@@ -34,6 +34,23 @@
 				}
 				console.log(urlWithParams);
 
+				// 在 tbody 顯示 spinner
+				document.getElementById("tbody").innerHTML = `
+					<tr>
+						<td colspan="9">
+							<!-- spinner -->
+							<div class="d-flex justify-content-center align-item-center m-5">
+								<div class="spinner-border" role="status">
+									<span class="visually-hidden">Loading...</span>
+								</div>
+							</div>
+						</td>
+					</tr>`;
+				// 將 pagination 消失
+				document.querySelector("ul.pagination").innerHTML = "";
+
+				
+
 				axios.get(urlWithParams)
 					.then(res => {
 						console.log(res.data);
@@ -137,7 +154,7 @@
 					}
 					element.addEventListener("click", function() {
 						let param = {
-							p: this.getAttribute("data-page-num")
+							pageNumber: this.getAttribute("data-page-num")
 						};
 						console.log(param);
 						search(param);
@@ -186,7 +203,6 @@
 
 			</tbody>
 		</table>
-		<!-- <div id="page-buttons"></div> -->
 		<div class="d-flex flex-row-reverse">
 			<nav>
 				<ul class="pagination">

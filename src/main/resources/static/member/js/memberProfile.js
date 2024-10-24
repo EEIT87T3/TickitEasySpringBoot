@@ -1,6 +1,6 @@
 // memberProfile.js
 
-// 獲取會員資料
+// 獲取會員資料並更新個人資料表單
 async function getMemberProfile() {
     console.log('開始獲取會員資料');
     if (!Auth.isLoggedIn()) {
@@ -14,10 +14,32 @@ async function getMemberProfile() {
             headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
         });
         console.log('API 回應:', response.data);
-        updateProfileUI(response.data);
+        updateProfileForm(response.data);
+        loadMemberInfo(); // 觸發 memberInfo.js 更新 UI
     } catch (error) {
         console.error('獲取會員資料時發生錯誤:', error);
         handleApiError(error);
+    }
+}
+
+// 更新個人資料表單的 UI
+function updateProfileForm(memberData) {
+    const elements = {
+        email: document.getElementById('email'),
+        name: document.getElementById('name'),
+        nickname: document.getElementById('nickname'),
+        birthDate: document.getElementById('birthDate'),
+        phone: document.getElementById('phone')
+    };
+
+    // 檢查並更新表單字段
+    for (const [key, element] of Object.entries(elements)) {
+        if (element) {
+            element.value = memberData[key] || '';
+            console.log(`更新 ${key}: ${element.value}`);
+        } else {
+            console.warn(`找不到元素: ${key}`);
+        }
     }
 }
 
@@ -32,7 +54,8 @@ async function updateProfile(formData) {
         });
         console.log('更新資料回應:', response.data);
         Swal.fire('成功', '資料更新成功', 'success');
-        getMemberProfile();
+        await getMemberProfile(); // 更新個人資料表單
+        // loadMemberInfo() 已在 getMemberProfile() 中被呼叫
     } catch (error) {
         console.error('更新會員資料時發生錯誤:', error);
         handleApiError(error, '資料更新失敗');
@@ -47,6 +70,23 @@ async function updateProfilePic(file) {
     const formData = new FormData();
     formData.append('profilePic', file);
 
+    // 即時顯示選擇的圖片作為預覽
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const profilePicDisplay = document.getElementById('profilePicDisplay');
+        if (profilePicDisplay) {
+            profilePicDisplay.src = e.target.result;
+            console.log('即時預覽頭貼圖片');
+        }
+
+        const navMemberAvatar = document.getElementById('memberAvatar');
+        if (navMemberAvatar) {
+            navMemberAvatar.src = e.target.result;
+            console.log('即時預覽導航欄頭貼圖片');
+        }
+    };
+    reader.readAsDataURL(file);
+
     try {
         const response = await axios.post('/TickitEasy/api/member/profilePic', formData, {
             headers: {
@@ -54,12 +94,12 @@ async function updateProfilePic(file) {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        console.log('更新頭像回應:', response.data);
-        Swal.fire('成功', '頭像更新成功', 'success');
-        getMemberProfile();
+        console.log('更新頭貼回應:', response.data);
+        Swal.fire('成功', '頭貼更新成功', 'success');
+        await getMemberProfile(); // 更新個人資料表單並觸發 memberInfo.js 更新 UI
     } catch (error) {
-        console.error('更新頭像時發生錯誤:', error);
-        handleApiError(error, '頭像更新失敗');
+        console.error('更新頭貼時發生錯誤:', error);
+        handleApiError(error, '頭貼更新失敗');
     }
 }
 
@@ -78,6 +118,19 @@ async function changePassword(currentPassword, newPassword, confirmPassword) {
         });
         console.log('變更密碼回應:', response.data);
         Swal.fire('成功', '密碼已成功變更', 'success');
+
+        // 清空密碼欄位
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        console.log('密碼欄位已清空');
+
+        // 可選：重置整個表單
+        const changePasswordForm = document.getElementById('changePasswordForm');
+        if (changePasswordForm) {
+            changePasswordForm.reset();
+            console.log('密碼變更表單已重置');
+        }
     } catch (error) {
         console.error('變更密碼時發生錯誤:', error);
         handleApiError(error, '密碼變更失敗');
@@ -99,71 +152,15 @@ function handleApiError(error, defaultMessage = '操作失敗') {
     Swal.fire('錯誤', errorMessage, 'error');
 }
 
-function updateProfileUI(memberData) {
-    console.log('開始更新 UI，會員數據:', memberData);
-    
-    // 更新側邊欄的會員名字
-    const memberNameElement = document.getElementById('memberName1');
-    if (memberNameElement) {
-        console.log('成功抓取到 memberName1 元素，正在更新內容');
-        const displayName = memberData.nickname || memberData.name || '會員';
-        memberNameElement.textContent = displayName;
-    } else {
-        console.error('未能找到 memberName1 元素');
-    }
-    
-    // 更新導航欄的會員名字和頭像
-    const navMemberName = document.getElementById('memberName');
-    const navMemberAvatar = document.getElementById('memberAvatar');
-    
-    if (navMemberName && navMemberAvatar) {
-        navMemberName.textContent = memberData.nickname || memberData.name || '會員';
-        navMemberAvatar.src = memberData.profilePic
-            ? `/TickitEasy/api/member/profilePic/${memberData.memberID}`
-            : '/TickitEasy/images/member/default-avatar.png';
-    } else {
-        console.error('導航欄中的會員頭像或名稱元素未找到');
-    }
-
-    // 更新其他表單字段
-    const elements = {
-        email: document.getElementById('email'),
-        name: document.getElementById('name'),
-        nickname: document.getElementById('nickname'),
-        birthDate: document.getElementById('birthDate'),
-        phone: document.getElementById('phone'),
-        profilePicDisplay: document.getElementById('profilePicDisplay')
-    };
-
-    // 檢查並更新每個元素
-    for (const [key, element] of Object.entries(elements)) {
-        if (element) {
-            if (key === 'profilePicDisplay') {
-                element.src = memberData.profilePic 
-                    ? `/TickitEasy/api/member/profilePic/${memberData.memberID}`
-                    : '/TickitEasy/images/member/default-avatar.png';
-                console.log(`更新頭像: ${element.src}`);
-            } else {
-                element.value = memberData[key] || '';
-                console.log(`更新 ${key}: ${element.value}`);
-            }
-        } else {
-            console.warn(`找不到元素: ${key}`);
-        }
-    }
-	console.log('更新後的顯示名稱:', document.getElementById('memberName1').textContent);
-
-}
-
 // 當頁面加載完成時執行
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM 加載完成，開始初始化');
-    
+
     if (!Auth.isLoggedIn()) {
         Auth.logout();
         return;
     }
-    
+
     // 獲取並顯示會員資料
     getMemberProfile();
 
