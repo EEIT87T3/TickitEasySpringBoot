@@ -21,4 +21,12 @@ public interface FundProjRepository extends JpaRepository<FundProj, Integer> {
 	// 查詢by categoryID
 	@Query(value="SELECT * FROM fundingProj WHERE categoryID = :i", nativeQuery=true)
 	Page<FundProj> findProjectByCategory(@Param("i") Integer categoryID, Pageable pgb);
+	
+	// 前台查詢by categoryID
+	@Query(value="SELECT * FROM fundingProj WHERE categoryID = :i AND status=1", nativeQuery=true)
+	Page<FundProj> findProjectByCategoryAndStatus(@Param("i") Integer categoryID, Pageable pgb);
+	
+	// 前台查詢All
+	@Query(value="SELECT * FROM fundingProj WHERE status=1", nativeQuery=true)
+	Page<FundProj> findProjectByStatus(Pageable pgb);
 }

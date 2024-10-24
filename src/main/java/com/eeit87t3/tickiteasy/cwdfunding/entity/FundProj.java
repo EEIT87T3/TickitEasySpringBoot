@@ -63,6 +63,8 @@ public class FundProj{
 	@Column(name = "postponeDate")
 	private Timestamp postponeDate;
 	
+	@Column(name = "status")
+	private Integer status;
 	
 	/*
 	 * [JoinColumn]告訴spring容器FundProj類別的"categoryID"屬性，會參考到CategoryEntity的類別"categoryId"屬性
@@ -224,6 +226,21 @@ public class FundProj{
 //	public static long getSerialversionuid() {
 //		return serialVersionUID;
 //	}
+
+
+	public Integer getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+
+	public void setProjectID(Integer projectID) {
+		this.projectID = projectID;
+	}
 
 	
 }

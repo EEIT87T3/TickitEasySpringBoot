@@ -42,6 +42,8 @@ public class FundProjDTO {
     
     private MultipartFile imageFile;
     
+    private Integer status;
+    
     private List<FundPlanDTO> fundplanList;
     
     
@@ -153,7 +155,11 @@ public class FundProjDTO {
 	public void setImageFile(MultipartFile imageFile) {
 		this.imageFile = imageFile;
 	}
-
-
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
 }
