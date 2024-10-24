@@ -138,6 +138,10 @@
 
         const timeDiff = endDate - currentDate;
         const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+        //呼叫函式
+        isDonating(currentDate);
+
         if (daysDiff > 0) {
           daysLeft.textContent = daysDiff + " 天";
         } else {
@@ -163,6 +167,18 @@
           // 組合成指定格式
           let formattedDate = `${year}/${month}/${day} ${hours}:${minutes}`;
           return formattedDate;
+        }
+
+        // 是否已經開始募資？ "贊助":"非募資期間"
+        function isDonating(now) {
+          const buyBtns = document.getElementsByClassName("btn-buy");
+          for (let i = 0; i < buyBtns.length; i++) {
+            if (now < startDate || now > endDate) {
+              buyBtns[i].classList.add("disabled");
+              buyBtns[i].classList.add("btn-secondary");
+              buyBtns[i].textContent = "非贊助期間";
+            }
+          }
         }
       });
     </script>
@@ -212,8 +228,10 @@
                 <small class="custom-small-text2"
                   ><i class="fa-solid fa-user" style="color: #797a7c"></i
                 ></small>
-                <small class="custom-small-text2 me-2 fw-semibold"
-                  >8,628 人
+                <small
+                  class="custom-small-text2 me-2 fw-semibold"
+                  th:text="${fundProjDTO.participants}+' 人'"
+                >
                 </small>
                 <small>
                   <i

@@ -7,9 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundOrderRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
@@ -25,6 +30,17 @@ public class FundOrderService {
 	
 	@Autowired
 	private FundPlanRepository fundPlanRepository;
+	
+	/* 查詢所有募資訂單 */
+	public Page<FundOrder> findFundOrderByPage(Integer pageNumber, Integer size){
+		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"orderID");
+		return fundOrderRepository.findAll(pgb);
+	}
+	
+	/* 查詢募資訂單by Tickit ID */
+	public FundOrder findFundOrderByTickitID(String tickitID) {
+		return fundOrderRepository.findByTickitID(tickitID);
+	}
 	
 	/* 新增募資訂單 */
 	public void saveFundOrder(Map<String, Object> form,  Map<String, Object> fullForm) {
@@ -74,9 +90,5 @@ public class FundOrderService {
 	public List<FundOrder> findFundOrderByMember(Integer memberID) {
 		return fundOrderRepository.findByMemberID(memberID);
 	}
-	
-	/* 查詢募資訂單by Tickit ID */
-	public FundOrder findFundOrderByTickitID(String tickitID) {
-		return fundOrderRepository.findByTickitID(tickitID);
-	}
+
 }

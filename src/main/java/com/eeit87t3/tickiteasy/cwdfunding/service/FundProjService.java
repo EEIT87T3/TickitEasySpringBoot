@@ -26,6 +26,7 @@ import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlanDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
+import com.eeit87t3.tickiteasy.cwdfunding.repository.FundOrderRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
@@ -41,6 +42,9 @@ public class FundProjService {
 
 	@Autowired
 	private FundPlanRepository fundPlanRepo;
+	
+	@Autowired
+	private FundOrderRepository fundOrderRepo;
 	
 	@Autowired
 	private CategoryRepo categoryRepo;
@@ -92,8 +96,6 @@ public class FundProjService {
 		return fundProjRepo.save(proj);
 			
 	}
-	
-	
 
 	/* 前台查詢全部（id升冪、以category搜索）：分頁 */
 	public Page<FundProjDTO> findFundProjByPageAndStatus(Integer pageNumber, Integer size, Integer categoryID){
@@ -105,6 +107,8 @@ public class FundProjService {
 		}else {
 			fundProjPage = fundProjRepo.findProjectByStatus(pgb);
 		}
+		
+		//找出贊助總人數
 		//Page內建map()方法，可將A實體轉換成B實體
 		Page<FundProjDTO> dtoPage= fundProjPage.map(fundProj ->{
 			FundProjDTO dto = new FundProjDTO();
@@ -126,6 +130,11 @@ public class FundProjService {
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
 			dto.setStatus(fundProj.getStatus());
+			
+			// 查詢贊助人數
+			Integer participants = fundOrderRepo.countMembers(fundProj.getProjectID());
+			dto.setParticipants(participants);
+		
 			return dto;
 		});
 		return dtoPage;
@@ -208,6 +217,10 @@ public class FundProjService {
 	        
 	        dto.setFundplanList(planDTOList);
 			dto.setStatus(fundProj.getStatus());
+			
+			// 查詢贊助人數
+			Integer participants = fundOrderRepo.countMembers(fundProj.getProjectID());
+			dto.setParticipants(participants);
 
 			return dto;
 		});

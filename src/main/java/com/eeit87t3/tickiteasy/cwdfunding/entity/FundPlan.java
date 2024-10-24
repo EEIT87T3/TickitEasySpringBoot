@@ -1,7 +1,11 @@
 package com.eeit87t3.tickiteasy.cwdfunding.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity @Table(name = "fundingPlan")
@@ -40,6 +45,15 @@ public class FundPlan {
 	@ManyToOne
 	@JoinColumn( name="projectID", referencedColumnName = "projectID")
 	private FundProj fundProj;
+	
+	/*
+	 * FundPlan沒有和FundOrder有關的欄位
+	 * [ mappedBy = "fundPlan" ] : 
+	 * 		告訴spring容器FundPlan類別會被FundOrder類別參考，參考欄位為fundOrder的"fundPlan"屬性
+	 */
+	@JsonIgnore
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "fundPlan")
+	private List<FundOrder> fundOrder = new ArrayList<>();
 
 	public Integer getPlanID() {
 		return planID;
