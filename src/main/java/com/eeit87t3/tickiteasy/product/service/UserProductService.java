@@ -17,6 +17,7 @@ import com.eeit87t3.tickiteasy.product.dto.ProductDTO;
 import com.eeit87t3.tickiteasy.product.entity.ProductCartItemEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductPhotoEntity;
+import com.eeit87t3.tickiteasy.product.repository.ProdFavoritesRepo;
 import com.eeit87t3.tickiteasy.product.repository.ProductPhotoRepo;
 import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
 
@@ -28,6 +29,11 @@ public class UserProductService {
 	
 	@Autowired
 	private ProductPhotoRepo productPhotoRepo;
+	
+	@Autowired
+	private ProdFavoritesRepo prodFavoritesRepo;
+	
+	
 	
 	 //前台首頁查詢商品頁面
     public Page<ProductEntity> findProductsByFilter(Integer categoryId, Integer minPrice, Integer maxPrice,
@@ -137,5 +143,7 @@ public class UserProductService {
         cartItem.setQuantity(newQuantity);
         return cartItem;
     }
+    
+    
 
 }
