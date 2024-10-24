@@ -3,6 +3,7 @@ package com.eeit87t3.tickiteasy.event.service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.event.dto.EventsDTO;
+import com.eeit87t3.tickiteasy.event.dto.EventsSearchingDTO;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.event.repository.EventsSpecification;
@@ -85,6 +87,17 @@ public class AdminEventsService {
 		} else {			
 			return eventsProcessingService.findByEventTag(tagEntity);
 		}
+	}
+	
+	/**
+	 * 管理員後台的動態查詢；單頁筆數固定為 10。
+	 * 
+	 * @param eventsSearchingDTO
+//	 * @retur 查詢結果。
+	 */
+	public Page<EventsEntity> findBySpecification(EventsSearchingDTO eventsSearchingDTO) {
+		eventsSearchingDTO.setPageSize(10);  // 後台的單頁筆數固定為 10
+		return eventsProcessingService.findBySpecification(eventsSearchingDTO);
 	}
 	
 	
