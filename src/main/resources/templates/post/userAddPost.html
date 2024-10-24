@@ -7,13 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/TickitEasy/post/js/postAdd.js" defer></script>
   <title>新增貼文</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
-
-
 
     }
 
@@ -118,13 +117,6 @@
 
     <label for="fullPostTag">標籤:</label>
     <select id="fullPostTag" name="tagID" class="border p-2 mb-4 w-full"></select>
-
-    <!-- <label for="fullPostImgUrl">圖片:</label> -->
-    <!-- <input type="text" id="fullPostImgUrl" name="postImgUrl" required class="border p-2 mb-4 w-full"> -->
-    <!-- <div class="mb-3">
-      <label for="formFile" class="form-label">圖片:</label>
-      <input class="form-control" type="file" id="formFile" name="image" accept="image/*" multiple>
-    </div> -->
     <div class="mb-3">
       <label for="formFileMultiple" class="form-label">圖片:</label>
       <input class="form-control" type="file" name="image" accept="image/*" id="formFileMultiple" multiple>
@@ -138,154 +130,6 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
 
-
-    // 動態填充分類和標籤選項
-    axios.get('/TickitEasy/admin/api/post/categories')
-      .then(response => {
-        const categories = response.data;
-        categories.forEach(category => {
-          $('#fullPostCategory').append(new Option(category.categoryName, category.categoryId));
-        });
-      });
-
-    axios.get('/TickitEasy/admin/api/post/tags')
-      .then(response => {
-        const tags = response.data;
-        tags.forEach(tag => {
-          $('#fullPostTag').append(new Option(tag.tagName, tag.tagId));
-        });
-      });
-    $('.postList').on('click', function () {
-
-      window.location.href = `/TickitEasy/user/post/PostList`;
-    });
-
-    //上傳圖片預覽
-    const imageInput = document.getElementById('formFileMultiple');
-    const imagePreview = document.getElementById('imagePreview');
-    const uploadedImages = []; // 用來存儲已上傳的圖片資訊
-
-    imageInput.addEventListener('change', function () {
-      // imagePreview.innerHTML = '';  // 清空上次的圖片預覽
-      const files = imageInput.files;
-
-      //加入多張圖片並驗證檔案是否重複
-      for (let i = 0; i < files.length; i++) {
-        if (!uploadedImages.some(img => img.name === files[i].name)) {
-          const fileName = files[i].name;
-
-          // // 將檔案名稱加入陣列（可選）
-          // uploadedImages.push(fileName);
-          // 將檔案資訊加入陣列
-          uploadedImages.push(files[i]);
-
-
-          // 創建顯示檔名和圖片的容器
-          const imageItem = document.createElement('div');
-          imageItem.classList.add('image-item');
-
-          // 創建預覽圖像元素
-          const imgElement = document.createElement('img');
-          imgElement.src = URL.createObjectURL(files[i]);
-
-          imgElement.style.width = '100px';
-          imgElement.style.marginRight = '10px';
-
-
-          // 創建顯示檔名的元素
-          const fileNameElement = document.createElement('span');
-          fileNameElement.textContent = fileName;
-          // const fileNameElement = document.createElement('div');
-          // fileNameElement.textContent = files[i].name; // 取得檔案名稱
-          // fileNameElement.style.textAlign = 'center'; // 讓檔名置中
-
-          // 創建刪除按鈕
-          const deleteBtn = document.createElement('span');
-          deleteBtn.innerHTML = '<i class="fa-solid fa-x"></i>';
-          deleteBtn.classList.add('delete-btn');
-          deleteBtn.dataset.index = i; // 儲存索引以便後續查找
-          deleteBtn.addEventListener('click', function () {
-            // 從預覽中刪除該項
-            const index = parseInt(deleteBtn.dataset.index); // 獲取索引
-            imagePreview.removeChild(imageItem);
-
-            // 從 uploadedImages 陣列中移除該檔案
-            // const index = uploadedImages.indexOf(files[i]);
-            if (index > -1) {
-              uploadedImages.splice(index, 1);
-
-            }
-          });
-
-          // // 創建容器來包裝圖片和檔名
-          // const container = document.createElement('div');
-          // container.style.display = 'inline-block'; // 使圖片和檔名在同一行
-          // container.style.marginRight = '20px'; // 調整容器之間的間距
-
-          // 將圖片和檔名添加到容器
-          imageItem.appendChild(imgElement);
-          imageItem.appendChild(fileNameElement);
-          imageItem.appendChild(deleteBtn);
-
-          // 將容器添加到預覽區域
-          imagePreview.appendChild(imageItem);
-          // // 將圖片和檔名加入容器，然後將容器加入預覽區域
-          // container.appendChild(imgElement);
-          // container.appendChild(fileNameElement);
-          // imagePreview.appendChild(container);
-
-          // 將圖片資訊保存到uploadedImages陣列
-          // uploadedImages.push(files[i]);
-        }
-      }
-    });
-
-    $('#fullCreatePostForm').on('submit', function (event) {
-      event.preventDefault();
-
-      const formData = new FormData();
-
-      console.log($('#fullPostCategory').val());
-
-      // 使用formData取代json傳遞資料
-      formData.append('postTitle', $('#fullPostTitle').val());
-      formData.append('postContent', $('#fullPostContent').val());
-      formData.append('categoryID', $('#fullPostCategory').val());
-      formData.append('tagID', $('#fullPostTag').val());
-
-      // 附加所有已上傳的檔案
-      uploadedImages.forEach(file => {
-        formData.append('images', file); // 將所有未被刪除的檔案一起上傳
-      });
-      // // 附加圖片檔案(多個)
-      // uploadedImages.forEach(image => {
-      //   formData.append('images', image);  // 使用相同的參數名
-      // });
-      // // 附加圖片檔案(單個)
-      // // const imageFile = document.getElementById('formFile').files[0];
-      // // formData.append('image', imageFile);  // 'image' 是後端用來接收檔案的參數名
-
-      axios.post('/TickitEasy/admin/api/post/POST/pic/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-        .then(response => {
-          if (response.data && response.data.postID) {  // 確認回應包含 postID
-            const postID = response.data.postID;  // 抓取生成的 postID
-            alert("貼文新增成功！");
-            window.location.href = `/TickitEasy/user/post/${postID}`;  // 使用生成的 postID 跳轉
-          } else {
-            alert("新增成功，但無法取得貼文 ID。");
-          }
-        })
-        .catch(error => {
-          console.error("新增貼文失敗:", error);
-          alert("新增失敗，請稍後再試。");
-        });
-
-
-    });
   </script>
 
   <div th:replace="~{commons/userFooter}"></div>

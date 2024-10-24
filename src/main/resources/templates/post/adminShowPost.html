@@ -191,15 +191,15 @@
         </div>
 
         <!-- 發布者圖像和名稱 -->
-         
+
         <div class="post-row">
             <div class="tooltip">
                 <img id="profilePic" class="profile-pic" alt="發布者頭像">
-                
+
             </div>
         </div>
         <div class="post-row">
-          
+
             <div class="post-label">發布者:</div>
             <div id="tooltipName" class="post-value"></div>
         </div>
@@ -216,7 +216,8 @@
 
         <div class="post-row">
             <div class="post-label">圖片網址:</div>
-            <div id="postImgUrl" class="post-value"></div>
+            <!-- <div id="postImgUrl" class="post-value"></div> -->
+            <div id="imageList" class="post-value"></div>
         </div>
     </div>
 
@@ -232,10 +233,10 @@
                     const post = await response.json();
                     document.getElementById('postTitle').innerText = post.postTitle;
                     document.getElementById('postContent').innerText = post.postContent;
-                    document.getElementById('postImgUrl').innerText = post.postImgUrl;
+
                     document.getElementById('postTime').innerText = post.postTime;
-                    document.getElementById('likesCount').innerText = post.likesCount;
-                    document.getElementById('viewCount').innerText = post.viewCount;
+                    document.getElementById('likesCount').innerText = post.likesCount || 0; // 防止為 null
+                    document.getElementById('viewCount').innerText = post.viewCount || 0; // 防止為 null
                     document.getElementById('status').innerText = post.status;
                     document.getElementById('categoryName').innerText = post.postCategory.categoryName;
                     document.getElementById('tagName').innerText = post.postTag.tagName;
@@ -245,6 +246,55 @@
                     // post.member.profilePicPath || 
                     document.getElementById('profilePic').src = '/TickitEasy/images/member/default-avatar.png';
 
+                    const imageListContainer = document.getElementById('imageList');
+                    imageListContainer.innerHTML = ''; // 清空容器中的內容
+
+                    // 創建表格元素
+                    const table = document.createElement('table');
+                    const headerRow = document.createElement('tr');
+
+                    // 添加表格標題
+                    const headerImage = document.createElement('th');
+                    headerImage.innerText = '圖片';
+                    const headerPath = document.createElement('th');
+                    headerPath.innerText = '圖片網址';
+                    headerRow.appendChild(headerImage);
+                    headerRow.appendChild(headerPath);
+                    table.appendChild(headerRow);
+                    // 顯示圖片網址
+                    if (Array.isArray(post.images) && post.images.length > 0) {
+
+                        // 遍歷圖片數組並添加到表格中
+                        post.images.forEach(image => {
+                            const row = document.createElement('tr');
+
+                            // 創建圖片單元格
+                            const imgCell = document.createElement('td');
+                            const imgElement = document.createElement('img');
+                            imgElement.src = `/TickitEasy${image.imagePath}`; // 設置圖片來源
+                            imgElement.alt = `Image ID: ${image.imageID}`; // 設置圖片 alt 屬性
+                            imgElement.style.width = '100px'; // 設置圖片寬度
+                            imgCell.appendChild(imgElement);
+
+                            // 創建文件路徑單元格
+                            const pathCell = document.createElement('td');
+                            pathCell.textContent = `/TickitEasy${image.imagePath}`; // 設置文件路徑
+
+                            // 將單元格添加到行
+                            row.appendChild(imgCell);
+                            row.appendChild(pathCell);
+                            table.appendChild(row); // 將行添加到表格
+                        });
+
+                        // 將表格添加到容器
+                        imageListContainer.appendChild(table);
+                    } else {
+                        // 創建文件路徑元素
+                        const nullmsg = document.createElement('span');
+                        nullmsg.textContent = '本則貼文無圖片'; 
+                        imageListContainer.appendChild( nullmsg);
+                        console.error("post.images is not an array or is undefined.");
+                    }
                 } else {
                     document.getElementById("updateResult").innerText = `Failed to load post: ${response.status}`;
                 }

@@ -117,11 +117,37 @@ public class PostJsonController {
 	@PutMapping("PUT/{postID}")
 	public ResponseEntity<PostEntity> updatePost(
 			@PathVariable("postID") Integer postID,
-			@RequestBody PostEntity post) {
+			@RequestParam("postTitle") String postTitle,
+	        @RequestParam("postContent") String postContent,
+	        @RequestParam(value = "postCategory.categoryId", required = false) Integer categoryId,
+	        @RequestParam(value = "postTag.tagId", required = false) Integer tagId,
+	        @RequestParam(value = "images", required = false) MultipartFile[] imageFiles) {
 
 		try {
-			PostEntity updatedPost = postService.update(postID, post);
-			return ResponseEntity.ok(updatedPost); // 返回更新後的 JSON 數據
+			 // 先獲取現有的貼文
+	        PostEntity existingPost = postRepo.findById(postID)
+	                .orElseThrow(() -> new RuntimeException("Post not found"));
+	        
+	        // 更新需要修改的屬性
+	        existingPost.setPostTitle(postTitle);
+	        existingPost.setPostContent(postContent);
+
+	        // 更新分類
+	        if (categoryId != null) {
+	            CategoryEntity category = categoryRepo.findById(categoryId)
+	                    .orElseThrow(() -> new RuntimeException("Category not found"));
+	            existingPost.setPostCategory(category);
+	        }
+
+	        // 更新標籤
+	        if (tagId != null) {
+	            TagEntity tag = tagRepo.findById(tagId)
+	                    .orElseThrow(() -> new RuntimeException("Tag not found"));
+	            existingPost.setPostTag(tag);
+	        }
+
+	        PostEntity result = postService.update(postID, existingPost, imageFiles);
+	        return ResponseEntity.ok(result);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(null); // 發生錯誤時回傳 HTTP 400 狀態
@@ -164,40 +190,8 @@ public class PostJsonController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
 
-	// 新增單筆貼文
-	@PostMapping("POST/")
-	public ResponseEntity<PostEntity> createPost(@RequestBody CreatePostDTO createPostDTO) {
-		// 驗證必要字段
-		if (createPostDTO.getPostTitle() == null || createPostDTO.getPostContent() == null) {
-			return ResponseEntity.badRequest().body(null);
-		}
-
-		PostEntity post = new PostEntity();
-		post.setPostTitle(createPostDTO.getPostTitle());
-		post.setPostContent(createPostDTO.getPostContent());
-		// post.setPostImgUrl(createPostDTO.getPostImgUrl());
-
-		// 設置分類和標籤
-		if (createPostDTO.getCategoryID() != null) {
-			CategoryEntity category = categoryService.findProductCategoryById(createPostDTO.getCategoryID());
-			post.setPostCategory(category);
-		}
-		if (createPostDTO.getTagID() != null) {
-			TagEntity tag = tagService.findProductTagById(createPostDTO.getTagID());
-			post.setPostTag(tag);
-		}
-
-		// 設置默認值或從當前用戶會話中獲取
-		// post.setMemberID(getCurrentMemberId()); // 實現這個方法來獲取當前登錄用戶的ID
-		post.setMemberID(1); // 實現這個方法來獲取當前登錄用戶的ID
-		post.setStatus(1); // 假設 1 是默認狀態
-
-		PostEntity createdPost = postService.insert(post);
-		return ResponseEntity.ok(createdPost);
-	}
-
 	// 新增單筆貼文(附圖)//這不是json
-	@PostMapping("POST/pic/")
+	@PostMapping("POST/")
 	public ResponseEntity<?> createPost(
 			@ModelAttribute CreatePostDTO createPostDTO,
 			@RequestParam(value = "images", required = false) MultipartFile[] imageFiles) {

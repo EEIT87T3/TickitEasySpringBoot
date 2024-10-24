@@ -1,7 +1,10 @@
 package com.eeit87t3.tickiteasy.post.service;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -9,16 +12,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
+import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
+import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.post.dto.ShowPostDTO;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.repository.PostRepo;
+//import com.eeit87t3.tickiteasy.post.exception.ResourceNotFoundException;
+
 
 
 @Service
@@ -26,12 +38,20 @@ public class PostService {
 	
 	@Autowired
 	private PostRepo postRepo;
+	
+	@Autowired
+	private CategoryRepo categoryRepo;
+	
+	@Autowired
+	private TagRepo tagRepo;
 	@Autowired
 	private CategoryService categoryService;
 	@Autowired
 	private TagService tagService;
 	@Autowired
 	private ImageUtil imageUtil;
+	@Autowired
+	private PostImageService postImageService;
 	
 	//取得所有貼文
 //	@Transactional(readOnly = true)
@@ -119,8 +139,12 @@ public class PostService {
     }
     //更新單筆貼文
     @Transactional
-    public PostEntity update(Integer postID, PostEntity updatedPost) {
-
+    public PostEntity update(
+    		Integer postID, 
+    		PostEntity updatedPost,
+			@RequestParam(value = "images", required = false) MultipartFile[] imageFiles
+			) {
+    	try {
         // 首先查找該貼文是否存在
         PostEntity existingPost = postRepo.findById(postID)
                                           .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -128,9 +152,38 @@ public class PostService {
         // 更新貼文的屬性
         existingPost.setPostTitle(updatedPost.getPostTitle());
         existingPost.setPostContent(updatedPost.getPostContent());
+        // 確保不修改 memberID
+        Integer memberID = existingPost.getMemberID(); // 獲取當前的 memberID
+        existingPost.setMemberID(memberID); // 保持原有的 memberID
+        // 更新分類
+        if (updatedPost.getPostCategory() != null) {
+            CategoryEntity category = categoryRepo.findById(updatedPost.getPostCategory().getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+            existingPost.setPostCategory(category);
+        }
 
+        // 更新標籤
+        if (updatedPost.getPostTag() != null) {
+            TagEntity tag = tagRepo.findById(updatedPost.getPostTag().getTagId())
+                .orElseThrow(() -> new RuntimeException("Tag not found"));
+            existingPost.setPostTag(tag);
+        }
+     // 處理圖片上傳
+     	if (imageFiles != null && imageFiles.length > 0) {
+     		postImageService.uploadImages(imageFiles, postID);
+     	} else {
+
+     	}
+    
         // 儲存更新後的貼文
         return postRepo.save(existingPost); // 返回更新後的貼文實體
+    	} catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to upload images", e); // 可以根據需要自定義異常處理
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw e; // 重新拋出 RuntimeException，以便外層可以捕獲
+        }
     }
     
     @Transactional

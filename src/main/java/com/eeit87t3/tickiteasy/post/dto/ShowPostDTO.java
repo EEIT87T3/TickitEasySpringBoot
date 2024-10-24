@@ -13,7 +13,7 @@ public class ShowPostDTO {
     private Integer categoryId; // 類別Id
     private String tagName; // 標籤名稱
     private Integer tagId; // 標籤ID
-    private List<String> imagePaths; // 僅包含圖片路徑的列表
+//    private List<String> imagePaths; // 僅包含圖片路徑的列表
 
 //    private String postImgUrl; // 文章圖片URL
     private Integer status; // 文章狀態
@@ -105,12 +105,12 @@ public class ShowPostDTO {
 	public void setViewCount(Integer viewCount) {
 		this.viewCount = viewCount;
 	}
-	public List<String> getImagePaths() {
-		return imagePaths;
-	}
-	public void setImagePaths(List<String> imagePaths) {
-		this.imagePaths = imagePaths;
-	}
+//	public List<String> getImagePaths() {
+//		return imagePaths;
+//	}
+//	public void setImagePaths(List<String> imagePaths) {
+//		this.imagePaths = imagePaths;
+//	}
     
 
 }
