@@ -32,7 +32,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.admin.service.AdminService;
+import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
+import com.eeit87t3.tickiteasy.event.service.TicketTypesProcessingService;
 import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.order.entity.CheckoutPaymentRequestForm;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrderDetails;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
@@ -152,13 +155,20 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 	
 	@Autowired
 	ProductService productService;
+	@Autowired
+	TicketTypesProcessingService ticketTypesProcessingService;
+	@Autowired
+	MemberService memberService;
 	//串接綠界ECPay
 	@Override
-	public String ECPay(List<Map<String,Object>> lists,String totalAmount) { 
+	public String ECPay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount,String memberEmail) { 
 		//lists內放productID、productName、productQuantity、productAmount
 		StringBuilder itemNameBuilder  = new StringBuilder() ; //串接商品明細
-		for(Map<String,Object> list : lists) {
-			itemNameBuilder.append(list.get("productName")).append("#"); //綠界需要	
+		for(Map<String,Object> list : ticketTypesCartToCheckoutJson) {
+			itemNameBuilder.append(list.get("eventName")).append("#"); //綠界明細需要	
+		}
+		for(Map<String,Object> list : checkoutItems) {
+			itemNameBuilder.append(list.get("productName")).append("#"); //綠界明細需要	
 		}
 		if(itemNameBuilder.length() > 0) {
 			itemNameBuilder.setLength(itemNameBuilder.length() - 1);
@@ -180,11 +190,9 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 				
 		String form = all.aioCheckOut(obj, null);
 		
-		
 		ProdOrders prodOrders = new ProdOrders();//prodOrders 資料庫新增
-		Member member = new Member();
-		member.setMemberID(5);
-		prodOrders.setMember(member);
+		Member memberByEmail = memberService.findByEmail(memberEmail);
+		prodOrders.setMember(memberByEmail);
 		String orderDate = obj.getMerchantTradeDate().replace("/","-");
 		prodOrders.setOrderDate(Timestamp.valueOf(orderDate));
 		prodOrders.setStatus("未付款");
@@ -193,17 +201,33 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		ProdOrders prodOrderSave = por.save(prodOrders);
 		
 		List<ProdOrderDetails> listsProdOrderDetails = new ArrayList<>(); //prodOrderDetails 資料庫新增
-		for(Map<String,Object> list : lists) {
+		for(Map<String,Object> map : checkoutItems) {
 			ProdOrderDetails prodOrderDetails = new ProdOrderDetails();
-			Integer productID = (Integer)list.get("productID"); //產品ID
-			ProductEntity productById = productService.findProductById(productID);
-			Integer prodproductQuantityuct = (Integer)list.get("productQuantity"); //產品數量
-			
-			prodOrderDetails.setProdOrder(prodOrderSave);
-			prodOrderDetails.setProductId(productID);
-			prodOrderDetails.setPrice(productById.getPrice());
-			prodOrderDetails.setQuantity(prodproductQuantityuct);
+			Integer productID = (Integer)map.get("productID"); //產品ID		
+			if (productID != null) {
+				prodOrderDetails.setProductId(productID);
+				ProductEntity productById = productService.findProductById(productID);
+				Integer productQuantity = (Integer)map.get("productQuantity"); //產品數量
+	
+				prodOrderDetails.setProdOrder(prodOrderSave);
+				prodOrderDetails.setPrice(productById.getPrice());
+				prodOrderDetails.setQuantity(productQuantity);
+			}			
 			listsProdOrderDetails.add(prodOrderDetails);		
+		}
+		for(Map<String,Object> map : ticketTypesCartToCheckoutJson) {
+			ProdOrderDetails prodOrderDetails = new ProdOrderDetails();
+			Integer ticketTypeID = (Integer)map.get("ticketTypeID"); //票券ID	
+			if (ticketTypeID != null) {
+				prodOrderDetails.setTicketTypeId(ticketTypeID);
+				TicketTypesEntity ticketById = ticketTypesProcessingService.findById(ticketTypeID);
+				Integer ticketQuantity = (Integer) map.get("quantity");
+				
+				prodOrderDetails.setProdOrder(prodOrderSave);
+				prodOrderDetails.setTicketPrice(ticketById.getPrice());
+				prodOrderDetails.setTicketQuantity(ticketQuantity);
+			}
+			listsProdOrderDetails.add(prodOrderDetails);
 		}
 		
 		prodOrderSave.setProdOrderDetailsBean(listsProdOrderDetails);
@@ -278,20 +302,6 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
                     "<td style='padding: 10px 0;'>" + paymentType + "</td>" +
                 "</tr>" +
             "</table>" +
-            "<div style='background-color: #f8f8f8; padding: 15px; margin-top: 20px;'>" +
-                "<table style='width: 100%;'>" +
-                    "<tr>" +
-                        "<td style='width: 80px;'>" +
-                            "<img src='product-image-url' alt='商品圖片' style='width: 80px; height: 80px; object-fit: cover;'>" +
-                        "</td>" +
-                        "<td style='padding-left: 15px;'>" +
-                            "<h3 style='margin: 0; color: #333;'>醜比頭</h3>" +
-                            "<p style='margin: 5px 0;'>單價：NT$549 數量：1</p>" +
-                            "<p style='margin: 5px 0;'><strong>小計：NT$549</strong></p>" +
-                        "</td>" +
-                    "</tr>" +
-                "</table>" +
-            "</div>" +
             "<div style='margin-top: 20px; text-align: right;'>" +
                 "<h3 style='color: #333;'>總計：NT$" + tradeAmt + "</h3>" +
             "</div>" +
