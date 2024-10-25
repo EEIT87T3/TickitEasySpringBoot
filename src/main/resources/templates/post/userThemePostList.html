@@ -215,7 +215,7 @@
         // 獲取文章的函數
         function fetchPosts(page = 0) {
             const categoryId = getCategoryIdFromUrl() || 1; // 如果沒有categoryId，使用默認值1
-            const tagId = document.getElementById("tagId").value ; 
+            const tagId = document.getElementById("tagId").value;
             const pageSize = document.getElementById("pageSize").value || 10;
             const sortBy = document.getElementById("sortBy").value || "postTime";
             const keyword = document.getElementById("keyword").value || "";
@@ -238,8 +238,11 @@
             // 獲取 nav 容器
             const categoryNav = document.getElementById('categoryNav');
 
+            // 按照 categoryId 排序，避免受 categoryStatus影響 將 [...categories]:categories 陣列的每個元素展開並包裝進一個新陣列
+            const sortedcategories = [...categories].sort((a, b) => a.categoryId - b.categoryId);
+
             // 動態生成類別導航連結
-            categories.forEach((category) => {
+            sortedcategories.forEach((category) => {
                 const navLink = document.createElement('a');
                 navLink.classList.add('flex-sm-fill', 'text-sm-center', 'nav-link');
                 navLink.setAttribute('href', `?categoryId=${category.categoryId}`);
@@ -267,11 +270,10 @@
         function populateTagOption() {
 
             const tagSelect = document.getElementById('tagId');
-            // 清空現有選項，只保留預設選項
-            tagSelect.innerHTML = '<option value="" selected>請選擇標籤</option>';
+            // 按照 tagId 排序，避免受 tagStatus影響
+            const sortedTags = [...tags].sort((a, b) => a.tagId - b.tagId);
 
-            // 為每個tag創建新的option
-            tags.forEach((tag) => {
+            sortedTags.forEach((tag) => {
                 const option = document.createElement('option');
                 option.value = tag.tagId; // 直接使用tagId作為值
                 option.textContent = tag.tagName;
@@ -405,7 +407,7 @@
         // 當頁面加載時獲取所有文章
         document.addEventListener('DOMContentLoaded', () => {
             fetchCategories();
-            fetchTag(); 
+            fetchTag();
         });
     </script>
 
