@@ -43,6 +43,15 @@ public class Member {
     @Column(name = "verificationToken")
     private String verificationToken;
     
+    @Column(name = "googleId")
+    private String googleId;
+
+    
+
+	@Column(name = "facebookId")
+    private String facebookId;
+
+    
     // 無參構造函數
     public Member() {
     }
@@ -61,6 +70,22 @@ public class Member {
     }
 
     // Getter 和 Setter 方法
+    public String getGoogleId() {
+    	return googleId;
+    }
+    
+    public void setGoogleId(String googleId) {
+    	this.googleId = googleId;
+    }
+    
+    public String getFacebookId() {
+    	return facebookId;
+    }
+    
+    public void setFacebookId(String facebookId) {
+    	this.facebookId = facebookId;
+    }
+    
     public Integer getMemberID() {
         return memberID;
     }
@@ -173,5 +198,18 @@ public class Member {
         已驗證,
         未驗證,
         討論區停權
+    }
+    
+ // 檢查社群媒體登入狀態的方法
+    public boolean isOAuthUser() {
+        return googleId != null || facebookId != null;
+    }
+
+    // 檢查必要資料是否完整的方法
+    public boolean isProfileComplete() {
+        return name != null && !name.trim().isEmpty()
+            && nickname != null && !nickname.trim().isEmpty()
+            && phone != null && phone.matches("^09\\d{8}$")
+            && birthDate != null;
     }
 }

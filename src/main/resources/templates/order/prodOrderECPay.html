@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>結帳</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>購物車結帳</h1>
+    <button id="checkoutBtn">前往結帳</button>
+
+    <div id="ecpayForm"></div>
+
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById("checkoutBtn").addEventListener("click", function() {
+                axios.post('http://localhost:8080/TickitEasy/api/ecpay/checkout')
+                    .then(function(response) {
+                        console.log(response);
+                        document.getElementById('ecpayForm').innerHTML = response.data;
+                        document.querySelector('form').submit();
+                    })
+                    .catch(function(error) {
+                        console.error("結帳錯誤:", error);
+                        alert("結帳過程發生錯誤，請稍後再試。");
+                    });
+            });
+        });
+    </script> -->
+
+<script>
+    let prodProduct = {
+        id : 1,
+        count : 3
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("checkoutBtn").addEventListener("click", function() {
+            axios.post('http://localhost:8080/TickitEasy/admin/order/ECPay',prodProduct)
+                .then(function(response) {
+                    console.log(response);
+                    document.getElementById('ecpayForm').innerHTML = response.data;
+                    document.querySelector('form').submit();
+                })
+                .catch(function(error) {
+                    console.error("結帳錯誤:", error);
+                    alert("結帳過程發生錯誤，請稍後再試。");
+                });
+        });
+    });
+</script>
+</body>
+</html>
+

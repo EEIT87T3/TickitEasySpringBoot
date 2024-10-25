@@ -16,6 +16,8 @@ import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.entity.Member.MemberStatus;
 import com.eeit87t3.tickiteasy.member.repository.MemberRepository;
+import com.eeit87t3.tickiteasy.util.JWTUtil;
+import com.eeit87t3.tickiteasy.util.OAuthLoginRequest;
 
 import jakarta.transaction.Transactional;
 
@@ -30,6 +32,9 @@ public class MemberService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private JWTUtil jwtUtil;
 
     // 會員註冊
     @Transactional
@@ -60,16 +65,48 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("無效的驗證連結。"));
 
         if (member.getStatus() == Member.MemberStatus.已驗證) {
-            throw new IllegalArgumentException("帳號已經被驗證過。");
+            throw new IllegalArgumentException("此帳號已經過驗證。");
         }
 
-        // 更新會員狀態為已驗證，並清除驗證 token
+        // 更新會員狀態為已驗證，並清除token
         member.setStatus(Member.MemberStatus.已驗證);
         member.setVerificationToken(null);  // 清除 token
         memberRepository.save(member);
     }
+    
+ // 處理會員登入，驗證會員憑證並生成 JWT Token
+    @Transactional
+    public Optional<String> login(String email, String password) {
+        Member member = memberRepository.findByEmail(email);
+        
+        // 檢查會員是否存在
+        if (member == null) {
+            throw new IllegalArgumentException("該會員帳號不存在"); // 直接拋出例外
+        }
 
- // 更新會員基本資料，不包括圖片
+        // 檢查會員是否完成驗證
+        if (member.getStatus() != Member.MemberStatus.已驗證) {
+            throw new IllegalArgumentException("會員尚未驗證，請先完成驗證程序");
+        }
+
+        // 比對密碼
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("密碼錯誤");  // 拋出異常
+        }
+
+        // 生成 JWT Token
+        String token = jwtUtil.generateToken(member.getEmail());
+        
+        return Optional.of(token);  // 登入成功，返回 JWT Token
+    }
+
+ // 根據email找會員
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
+
+    // 更新會員基本資料，不包括圖片
     @Transactional
     public void updateProfile(Member currentMember, Member updatedInfo) {
         currentMember.setName(updatedInfo.getName());
@@ -96,17 +133,67 @@ public class MemberService {
         }
     }
 
-
-    // 處理會員登入
-    public Optional<Member> login(String email, String password) {
-        Member member = memberRepository.findByEmail(email);
-        if (member != null && passwordEncoder.matches(password, member.getPassword())) {
-            return Optional.of(member);
+    //密碼變更
+    @Transactional
+    public void changePassword(String email, String currentPassword, String newPassword) {
+        Member member = findByEmail(email);
+        if (member == null) {
+            throw new IllegalArgumentException("會員不存在");
         }
-        return Optional.empty();
+        
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            throw new IllegalArgumentException("當前密碼不正確");
+        }
+        
+        member.setPassword(passwordEncoder.encode(newPassword));
+        memberRepository.save(member);
     }
     
-    
+ // 第三方登入，僅保留 Google 登入邏輯
+    @Transactional
+    public Optional<String> oauthLogin(OAuthLoginRequest request) {
+        Member member;
+        
+        // 根據提供者ID查找會員
+        if ("google".equals(request.getProvider())) {
+            member = findByGoogleId(request.getProviderId());
+        } else {
+            throw new IllegalArgumentException("不支援的登入提供者");
+        }
+
+        // 如果會員不存在，創建新會員
+        if (member == null) {
+            member = createOAuthMember(request);
+        }
+
+        // 生成 JWT Token
+        String token = jwtUtil.generateToken(member.getEmail());
+        return Optional.of(token);
+    }
+
+    private Member createOAuthMember(OAuthLoginRequest request) {
+        // 檢查信箱是否已被使用
+        Member existingMember = findByEmail(request.getEmail());
+        if (existingMember != null) {
+            return existingMember;
+        }
+
+        // 創建新會員
+        Member newMember = new Member();
+        newMember.setEmail(request.getEmail());
+        newMember.setName(request.getName());
+        newMember.setNickname(request.getName());
+        newMember.setRegisterDate(LocalDate.now());
+        newMember.setStatus(Member.MemberStatus.已驗證);  // OAuth登入的用戶直接設為已驗證
+
+        newMember.setGoogleId(request.getProviderId());  // 設置 Google ID
+        return memberRepository.save(newMember);
+    }
+
+    // 根據 Google ID 查找會員
+    public Member findByGoogleId(String googleId) {
+        return memberRepository.findByGoogleId(googleId);
+    }
     
     /**************後台*********************/
 
@@ -130,6 +217,17 @@ public class MemberService {
             return imageUtil.getImageByteArray(profilePicPath);
         }
         return imageUtil.getImageByteArray("/images/member/default-avatar.png");
+    }
+    
+   //獲取頭貼檔案名稱
+    public String getProfilePicFilename(Integer memberId) {
+    	Optional<Member> optionalMember = memberRepository.findById(memberId);
+    	if (optionalMember.isPresent()) {
+			Member member = optionalMember.get();
+			String profilePicPath = member.getProfilePicPath();
+			return profilePicPath.substring(profilePicPath.lastIndexOf("/") + 1);
+		}
+    	return "default-avatar.png";
     }
 
     // 移除會員頭貼

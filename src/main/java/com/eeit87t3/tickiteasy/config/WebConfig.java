@@ -16,12 +16,13 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
 //    @Override
-////    public void addInterceptors(InterceptorRegistry registry) {
-////        // 註冊 AdminInterceptor，攔截所有 /admin/** 開頭的請求
-////        registry.addInterceptor(adminInterceptor)
-////                .addPathPatterns("/admin/**") // 攔截 /admin 開頭的路徑
-////                .excludePathPatterns("/admin/login", "/admin/api/login"); // 排除登入頁面
-////    }
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        // 註冊 AdminInterceptor，攔截所有 /admin/** 開頭的請求
+//        registry.addInterceptor(adminInterceptor)
+//                .addPathPatterns("/admin/**") // 攔截 /admin 開頭的路徑
+//                .excludePathPatterns("/admin/login", "/admin/api/login"); // 排除登入頁面
+//    }
+
     
     
 }

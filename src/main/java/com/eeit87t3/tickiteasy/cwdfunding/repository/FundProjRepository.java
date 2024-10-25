@@ -2,7 +2,6 @@ package com.eeit87t3.tickiteasy.cwdfunding.repository;
 
 import java.util.List;
 
-import org.hibernate.query.NativeQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +21,12 @@ public interface FundProjRepository extends JpaRepository<FundProj, Integer> {
 	// 查詢by categoryID
 	@Query(value="SELECT * FROM fundingProj WHERE categoryID = :i", nativeQuery=true)
 	Page<FundProj> findProjectByCategory(@Param("i") Integer categoryID, Pageable pgb);
+	
+	// 前台查詢by categoryID
+	@Query(value="SELECT * FROM fundingProj WHERE categoryID = :i AND status=1", nativeQuery=true)
+	Page<FundProj> findProjectByCategoryAndStatus(@Param("i") Integer categoryID, Pageable pgb);
+	
+	// 前台查詢All
+	@Query(value="SELECT * FROM fundingProj WHERE status=1", nativeQuery=true)
+	Page<FundProj> findProjectByStatus(Pageable pgb);
 }
