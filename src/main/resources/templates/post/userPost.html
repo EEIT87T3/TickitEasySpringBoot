@@ -140,7 +140,7 @@
 
                 axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
                 .then(response => {
-                        
+                        const categoryId = response.data.categoryId;
                         alert('貼文已刪除');
                         window.location.href =  `/TickitEasy/user/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
                     })

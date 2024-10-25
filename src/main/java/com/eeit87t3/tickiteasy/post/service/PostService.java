@@ -80,7 +80,7 @@ public class PostService {
             return dto;
         }).collect(Collectors.toList());
     }
-    public Page<ShowPostDTO> getPostsByCategory(Integer categoryId, int page, int size ,String sortBy, String orderBy) {
+    public Page<ShowPostDTO> getPostsByCategory( Integer categoryId, Integer tagId, String keyword, int page, int size, String sortBy, String orderBy) {
     	Sort sort ;
 
         // 設定排序方向
@@ -89,10 +89,12 @@ public class PostService {
         } else {
             sort = Sort.by(sortBy).descending();
         }
+        
     	Pageable pageable = PageRequest.of(page, size, sort);
         Page<PostEntity> postPage = postRepo.findByPostCategory_CategoryId(categoryId, pageable);
 
-        return postPage.map(this::convertToShowPostDTO);
+        return postRepo.findByCategoryTagAndKeyword(categoryId, tagId, keyword, pageable)
+                .map(this::convertToShowPostDTO);
     }	
     private ShowPostDTO convertToShowPostDTO(PostEntity post) {
         ShowPostDTO dto = new ShowPostDTO();
@@ -128,6 +130,7 @@ public class PostService {
 		}
 		
 		return null;
+		
     }
     
     //根據Category取得多筆貼文

@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -95,12 +96,14 @@ public class PostJsonController {
 	@GetMapping("/posts/category/{categoryId}")
 	public ResponseEntity<Page<ShowPostDTO>> getPostsByCategory(
 			@PathVariable Integer categoryId,
+			@RequestParam(required = false) Integer tagId,
+			@RequestParam(required = false) String keyword, 
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size,
 			@RequestParam(defaultValue = "postID") String sortBy, 
 		    @RequestParam(defaultValue = "desc") String orderBy) {
 
-		Page<ShowPostDTO> posts = postService.getPostsByCategory(categoryId, page, size,sortBy, orderBy);
+		  Page<ShowPostDTO> posts = postService.getPostsByCategory(categoryId, tagId, keyword, page, size, sortBy, orderBy);
 		return ResponseEntity.ok(posts);
 	}
 
@@ -261,26 +264,42 @@ public class PostJsonController {
 	// 刪除單筆貼文
 	@DeleteMapping("DELETE/{postID}")
 	public ResponseEntity<Map<String, Object>> delete(@PathVariable Integer postID) {
-		if (postID == null || postID <= 0) {
-			Map<String, Object> response = new HashMap<>();
-			response.put("success", false);
-			response.put("message", "貼文ID無效");
-			return ResponseEntity.badRequest().body(response);
-		}
+	    Map<String, Object> response = new HashMap<>();
+	    
+	    // 檢查 postID 是否有效
+	    if (postID == null || postID <= 0) {
+	        response.put("success", false);
+	        response.put("message", "貼文ID無效");
+	        return ResponseEntity.badRequest().body(response);
+	    }
+	    
+	    // 根據 ID 找到貼文
+	    PostEntity post = postService.findById(postID);
+	    
+	    // 如果找不到貼文，返回錯誤訊息
+	    if (post == null) {
+	        response.put("success", false);
+	        response.put("message", "找不到貼文");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	    }
+	    
+	    // 如果貼文存在，取得 categoryId
+	    Integer categoryId = post.getPostCategory().getCategoryId();
+	    
+	    // 執行刪除操作
+	    Boolean isDeleted = postService.delete(postID);
 
-		Boolean isDeleted = postService.delete(postID);
-
-		Map<String, Object> response = new HashMap<>();
-		if (isDeleted) {
-			response.put("success", true);
-			response.put("message", "貼文已成功刪除");
-//			response.put("postID", postID);
-			return ResponseEntity.ok(response);
-		} else {
-			response.put("success", false);
-			response.put("message", "刪除失敗，請稍後再試");
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-		}
+	    // 根據刪除結果返回相應的回應
+	    if (isDeleted) {
+	        response.put("success", true);
+	        response.put("message", "貼文已成功刪除");
+	        response.put("categoryId", categoryId);  // 返回類別ID
+	        return ResponseEntity.ok(response);
+	    } else {
+	        response.put("success", false);
+	        response.put("message", "刪除失敗，請稍後再試");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
 	}
 
 

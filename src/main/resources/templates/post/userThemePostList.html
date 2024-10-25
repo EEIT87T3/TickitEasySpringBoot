@@ -79,9 +79,9 @@
         <div class="button-group-nav button-group function">
             <form method="get" action="findByTheme">
                 <span>選擇標籤:</span>
-                <select name="themeID" onchange="fetchPosts()">
+                <select id="tagId" name="tagId" onchange="fetchPosts()">
                     <option value="" selected>請選擇標籤</option>
-                    <option value="0">所有主題</option>
+                    <!-- <option value="0">所有主題</option>
                     <option value="1">音樂</option>
                     <option value="2">舞蹈</option>
                     <option value="3">戲劇</option>
@@ -92,7 +92,7 @@
                     <option value="8">電影</option>
                     <option value="9">體育</option>
                     <option value="10">旅遊</option>
-                    <option value="11">其他</option>
+                    <option value="11">其他</option> -->
                 </select>
             </form>
 
@@ -125,10 +125,10 @@
             </div>
 
             <div class="bor">
-                <form method="get" action="findByEnter">
+                <form method="get">
                     <span>搜尋:</span>
-                    <input type="text" name="enter" />
-                    <input class="button" type="submit" value="確定" />
+                    <input id="keyword" type="text" name="keyword" />
+
                 </form>
             </div>
 
@@ -159,11 +159,13 @@
 
         let categories = [];
 
+        let tags = [];
+
         function fetchCategories() {
             axios.get('/TickitEasy/admin/api/post/categories')
                 .then(response => {
                     categories = response.data; // 將獲取的類別資料賦值給 categories 變數
-                    console.log(categories); // 查看獲取的資料
+                    console.log(categories);
 
                     populateCategoryNav(); // 當類別獲取後，再生成導航
                     let initialCategoryId = getCategoryIdFromUrl() || 1; // 如果URL中沒有categoryId，默認使用1
@@ -183,6 +185,26 @@
                 });
         }
 
+        function fetchTag() {
+            axios.get('/TickitEasy/admin/api/post/tags')
+                .then(response => {
+                    tags = response.data;
+                    console.log(tags);
+                    populateTagOption();
+
+                    fetchPosts();
+                })
+                .catch(error => {
+                    console.error('Error fetching tag:', error);
+                });
+        }
+        //偵測輸入框活動
+        const input = document.getElementById('keyword');
+
+        input.addEventListener('input', function () {
+            fetchPosts();
+        });
+
         // let categoryId = 1; // 預設值
         // 獲取 URL 查詢參數中的 categoryId
         function getCategoryIdFromUrl() {
@@ -193,10 +215,12 @@
         // 獲取文章的函數
         function fetchPosts(page = 0) {
             const categoryId = getCategoryIdFromUrl() || 1; // 如果沒有categoryId，使用默認值1
-            const pageSize = document.getElementById("pageSize").value||10;
-            const sortBy = document.getElementById("sortBy").value|| "postTime";
-            const orderBy = document.getElementById("orderBy").value|| "desc";
-            const url = `/TickitEasy/admin/api/post/posts/category/${categoryId}?page=${page}&size=${pageSize}&sortBy=${sortBy}&orderBy=${orderBy}`;
+            const tagId = document.getElementById("tagId").value ; 
+            const pageSize = document.getElementById("pageSize").value || 10;
+            const sortBy = document.getElementById("sortBy").value || "postTime";
+            const keyword = document.getElementById("keyword").value || "";
+            const orderBy = document.getElementById("orderBy").value || "desc";
+            const url = `/TickitEasy/admin/api/post/posts/category/${categoryId}?page=${page}&size=${pageSize}&sortBy=${sortBy}&tagId=${tagId}&keyword=${keyword}&orderBy=${orderBy}`;
             console.log("請求 URL:", url);
 
             axios.get(url)
@@ -238,6 +262,20 @@
 
                 // 將連結加入到 nav 容器
                 categoryNav.appendChild(navLink);
+            });
+        }
+        function populateTagOption() {
+
+            const tagSelect = document.getElementById('tagId');
+            // 清空現有選項，只保留預設選項
+            tagSelect.innerHTML = '<option value="" selected>請選擇標籤</option>';
+
+            // 為每個tag創建新的option
+            tags.forEach((tag) => {
+                const option = document.createElement('option');
+                option.value = tag.tagId; // 直接使用tagId作為值
+                option.textContent = tag.tagName;
+                tagSelect.appendChild(option);
             });
         }
 
@@ -367,7 +405,7 @@
         // 當頁面加載時獲取所有文章
         document.addEventListener('DOMContentLoaded', () => {
             fetchCategories();
-
+            fetchTag(); 
         });
     </script>
 
