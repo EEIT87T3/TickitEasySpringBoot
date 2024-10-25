@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta th:replace="~{commons/adminHead}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>新增貼文</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          margin: 0;
+          margin-top: 100px;
+          padding: 20px;
+          color: #333;
+        }
+    
+        h1 {
+          text-align: center;
+          color: #4CAF50;
+        }
+    
+        form {
+          background: white;
+          padding: 20px;
+          border-radius: 5px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          max-width: 600px;
+          margin: 0 auto;
+        }
+    
+        label {
+          display: block;
+          margin-bottom: 10px;
+          font-weight: bold;
+        }
+    
+        input[type="text"], textarea {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 20px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          font-size: 16px;
+        }
+    
+        .button {
+          background-color: #4CAF50;
+          color: white;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 5px;
+          font-size: 16px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          width: 100%;
+        }
+        .listbtn{
+        width: 5%;
+        }
+        button:hover {
+          background-color: #45a049;
+        }
+    
+        #updateResult {
+          margin-top: 20px;
+          text-align: center;
+          font-weight: bold;
+          color: #d9534f; /* Red color for errors */
+        }
+    
+        .success {
+          color: #5cb85c; /* Green color for success */
+        }
+      </style>
+
+</head>
+<body>
+    <div th:replace="~{commons/adminHeader}"></div>
+    <h1>新增貼文</h1>
+    <button class="button listbtn postList ">上一頁</button></td>
+    <form id="fullCreatePostForm">
+        <label for="fullPostTitle">標題:</label>
+        <input type="text" id="fullPostTitle" name="postTitle" required class="border p-2 mb-4 w-full">
+    
+        <label for="fullPostContent">內容:</label>
+        <textarea id="fullPostContent" name="postContent" required class="border p-2 mb-4 w-full"></textarea>
+        
+        <label for="fullPostCategory">分類:</label>
+        <select id="fullPostCategory" name="categoryID" class="border p-2 mb-4 w-full"></select>
+        
+        <label for="fullPostTag">標籤:</label>
+        <select id="fullPostTag" name="tagID" class="border p-2 mb-4 w-full"></select>
+        
+        <label for="fullPostImgUrl">圖片:</label>
+        <input type="text" id="fullPostImgUrl" name="postImgUrl" required class="border p-2 mb-4 w-full">
+    
+        <br>
+        <button class="button" type="submit">新增貼文</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+     $('#fullCreatePostForm').on('submit', function(event) {
+    event.preventDefault();
+
+    // const postData = {
+    //     postTitle: $('#fullPostTitle').val(),
+    //     postContent: $('#fullPostContent').val(),
+    //     categoryID: $('#fullPostCategory').val(),
+    //     tagID: $('#fullPostTag').val()
+    // };
+    console.log($('#fullPostCategory').val());
+
+    // const postData = new URLSearchParams(); application/x-www-form-urlencoded
+    const postData = {
+    postTitle: $('#fullPostTitle').val(),
+    postContent: $('#fullPostContent').val(),
+    postImgUrl: $('#fullPostImgUrl').val(),
+    categoryID: $('#fullPostCategory').val(),
+    tagID: $('#fullPostTag').val()
+    };
+
+    axios.post('/TickitEasy/admin/api/post/POST/', postData, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        alert("貼文新增成功！");
+        window.location.href = '/TickitEasy/admin/post'; // 跳轉到貼文列表頁
+    })
+    .catch(error => {
+        console.error("新增貼文失敗:", error);
+        alert("新增失敗，請稍後再試。");
+    });
+
+
+    // postData.append('postTitle', $('#fullPostTitle').val());
+    // postData.append('postContent', $('#fullPostContent').val());
+    // postData.append('postImgUrl', $('#fullPostImgUrl').val());
+    // // postData.append('memberID', 1);
+    // // postData.append('status', 1);
+    // postData.append('categoryID', $('#fullPostCategory').val());
+    // postData.append('tagID', $('#fullPostTag').val());
+    // console.log(postData);
+    // axios.post('/TickitEasy/admin/api/post/POST/', postData)
+    //     .then(response => {
+    //         alert("貼文新增成功！");
+    //         window.location.href = '/TickitEasy/admin/post'; // 跳轉到貼文列表頁
+    //     })
+    //     .catch(error => {
+    //         console.error("新增貼文失敗:", error);
+    //         alert("新增失敗，請稍後再試。");
+    //     });
+});
+
+// 動態填充分類和標籤選項
+axios.get('/TickitEasy/admin/api/post/categories')
+    .then(response => {
+        const categories = response.data;
+        categories.forEach(category => {
+            $('#fullPostCategory').append(new Option(category.categoryName, category.categoryId));
+        });
+    });
+
+axios.get('/TickitEasy/admin/api/post/tags')
+    .then(response => {
+        const tags = response.data;
+        tags.forEach(tag => {
+            $('#fullPostTag').append(new Option(tag.tagName, tag.tagId));
+        });
+    });
+    $('.postList').on('click', function() {
+               
+               window.location.href = `/TickitEasy/admin/post`; 
+           });
+        </script>
+        <div th:replace="~{commons/adminFooter}"></div>
+    </body>
+</html>

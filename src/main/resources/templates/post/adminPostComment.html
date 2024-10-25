@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta th:replace="~{commons/adminHead}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .w600px{
+            width: 600px;
+        }
+        .h500px{
+            height: 500px;
+        }
+        .h600px{
+            height: 600px;
+        }
+        .my-textarea{
+            /* width: 300px;
+            height: 200px; */
+            /* resize: both; 可同時調整寬度和高度 */
+            /* resize: horizontal;  只允許調整寬度 */
+            /* resize: vertical;     */
+            /* 只允許調整高度 */
+            resize: none;       
+             /* 禁用調整大小 */
+        }
+    </style>
+    <title>留言列表</title>
+    <script>
+        let dataTable;
+        let postID = /*[[${postID}]]*/ '';
+        let commentID = /*[[${commentID}]]*/ '';
+
+        function createCommentRow(comment) {
+            return `
+            <tr>
+                <td>${comment.postID}</td>
+                <td>${comment.postCommentID}</td>
+                <td>${comment.memberID}</td>
+                <td>${comment.content || 'N/A'}</td> 
+                <td>${comment.commentDate || 'N/A'}</td> 
+                <td>
+                    <button class="openUpdateModal bg-blue-500 text-white px-2 py-2 rounded" data-comment-id="${comment.postCommentID}">編輯</button>
+                    <button class="delete-post bg-red-500 text-white px-2 py-2 rounded" data-comment-id="${comment.postCommentID}">刪除</button>
+                </td>
+            </tr>
+            `;
+        }
+        // 獲取所有貼文的函數，postID 是從模板中注入的變量
+        function fetchAllComments(postID) {
+
+            const url = `/TickitEasy/admin/api/post/comments?postID=${postID}`; // 使用相對路徑，確保 API 路徑正確
+
+            axios.get(url)
+                .then(response => {
+                    const comments = response.data; // 獲取 JSON 數據
+                    populateTable(comments); // 將資料填充到表格
+                })
+                .catch(error => {
+                    console.error("Error fetching comments:", error);
+                });
+        }
+
+        // 將貼文資料填充到表格中的函數
+        function populateTable(comments) {
+            // 清空現有資料
+            $('#commentsTable tbody').empty();
+
+            // 將獲取到的貼文資料加入表格
+            comments.forEach(comment => {
+                $('#commentsTable tbody').append(createCommentRow(comment));
+            });
+
+            // 如果 DataTable 已經初始化過，直接更新表格資料
+            if (dataTable) {
+                dataTable.clear().draw();  // 清空 DataTable
+                comments.forEach(comment => {
+                    const rowNode = $(createCommentRow(comment));
+                    dataTable.row.add(rowNode).draw(); // 新增資料並重繪表格
+                });
+            } else {
+                // 初始化 DataTable
+                dataTable = $('#commentsTable').DataTable();
+            }
+        }
+
+        // 當頁面加載時抓取所有貼文
+        $(document).ready(function () {
+            const postID = $('body').attr('data-post-id');
+
+            console.log("Selected Comment ID:", commentID); // 確認 commentID 是否正確
+            if (postID) {
+                fetchAllComments(postID);
+            } else {
+                console.error("No postID found");
+            }
+            $('.postList').on('click', function () {
+
+                window.location.href = `/TickitEasy/admin/post`;
+            });
+
+
+            // 處理新增留言提交
+            $('#addCommentForm').on('submit', function (e) {
+                e.preventDefault();  // 防止表單預設提交行為
+
+                const postID = $('body').attr('data-post-id');
+                console.log("postID:", postID);
+                const formData = {
+                    postID: postID,
+                    memberID: 1,//暫時使用1
+                    content: $("#content").val()
+
+                };
+                console.log("Sending data:", formData);
+
+                axios.post('/TickitEasy/admin/api/post/comment/POST/', formData, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(function (response) {
+                        console.log("Response:", response.data);
+                        alert("留言創建成功");
+                        $("#postModal").removeClass("flex").addClass("hidden");
+                        fetchAllComments(postID);
+                    })
+                    .catch(function (error) {
+                        alert("錯誤：" + (error.response ? error.response.data : error.message));
+                    });
+
+
+            });
+
+            // 處理編輯留言提交
+            $('#updateCommentForm').on('submit', function (e) {
+                e.preventDefault();  // 防止表單預設提交行為
+
+                const commentID = $('#updateCommentForm').data('comment-id'); // 從表單中獲取 commentID
+                // const commentID = $('#updateCommentForm').attr('action').split('/').pop();
+                // const commentID = $(this).data('comment-id'); // 獲取按鈕的 data-comment-id 值
+
+                console.log("Submitting update for comment ID:", commentID);
+
+                const content = $('#updateModal textarea[name="content"]').val();
+                const postID = $('body').attr('data-post-id');
+
+                const formData = {
+                    postID: postID,
+                    memberID: 1,//暫時使用1
+                    content: content
+
+                };
+                console.log("Sending data:", formData);
+
+                axios.put(`/TickitEasy/admin/api/post/comment/PUT/${commentID}`, formData, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(function (response) {
+                        console.log("Response:", response.data);
+                        alert("留言更新成功");
+                        $("#updateModal").removeClass("flex").addClass("hidden");
+                        fetchAllComments(postID);
+                    })
+                    .catch(function (error) {
+                        alert("錯誤：" + (error.response ? error.response.data : error.message));
+                    });
+
+
+            });
+
+            // 刪除留言=================================
+            $('#commentsTable').on('click', '.delete-post', function () {
+                const commentID = $(this).data('comment-id');  // 獲取 data-comment-id
+                if (confirm('確定要刪除此留言嗎？')) {
+                    axios.delete(`/TickitEasy/admin/api/post/comment/DELETE/${commentID}`)
+                        .then(response => {
+                            alert("刪除成功！");
+                            fetchAllComments(postID);
+                        })
+                        .catch(error => {
+                            console.error("Error fetching comments:", error);
+                            alert("刪除失敗！");
+                        });
+                }
+            });
+            // 彈窗控制==================================
+            // 打開新增留言視窗
+            $("#openPostModal").click(function () {
+                $("#postModal").removeClass("hidden").addClass("flex");
+            });
+
+            // 關閉新增留言彈窗
+            $("#closePostModal").click(function () {
+                $("#postModal").removeClass("flex").addClass("hidden");
+            });
+
+            // 打開編輯留言視窗
+            $('#commentsTable').on('click', '.openUpdateModal', function () {
+                const commentID = $(this).data('comment-id');
+                console.log($(this)); // 檢查點擊的元素
+                console.log($(this).data()); // 檢查所有 data 屬性
+                console.log($(this).data('comment-id')); // 檢查 comment-id 值
+                console.log("Opening modal for comment ID:", commentID);
+                // 打開編輯留言視窗
+                $("#updateModal").removeClass("hidden").addClass("flex");
+                // 將 commentID 存儲在表單的 data 屬性中
+                $('#updateCommentForm').data('comment-id', commentID);
+                // 根據選中的留言設定內容，假設你需要將選中留言的內容填入編輯表單
+                // const commentRow = $(this).closest('tr');
+                const content = $(this).closest('tr').find('td').eq(3).text();// 假設留言內容在第 4 列
+
+
+                $('#updateModal textarea[name="content"]').val(content); // 填入當前留言內容
+                // $('#updateCommentForm').attr('action', `/admin/api/post/comment/PUT/${commentID}`); // 設置表單的 action
+            });
+
+            // 關閉編輯留言彈窗
+            $("#closeUpdateModal").click(function () {
+                $("#updateModal").removeClass("flex").addClass("hidden");
+            });
+        });
+    </script>
+</head>
+
+<body th:data-post-id="${postID}">
+    <div th:replace="~{commons/adminHeader}"></div>
+    <button class="postList bg-blue-500 text-white px-2 py-2 rounded">上一頁</button>
+    <button id="openPostModal" class=" add-post bg-blue-500 text-white px-4 py-2 rounded">新增留言</button>
+    <h1>All Comments for Post [[${postID}]]</h1>
+    <table id="commentsTable" class="display">
+        <thead>
+            <tr>
+                <th>Post ID</th>
+                <th>postCommentID</th>
+                <th>memberID</th>
+                <th>content</th>
+                <th>commentDate</th>
+                <th>動作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="comment : ${comments}">
+                <td th:text="${comment.postID}"></td>
+                <td th:text="${comment.postCommentID}"></td>
+                <td th:text="${comment.memberID}"></td>
+                <td th:text="${comment.content} ?: 'N/A'"></td>
+                <td th:text="${comment.commentDate} != null ? ${comment.commentDate} : 'N/A'"></td>
+                <td>
+                    <button class="openUpdateModal bg-blue-500 text-white px-2 py-2 rounded"
+                        th:data-comment-id="${comment.postCommentID}">編輯</button>
+                    <button class="delete-post bg-red-500 text-white px-2 py-2 rounded"
+                        data-comment-id="${comment.postCommentID}">刪除</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- 
+    <form id="commentForm" th:action="@{/admin/api/post/comment/POST/}" method="post">
+        <textarea name="content" id="content" placeholder="輸入你的留言"></textarea>
+        <button type="submit">提交留言</button>
+    </form> 
+    -->
+
+
+    <!--新增彈窗-->
+    <div id="postModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="w600px h500px bg-white p-8 rounded shadow-lg">
+            <h2 class="text-xl font-bold mb-4">新增留言</h2>
+            <form id="addCommentForm" th:action="@{/admin/api/post/comment/POST/}" method="post">
+
+                <div class="mb-4">
+                    <label for="postContent" class="block mb-2">內容：</label>
+                    <textarea style="resize: none; "  rows="10" cols="50" name="content" id="content" placeholder="輸入你的留言" required
+                        class="w-full px-3 py-2 border rounded"></textarea>
+                </div>
+
+
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">提交</button>
+                <button type="button" id="closePostModal"
+                    class="bg-red-500 text-white px-4 py-2 rounded ml-2">關閉</button>
+            </form>
+        </div>
+    </div>
+
+    <!--編輯彈窗-->
+    <div id="updateModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="w600px h500px bg-white p-8 rounded shadow-lg">
+            <h2 class="text-xl font-bold mb-4">編輯留言</h2>
+            <form id="updateCommentForm" th:action="@{/admin/api/post/comment/PUT/{commentID}(commentID=${commentID})}"
+                method="post">
+
+                <div class="mb-4">
+                    <label for="postContent" class="block mb-2">內容：</label>
+                    <textarea style="resize: none; "  rows="10" cols="50" name="content" id="content" placeholder="輸入你的留言" required
+                        class="w-full px-3 py-2 border rounded"></textarea>
+                </div>
+
+
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">提交</button>
+                <button type="button" id="closeUpdateModal"
+                    class="bg-red-500 text-white px-4 py-2 rounded ml-2">關閉</button>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{commons/adminFooter}"></div>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.member.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,11 @@ public class MemberPageController {
 	@Autowired
     private MemberService memberService;
 
+	
+	@Value("${oauth.google.client-id}")
+	private String googleClientId;
+
+	
     // 顯示註冊頁面
     @GetMapping("/register")
     public String showRegisterPage() {
@@ -23,7 +29,8 @@ public class MemberPageController {
 
     // 顯示登入頁面
     @GetMapping("/login")
-    public String showLoginPage() {
+    public String showLoginPage(Model model) {
+    	model.addAttribute("googleClientId", googleClientId);
         return "member/memberLogin";
     }
 
@@ -54,5 +61,22 @@ public class MemberPageController {
         }
         // 返回驗證頁面
         return "member/verify";
+    }
+    
+    //完善個人資料
+    @GetMapping("/complete-profile")
+    public String showCompleteProfilePage() {
+        return "member/completeProfile";
+    }
+    
+    //偽隱私政策
+    @GetMapping("/privacy-policy")
+    public String showPrivacyPolicy() {
+        return "policy/privacyPolicy";
+    }
+    //偽服務條款
+    @GetMapping("/terms-of-service")
+    public String showTermsOfService() {
+        return "policy/termsOfService";
     }
 }
