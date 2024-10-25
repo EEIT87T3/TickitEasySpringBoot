@@ -199,4 +199,17 @@ public class Member {
         未驗證,
         討論區停權
     }
+    
+ // 檢查社群媒體登入狀態的方法
+    public boolean isOAuthUser() {
+        return googleId != null || facebookId != null;
+    }
+
+    // 檢查必要資料是否完整的方法
+    public boolean isProfileComplete() {
+        return name != null && !name.trim().isEmpty()
+            && nickname != null && !nickname.trim().isEmpty()
+            && phone != null && phone.matches("^09\\d{8}$")
+            && birthDate != null;
+    }
 }
