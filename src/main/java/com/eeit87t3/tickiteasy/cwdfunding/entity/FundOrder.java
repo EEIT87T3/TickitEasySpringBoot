@@ -24,6 +24,9 @@ public class FundOrder {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer orderID;
 	
+	@Column(name = "memberID")
+	private Integer memberID; 
+	
 	@Column(name = "tickitID")
 	private String tickitID;
 	
@@ -33,7 +36,7 @@ public class FundOrder {
 	@Column(name = "totalAmount")
 	private Integer totalAmount;
 	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss EE", timezone = "UTC+8")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "UTC+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") // 檢查進來的時間，並做格式化
 	@Column(name = "orderDate")
 	private Timestamp orderDate;
@@ -54,6 +57,14 @@ public class FundOrder {
 
 	public void setOrderID(Integer orderID) {
 		this.orderID = orderID;
+	}
+
+	public Integer getMemberID() {
+		return memberID;
+	}
+
+	public void setMemberID(Integer memberID) {
+		this.memberID = memberID;
 	}
 
 	public String getTickitID() {

@@ -15,14 +15,15 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
+import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundPlanService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 
 @Controller
-@RequestMapping("/fundprojects")
 public class UserFundProjViewController {
 
 	@Autowired
@@ -37,10 +38,12 @@ public class UserFundProjViewController {
 	@Autowired
 	private TagService tagService;
 	
-	@GetMapping()
+	@Autowired FundOrderService orderService;
+	
+	@GetMapping("/fundprojects")
 	public String showProjPage(@RequestParam(value = "p", defaultValue = "1") Integer pageNumber, @RequestParam(required = false) Integer categoryID, Model model) {
 		Integer pageSize = 9;
-		Page<FundProjDTO> page = projService.findFundProjByPage(pageNumber, pageSize, categoryID);
+		Page<FundProjDTO> page = projService.findFundProjByPageAndStatus(pageNumber, pageSize, categoryID);
 		List<CategoryEntity> categories = categoryService.findFundProjCategoryList();
 		List<TagEntity> tags = tagService.findFundProjTagList();
 
@@ -53,7 +56,7 @@ public class UserFundProjViewController {
 		
 	}
 	
-	@GetMapping("/{projectID}")
+	@GetMapping("/fundprojects/{projectID}")
 	public String showOneProjPage(@PathVariable Integer projectID, Model model) {
 		FundProjDTO fundProjDTO = projService.findFundProjDTOById(projectID);
 		
@@ -62,7 +65,7 @@ public class UserFundProjViewController {
 		return "cwdfunding/cust_showOneFundProj";
 	}
 	
-	@GetMapping("/payment/{planID}")
+	@GetMapping("/fundprojects/payment/{planID}")
 	public String paymentPage(@PathVariable Integer planID, Model model) {
 		
 		FundPlan fundPlan = planService.findFundPlanById(planID);
@@ -70,6 +73,18 @@ public class UserFundProjViewController {
 		model.addAttribute("fundPlan",fundPlan);
 		
 		return "cwdfunding/cust_payPage";
+	}
+	
+	@GetMapping("/fundorderlist")
+	public String fundOrderList(Model model) {
+		return "cwdfunding/cust_fundOrderList";
+	}
+	
+	@GetMapping("/fundOrderDetail/{tickitID}")
+	public String fundOrderDetail(@PathVariable String tickitID, Model model) {
+		FundOrder fundOrder = orderService.findFundOrderByTickitID(tickitID);
+		model.addAttribute("order",fundOrder);
+		return "cwdfunding/cust_fundOrderDetail";
 	}
 	
 }

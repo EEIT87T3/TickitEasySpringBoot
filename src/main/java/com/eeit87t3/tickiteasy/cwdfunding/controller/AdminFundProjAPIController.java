@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.eclipse.angus.mail.handlers.message_rfc822;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,6 +31,7 @@ import com.eeit87t3.tickiteasy.cwdfunding.service.FundPlanService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
+import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 
 @Controller
 @RequestMapping("/admin")
@@ -80,13 +83,12 @@ public class AdminFundProjAPIController {
 		}
 	}
 
-	
+	/* [API] 新增募資活動 */
 	@ResponseBody
 	@PostMapping("/api/fundproject")
 	public ResponseEntity<Map<String, Object>> addProject(@ModelAttribute FundProjDTO fundProjDTO) {
 				// response定義
 		    Map<String, Object> response = new HashMap<>();
-		    
 		    try {
 				/*
 				 * 處理FundProj
@@ -245,4 +247,26 @@ public class AdminFundProjAPIController {
 		}
 	}
 
+	/* [API] 編輯募資活動上下架狀態 */
+    @PutMapping("/api/fundproject/status/{projectID}")
+    @ResponseBody
+    public ResponseEntity<?> editProductStatusByID(@PathVariable("projectID") Integer projectID,
+                                                   @RequestBody Map<String, Integer> requestBody) {
+        try {
+        	String message = null;
+        	Integer updatedStatus = requestBody.get("updatedStatus");
+            boolean editSuccess = projService.editStatusById(projectID, updatedStatus);
+            if (editSuccess) {
+            	message = "編輯狀態成功";
+            	return ResponseEntity.ok(message);
+            }else {
+            	message = "編輯狀態失敗";
+            	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid status: " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } 
+    }
 }

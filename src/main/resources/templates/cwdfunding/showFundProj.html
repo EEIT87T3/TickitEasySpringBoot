@@ -69,6 +69,17 @@
                el.currentAmount
              ).toLocaleString()} </td>
              <td> ${el.categoryName} </td>
+             <td> <select name="updatedStatus" class="form-select status-select" aria-label="Default select example" data-projectID="${
+               el.projectID
+             }">
+                     <option value="1" ${
+                       el.status == 1 ? "selected" : ""
+                     }>上架</option>
+                    <option value="0" ${
+                      el.status == 0 ? "selected" : ""
+                    }>下架</option>
+              </select>
+             </td>
              <td> <a href="/TickitEasy/admin/fundproject/${
                el.projectID
              }/edit"><button class="btn btn-edit" data-projectID="${
@@ -96,7 +107,7 @@
 
           //監聽刪除按鈕
           let deleteBtns = document.getElementsByClassName("btn-delete");
-          console.log(deleteBtns.length);
+          // console.log(deleteBtns.length);
           for (let i = 0; i < deleteBtns.length; i++) {
             deleteBtns[i].addEventListener("click", function (e) {
               let projectID = this.getAttribute("data-projectID");
@@ -125,6 +136,28 @@
 
           //重新塞入page.totalElements總數
           elementBlock.innerHTML = `總共有 <span>${pageData.totalElements}筆</span> `;
+
+          //監聽狀態select
+          let statusSelect = document.getElementsByClassName("status-select");
+          for (let i = 0; i < statusSelect.length; i++) {
+            statusSelect[i].addEventListener("change", function () {
+              let selectedValue = this.value.trim();
+              let projectID = this.getAttribute("data-projectID");
+              console.log("選取的狀態:", selectedValue);
+              console.log("projectID", projectID);
+              axios
+                .put(`/TickitEasy/admin/api/fundproject/status/${projectID}`, {
+                  projectID: projectID,
+                  updatedStatus: selectedValue,
+                })
+                .then((response) => {
+                  console.log(response.data);
+                })
+                .catch((error) => {
+                  console.log("編輯error:", error);
+                });
+            });
+          }
         }
 
         function deleteProjByID(id) {
@@ -174,13 +207,12 @@
         <thead>
           <th scope="col">#</th>
           <th scope="col">名稱</th>
-          <!-- <th scope="col">敘述</th> -->
-          <!-- <th scope="col">封面</th> -->
           <th scope="col">開始時間</th>
           <th scope="col">結束時間</th>
           <th scope="col">目標金額</th>
           <th scope="col">目前金額</th>
           <th scope="col">分類</th>
+          <th scope="col">狀態</th>
           <th scope="col">操作</th>
         </thead>
         <tbody id="outputBlock"></tbody>

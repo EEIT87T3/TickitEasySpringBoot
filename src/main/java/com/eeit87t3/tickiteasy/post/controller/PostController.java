@@ -56,31 +56,34 @@ public class PostController {
 	@Autowired
 	private CommentRepo commentRepo;
 	
-///////////////////////////////////////     頁面跳轉    //////////////////////////////////////
+///////////////////////////////////////     後台頁面跳轉    //////////////////////////////////////
 	//所有貼文頁面
 	 @GetMapping
 	    public String showPostsPage(Model model) {
-	        return "post/postList"; 
+	        return "post/adminPostList"; 
 	    }
+	 //單一貼文頁面
+	 @GetMapping("/{postID}")
+	 public String showPost(Model model) {
+		 return "post/adminShowPost"; 
+	 }
 	 //更新貼文頁面
 	 @GetMapping("/{postID}/edit")
 	 public String showUpdateForm() {
-		 return "/post/editPost"; 
+		 return "/post/adminEditPost"; 
 	 }
 	 
 	//新增貼文頁面 *未完成*
 	@GetMapping("/create")
 	    public String showInsertForm() {
-	        return "/post/addPost";  
+	        return "/post/adminAddPost";  
 	    }
 	//留言頁面
 	 @GetMapping("/comments/{postID}")
 	    public String showCommentsPage(@PathVariable Integer postID,Model model) {
 		 	model.addAttribute("postID", postID);
-	        return "post/postComment"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
+	        return "post/adminPostComment"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
 	    }
-	//////////////////////////////////////////////////////////////////////////////////////////
-
 	
 
  	
