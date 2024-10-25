@@ -36,7 +36,6 @@ public class ImageController {
 			HttpHeaders headers = new HttpHeaders();
 			MediaType determinedMediaType = imageUtil.determineMediaType(fileName);
 			headers.setContentType(determinedMediaType);
-			
 			return new ResponseEntity<>(imageByteArray, headers, HttpStatus.OK);
 		} catch (IOException e) {
 			System.out.println("在 /images/ 下未找到指定的圖片檔案。");

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta th:replace="~{commons/userHead}">
+    <title>首頁</title>
+    <link rel="stylesheet" href="/TickitEasy/post/css/home.css"> <!-- 引入 home.css -->
+    <style>
+    .newestpost{
+   border-bottom: 1px solid #ddd; /* 分隔線 */
+    }
+        /* 簡單的 CSS 用於卡片樣式 */
+        .articles {
+            display: flex;
+            flex-wrap: wrap; /* 允許換行 */
+            gap: 15px; /* 條目之間的間距 */
+        }
+
+        .latest-articles ul,
+        .popular-articles ul {
+            list-style-type: none; /* 移除預設的清單樣式 */
+            padding: 0; /* 移除內邊距 */
+        }
+
+        .latest-articles li,
+        .popular-articles article {
+            margin-bottom: 10px; /* 條目之間的間距 */
+        }
+
+        .latest-articles {
+            margin-bottom: 30px; /* 最新文章與熱門文章之間的間距 */
+        }
+
+        .popular-articles {
+            display: flex;
+            flex-wrap: wrap; /* 允許換行 */
+            gap: 15px; /* 條目之間的間距 */
+        }
+
+     
+
+        .meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+     .articles {
+    display: flex;
+    flex-wrap: wrap; /* 允許換行 */
+    gap: 15px; /* 條目之間的間距 */
+}
+
+article {
+    background-color: #f0f0f0; /* 背景顏色 */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1 0 200px; /* 每個文章區域的最小寬度 */
+    max-width: calc(33.33% - 10px); /* 每行最多三個文章，並減去間距 */
+}
+
+.article-image {
+    height: 150px; /* 色塊高度 */
+    background-color: #ccc; /* 色塊顏色 */
+    border-radius: 5px; /* 圓角 */
+    margin-bottom: 10px; /* 圖片與標題之間的間距 */
+    width: 100%; /* 確保色塊寬度為 100% */
+}
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{commons/userHeader}"></div>
+
+    <main>
+       
+        <section class="popular-articles">
+            <h4>熱門文章</h4>
+            <div class="articles">
+                <!-- 熱門文章範例 -->
+                <article>
+                    <div class="article-image"></div> <!-- 色塊作為圖片 -->
+                    <div class="article-category">類別 1</div>
+                    <h3>熱門文章標題 1</h3>
+                    <p>這是一篇熱門文章的簡介。內容大致描述文章的要點和主題。</p>
+                    <div class="meta">
+                        <span><i class="fas fa-thumbs-up"></i> 100</span>
+                        <span><i class="fas fa-eye"></i> 250</span>
+                    </div>
+                </article>
+                <article>
+                    <div class="article-image"></div> <!-- 色塊作為圖片 -->
+                    <div class="article-category">類別 2</div>
+                    <h3>熱門文章標題 2</h3>
+                    <p>這是一篇熱門文章的簡介。內容大致描述文章的要點和主題。</p>
+                    <div class="meta">
+                        <span><i class="fas fa-thumbs-up"></i> 200</span>
+                        <span><i class="fas fa-eye"></i> 300</span>
+                    </div>
+                </article>
+                <article>
+                    <div class="article-image"></div> <!-- 色塊作為圖片 -->
+                    <div class="article-category">類別 3</div>
+                    <h3>熱門文章標題 3</h3>
+                    <p>這是一篇熱門文章的簡介。內容大致描述文章的要點和主題。</p>
+                    <div class="meta">
+                        <span><i class="fas fa-thumbs-up"></i> 150</span>
+                        <span><i class="fas fa-eye"></i> 400</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+ <section class="board-section">
+ <h4>最新文章</h4>
+            <nav class=" newestpost nav nav-pills flex-column flex-sm-row justify-content-center">
+                <a class="flex-sm-fill text-sm-center nav-link active" href="#" onclick="loadArticles('聊天')">閒聊</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('其他')">其他</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('展覽')">展覽</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('音樂')">音樂</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('演唱會')">演唱會</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('舞蹈')">舞蹈</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('戲劇')">戲劇</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('學習')">學習</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('電影')">電影</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('旅遊')">旅遊</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('遊戲')">遊戲</a>
+                <a class="flex-sm-fill text-sm-center nav-link" href="#" onclick="loadArticles('運動')">運動</a>
+            </nav>
+           
+          
+             <br>
+            <div class="latest-articles">
+          
+            <ul id="article-list">
+                <!-- 最新文章將根據主題區域進行更新 -->
+                <li class="newestpost" >最新文章標題 1 <span class="meta"><i class="fas fa-thumbs-up"></i> 50 | <i class="fas fa-eye"></i> 150</span></li>
+                <li class="newestpost">最新文章標題 2 <span class="meta"><i class="fas fa-thumbs-up"></i> 70 | <i class="fas fa-eye"></i> 200</span></li>
+                <li class="newestpost">最新文章標題 3 <span class="meta"><i class="fas fa-thumbs-up"></i> 60 | <i class="fas fa-eye"></i> 180</span></li>
+                <li class="newestpost">最新文章標題 4 <span class="meta"><i class="fas fa-thumbs-up"></i> 40 | <i class="fas fa-eye"></i> 120</span></li>
+                <li class="newestpost">最新文章標題 5 <span class="meta"><i class="fas fa-thumbs-up"></i> 30 | <i class="fas fa-eye"></i> 100</span></li>
+            </ul>
+            </div>
+        </section>
+
+    
+        <section class="announcements">
+            <h2>論壇公告版</h2>
+            <div class="announcement-list">
+                <p class="newestpost">公告內容：這是一個管理員公告。</p>
+                <p class="newestpost">公告內容：這是另一個管理員公告。</p>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{commons/userFooter}"></div>
+
+    <script>
+        function loadArticles(topic) {
+            // 在此處根據選擇的主題動態加載最新文章
+            console.log('加載主題:', topic);
+            // 根據不同的主題，更新最新文章的列表
+            // 這裡使用假資料示範
+            const articles = [
+                { title: `主題 ${topic} 的文章 1`, likes: 10, views: 20 },
+                { title: `主題 ${topic} 的文章 2`, likes: 15, views: 30 },
+                { title: `主題 ${topic} 的文章 3`, likes: 5, views: 10 },
+                { title: `主題 ${topic} 的文章 4`, likes: 7, views: 14 },
+                { title: `主題 ${topic} 的文章 5`, likes: 8, views: 16 },
+            ];
+
+            const articleList = document.getElementById('article-list');
+            articleList.innerHTML = ''; // 清空現有文章
+            articles.forEach(article => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `${article.title} <span class="meta"><i class="fas fa-thumbs-up"></i> ${article.likes} | <i class="fas fa-eye"></i> ${article.views}</span>`;
+                articleList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+
+</html>

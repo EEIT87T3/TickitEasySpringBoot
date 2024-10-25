@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eeit87t3.tickiteasy.post.dto.ShowCommentDTO;
 import com.eeit87t3.tickiteasy.post.entity.CommentEntity;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.repository.CommentRepo;
@@ -37,6 +38,11 @@ public class CommentService {
 	    // 直接從 commentRepo 取得結果，若沒有資料則返回空的 List
 	    return commentRepo.findByPostPostID(postID);
 	}
+//	public List<ShowCommentDTO> getCommentsByPostId(Integer postID) {
+//	  
+//	    return commentRepo.getCommentsByPostId(postID);
+//	}
+
 
 	//根據貼文ID新增留言
 	@Transactional

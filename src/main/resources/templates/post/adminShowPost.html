@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta th:replace="~{commons/adminHead}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>查看貼文</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            margin-top: 100px;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #5F46E8;
+        }
+
+        .post-container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .post-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .post-label {
+            font-weight: bold;
+            width: 30%;
+        }
+
+        .post-value {
+            width: 70%;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        .info-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .info-item i {
+            margin-right: 8px;
+            font-size: 20px;
+            color: #5F46E8;
+        }
+
+        .info-item span {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .button {
+            background-color: #5F46E8;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .listbtn {
+            width: 5%;
+        }
+
+        button:hover {
+            background-color: #4836c7;
+        }
+
+        #updateResult {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        .success {
+            color: #5cb85c;
+        }
+
+        /* 新增的 CSS */
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            /* 將提示字放在圖像上方 */
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{commons/adminHeader}"></div>
+    <h1>Show Post</h1>
+    <button class="button listbtn postList">上一頁</button>
+
+    <div class="post-container">
+        <!-- 圖像化呈現區域 -->
+        <div class="info-container">
+            <!-- Likes Count -->
+            <div class="info-item">
+                <i class="fas fa-thumbs-up"></i>
+                <span id="likesCount"></span>
+            </div>
+
+            <!-- View Count -->
+            <div class="info-item">
+                <i class="fas fa-eye"></i>
+                <span id="viewCount"></span>
+            </div>
+
+            <!-- Status -->
+            <div class="info-item">
+                <i class="fas fa-flag"></i>
+                <span id="status"></span>
+            </div>
+
+            <!-- Category Name -->
+            <div class="info-item">
+                <i class="fas fa-list"></i>
+                <span id="categoryName"></span>
+            </div>
+
+            <!-- Tag Name -->
+            <div class="info-item">
+                <i class="fas fa-tag"></i>
+                <span id="tagName"></span>
+            </div>
+
+            <!-- Post Time -->
+            <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="postTime"></span>
+            </div>
+        </div>
+
+        <!-- 發布者圖像和名稱 -->
+
+        <div class="post-row">
+            <div class="tooltip">
+                <img id="profilePic" class="profile-pic" alt="發布者頭像">
+
+            </div>
+        </div>
+        <div class="post-row">
+
+            <div class="post-label">發布者:</div>
+            <div id="tooltipName" class="post-value"></div>
+        </div>
+
+        <div class="post-row">
+            <div class="post-label">標題:</div>
+            <div id="postTitle" class="post-value"></div>
+        </div>
+
+        <div class="post-row">
+            <div class="post-label">文章內容:</div>
+            <div id="postContent" class="post-value"></div>
+        </div>
+
+        <div class="post-row">
+            <div class="post-label">圖片網址:</div>
+            <!-- <div id="postImgUrl" class="post-value"></div> -->
+            <div id="imageList" class="post-value"></div>
+        </div>
+    </div>
+
+    <div id="updateResult"></div>
+
+    <script>
+        async function loadPostData() {
+            try {
+                const postID = window.location.pathname.split("/")[4];
+                const response = await fetch(`/TickitEasy/admin/api/post/GET/${postID}`, { method: 'GET' });
+
+                if (response.ok) {
+                    const post = await response.json();
+                    document.getElementById('postTitle').innerText = post.postTitle;
+                    document.getElementById('postContent').innerText = post.postContent;
+
+                    document.getElementById('postTime').innerText = post.postTime;
+                    document.getElementById('likesCount').innerText = post.likesCount || 0; // 防止為 null
+                    document.getElementById('viewCount').innerText = post.viewCount || 0; // 防止為 null
+                    document.getElementById('status').innerText = post.status;
+                    document.getElementById('categoryName').innerText = post.postCategory.categoryName;
+                    document.getElementById('tagName').innerText = post.postTag.tagName;
+
+                    // 設置發布者名稱和頭像
+                    document.getElementById('tooltipName').innerText = post.member.nickname;
+                    // post.member.profilePicPath || 
+                    document.getElementById('profilePic').src = '/TickitEasy/images/member/default-avatar.png';
+
+                    const imageListContainer = document.getElementById('imageList');
+                    imageListContainer.innerHTML = ''; // 清空容器中的內容
+
+                    // 創建表格元素
+                    const table = document.createElement('table');
+                    const headerRow = document.createElement('tr');
+
+                    // 添加表格標題
+                    const headerImage = document.createElement('th');
+                    headerImage.innerText = '圖片';
+                    const headerPath = document.createElement('th');
+                    headerPath.innerText = '圖片網址';
+                    headerRow.appendChild(headerImage);
+                    headerRow.appendChild(headerPath);
+                    table.appendChild(headerRow);
+                    // 顯示圖片網址
+                    if (Array.isArray(post.images) && post.images.length > 0) {
+
+                        // 遍歷圖片數組並添加到表格中
+                        post.images.forEach(image => {
+                            const row = document.createElement('tr');
+
+                            // 創建圖片單元格
+                            const imgCell = document.createElement('td');
+                            const imgElement = document.createElement('img');
+                            imgElement.src = `/TickitEasy${image.imagePath}`; // 設置圖片來源
+                            imgElement.alt = `Image ID: ${image.imageID}`; // 設置圖片 alt 屬性
+                            imgElement.style.width = '100px'; // 設置圖片寬度
+                            imgCell.appendChild(imgElement);
+
+                            // 創建文件路徑單元格
+                            const pathCell = document.createElement('td');
+                            pathCell.textContent = `/TickitEasy${image.imagePath}`; // 設置文件路徑
+
+                            // 將單元格添加到行
+                            row.appendChild(imgCell);
+                            row.appendChild(pathCell);
+                            table.appendChild(row); // 將行添加到表格
+                        });
+
+                        // 將表格添加到容器
+                        imageListContainer.appendChild(table);
+                    } else {
+                        // 創建文件路徑元素
+                        const nullmsg = document.createElement('span');
+                        nullmsg.textContent = '本則貼文無圖片'; 
+                        imageListContainer.appendChild( nullmsg);
+                        console.error("post.images is not an array or is undefined.");
+                    }
+                } else {
+                    document.getElementById("updateResult").innerText = `Failed to load post: ${response.status}`;
+                }
+            } catch (error) {
+                document.getElementById("updateResult").innerText = `Error: ${error.message}`;
+            }
+        }
+
+        loadPostData();
+
+        $('.postList').on('click', function () {
+            window.location.href = `/TickitEasy/admin/post`;
+        });
+    </script>
+
+    <div th:replace="~{commons/adminFooter}"></div>
+</body>
+
+</html>

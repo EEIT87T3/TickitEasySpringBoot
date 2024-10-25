@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta th:replace="~{commons/userHead}">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>論壇文章列表</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/TickitEasy/post/css/list.css">
+
+    <style>
+        /* 分頁按鈕 */
+        .posts-pagination {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .posts-pagination #paginationContainer button {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            color: #333;
+            font-size: 16px;
+            padding: 10px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .posts-pagination #paginationContainer button:hover {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .posts-pagination #paginationContainer button:disabled {
+            background-color: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+            border-color: #ddd;
+        }
+
+        .posts-pagination #paginationContainer button:disabled:hover {
+            background-color: #ddd;
+            color: #aaa;
+        }
+
+        .posts-pagination #paginationContainer button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        #postPageInfo {
+            margin-right: 10px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .postHomeBtn {
+            background-color: #5F46E8;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{commons/userHeader}"></div>
+    <button class="postHomeBtn text-white px-4 py-2 rounded">回首頁</button>
+    <div class="containerList">
+        <h4>文章列表</h4>
+        <nav class="newestpost nav nav-pills flex-column flex-sm-row justify-content-center" id="categoryNav">
+            <!-- 動態生成 -->
+        </nav>
+        <div class="button-group-nav button-group function">
+            <form method="get" action="findByTheme">
+                <span>選擇標籤:</span>
+                <select id="tagId" name="tagId" onchange="fetchPosts()">
+                    <option value="" selected>請選擇標籤</option>
+                    <!-- <option value="0">所有主題</option>
+                    <option value="1">音樂</option>
+                    <option value="2">舞蹈</option>
+                    <option value="3">戲劇</option>
+                    <option value="4">音樂劇</option>
+                    <option value="5">親子</option>
+                    <option value="6">講座</option>
+                    <option value="7">展覽</option>
+                    <option value="8">電影</option>
+                    <option value="9">體育</option>
+                    <option value="10">旅遊</option>
+                    <option value="11">其他</option> -->
+                </select>
+            </form>
+
+            <div class="bor">
+                <form>
+                    <span>依條件排序:</span>
+                    <!-- Select for sorting posts -->
+                    <label for="sortBy">依據:</label>
+                    <select id="sortBy" onchange="fetchPosts()">
+                        <option value="postTime">日期</option>
+                        <option value="postTitle">標題</option>
+                        <option value="likesCount">讚數</option>
+                        <option value="viewCount">點閱率</option>
+                        <option value="commentCount">留言數</option>
+                    </select>
+
+                    <!-- Select for choosing page size -->
+                    <label for="pageSize">筆數:</label>
+                    <select id="pageSize" onchange="fetchPosts()">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                    <label for="orderBy">順序:</label>
+                    <select id="orderBy" onchange="fetchPosts()">
+                        <option value="DESC">降冪</option>
+                        <option value="ASC">升冪</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="bor">
+                <form method="get">
+                    <span>搜尋:</span>
+                    <input id="keyword" type="text" name="keyword" />
+
+                </form>
+            </div>
+
+            <div class="bor">
+                <a class="button" href="usercreate">新增文章</a>
+            </div>
+        </div>
+
+        <div class="article-list" id="articleList">
+            <!-- 文章列表將在這裡填充 -->
+        </div>
+    </div>
+
+    <div class="posts-pagination">
+        <span id="postPageInfo"></span>
+        <div id="paginationContainer"></div>
+    </div>
+
+
+    <div th:replace="~{commons/userFooter}"></div>
+    <script>
+        $('.postHomeBtn').on('click', function () {
+
+            window.location.href = `/TickitEasy/user/post/HomePage`;
+        });
+        let currentPostPage = 0; // 當前頁面
+        // const pageSize = 6; // 每頁顯示的文章數量
+
+        let categories = [];
+
+        let tags = [];
+
+        function fetchCategories() {
+            axios.get('/TickitEasy/admin/api/post/categories')
+                .then(response => {
+                    categories = response.data; // 將獲取的類別資料賦值給 categories 變數
+                    console.log(categories);
+
+                    populateCategoryNav(); // 當類別獲取後，再生成導航
+                    let initialCategoryId = getCategoryIdFromUrl() || 1; // 如果URL中沒有categoryId，默認使用1
+                    initialCategoryId = parseInt(initialCategoryId);
+
+                    // 設置初始類別的active狀態
+                    const initialCategoryLink = document.querySelector(`a[href="?categoryId=${initialCategoryId}"]`);
+                    if (initialCategoryLink) {
+                        initialCategoryLink.classList.add('active'); //控制NAV顯示當前類別
+                    }
+
+                    loadArticles(initialCategoryId);
+                    // fetchPosts(0);
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                });
+        }
+
+        function fetchTag() {
+            axios.get('/TickitEasy/admin/api/post/tags')
+                .then(response => {
+                    tags = response.data;
+                    console.log(tags);
+                    populateTagOption();
+
+                    fetchPosts();
+                })
+                .catch(error => {
+                    console.error('Error fetching tag:', error);
+                });
+        }
+        //偵測輸入框活動
+        const input = document.getElementById('keyword');
+
+        input.addEventListener('input', function () {
+            fetchPosts();
+        });
+
+        // let categoryId = 1; // 預設值
+        // 獲取 URL 查詢參數中的 categoryId
+        function getCategoryIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('categoryId');
+            return categoryId ? parseInt(categoryId) : null;
+        }
+        // 獲取文章的函數
+        function fetchPosts(page = 0) {
+            const categoryId = getCategoryIdFromUrl() || 1; // 如果沒有categoryId，使用默認值1
+            const tagId = document.getElementById("tagId").value;
+            const pageSize = document.getElementById("pageSize").value || 10;
+            const sortBy = document.getElementById("sortBy").value || "postTime";
+            const keyword = document.getElementById("keyword").value || "";
+            const orderBy = document.getElementById("orderBy").value || "desc";
+            const url = `/TickitEasy/admin/api/post/posts/category/${categoryId}?page=${page}&size=${pageSize}&sortBy=${sortBy}&tagId=${tagId}&keyword=${keyword}&orderBy=${orderBy}`;
+            console.log("請求 URL:", url);
+
+            axios.get(url)
+                .then(response => {
+                    const posts = response.data.content; // 獲取文章內容數組
+                    updateArticleList(posts); // 更新文章列表
+                    updatePagination(response.data); // 更新分頁信息
+                })
+                .catch(error => {
+                    console.error("獲取文章時出錯:", error);
+                });
+        }
+
+        function populateCategoryNav() {
+            // 獲取 nav 容器
+            const categoryNav = document.getElementById('categoryNav');
+
+            // 按照 categoryId 排序，避免受 categoryStatus影響 將 [...categories]:categories 陣列的每個元素展開並包裝進一個新陣列
+            const sortedcategories = [...categories].sort((a, b) => a.categoryId - b.categoryId);
+
+            // 動態生成類別導航連結
+            sortedcategories.forEach((category) => {
+                const navLink = document.createElement('a');
+                navLink.classList.add('flex-sm-fill', 'text-sm-center', 'nav-link');
+                navLink.setAttribute('href', `?categoryId=${category.categoryId}`);
+
+                navLink.innerText = category.categoryName;
+
+                // 點擊事件處理
+                navLink.addEventListener('click', function (event) {
+                    event.preventDefault(); // 阻止默認的連結跳轉行為
+
+                    // 先移除所有 active 樣式
+                    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+
+                    // 為當前點擊的項目添加 active 樣式
+                    this.classList.add('active');
+
+                    // 載入該類別的文章，使用 categoryId
+                    loadArticles(category.categoryId);
+                });
+
+                // 將連結加入到 nav 容器
+                categoryNav.appendChild(navLink);
+            });
+        }
+        function populateTagOption() {
+
+            const tagSelect = document.getElementById('tagId');
+            // 按照 tagId 排序，避免受 tagStatus影響
+            const sortedTags = [...tags].sort((a, b) => a.tagId - b.tagId);
+
+            sortedTags.forEach((tag) => {
+                const option = document.createElement('option');
+                option.value = tag.tagId; // 直接使用tagId作為值
+                option.textContent = tag.tagName;
+                tagSelect.appendChild(option);
+            });
+        }
+
+        function loadArticles(categoryId) {
+
+            // 確保 categoryId 是數字
+            categoryId = parseInt(categoryId);
+            // 確保 categoryId 是有效值
+            const selectedCategory = categories.find(category => category.categoryId === categoryId);
+            if (selectedCategory) {
+                console.log(`正在載入類別: ${selectedCategory.categoryName} (ID: ${categoryId}) 的文章`);
+            } else {
+                console.error(`未找到類別 ID: ${categoryId}`);
+                return;
+            }
+
+            // 更新 URL
+            window.history.pushState({}, '', `?categoryId=${categoryId}`);
+
+            // 重新獲取文章
+            fetchPosts(0); // 從第一頁開始加載新類別的文章
+        }
+
+        // 控制頁碼///////////////////////////////////////
+        function updatePagination(pageData) {
+            currentPostPage = pageData.number; // 當前頁碼
+            const totalPages = pageData.totalPages;
+
+            const paginationContainer = document.getElementById('paginationContainer');
+            paginationContainer.innerHTML = ''; // 清空分頁容器
+
+            // 上一頁按鈕
+            const prevButton = document.createElement('button');
+            prevButton.innerText = '<<';
+            prevButton.disabled = currentPostPage === 0;
+            prevButton.addEventListener('click', () => fetchPosts(currentPostPage - 1));
+            paginationContainer.appendChild(prevButton);
+
+            // 顯示頁碼按鈕，最多顯示 6 個頁碼
+            const maxPagesToShow = 6;
+            let startPage = Math.max(0, currentPostPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesToShow);
+
+            if (endPage - startPage < maxPagesToShow) {
+                startPage = Math.max(0, endPage - maxPagesToShow);
+            }
+
+            for (let i = startPage; i < endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.innerText = i + 1;
+                if (i === currentPostPage) {
+                    pageButton.classList.add('active'); // 當前頁碼的按鈕
+                    pageButton.disabled = true; // 禁用當前頁面的按鈕
+                }
+                pageButton.addEventListener('click', () => fetchPosts(i));
+                paginationContainer.appendChild(pageButton);
+            }
+
+            // 下一頁按鈕
+            const nextButton = document.createElement('button');
+            nextButton.innerText = '>>';
+            nextButton.disabled = currentPostPage + 1 >= totalPages;
+            nextButton.addEventListener('click', () => fetchPosts(currentPostPage + 1));
+            paginationContainer.appendChild(nextButton);
+
+            // 顯示當前頁碼訊息
+            document.getElementById('postPageInfo').innerText = `第 ${currentPostPage + 1} 頁，共 ${totalPages} 頁`;
+
+        }
+
+        // 更新文章列表的函數
+        function updateArticleList(posts) {
+            const container = document.getElementById('articleList');
+            container.innerHTML = ''; // 清空容器
+
+            if (posts.length === 0) {
+                container.innerHTML = `<div class="article-item"><h2>查無文章</h2></div>`;
+                return;
+            }
+
+            posts.forEach(post => {
+                console.log(post); // 查看每個貼文的數據
+                const articleItem = document.createElement('div');
+                articleItem.classList.add('article-item');
+
+                // const formattedDate = formatDate(post.postTime);
+                // 檢查 editTime 是否為 null
+                let editDateHtml = '';
+                if (post.editTime) {
+                    const formattedEditDate = new Date(post.editTime).toLocaleString();
+                    editDateHtml = `<span>編輯日期：${formattedEditDate}</span>`;
+                }
+
+                articleItem.innerHTML = `
+                    <img class="postImg" src="${post.postImgUrl}" alt="文章縮略圖">
+                    <div>
+                        <span class="theme">${post.categoryName}</span>
+                        <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
+                        <a href="#" class="post-title">${post.postTitle}</a>
+                        <p>${post.postContent}</p>
+                        <div class="article-meta">
+                            <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
+                            <span>編輯日期：${new Date(post.editTime).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div class="meta-right">
+                        <span><i class="fas fa-thumbs-up"></i>${post.likesCount !== null ? post.likesCount : 0}</span>
+                    <span><i class="fas fa-eye"></i>${post.viewCount !== null ? post.viewCount : 0}</span>
+                    </div>
+                `;
+
+                // 添加 click 事件監聽器
+                articleItem.addEventListener('click', function () {
+                    window.location.href = `/TickitEasy/user/post/${post.postID}`;
+                });
+
+                container.appendChild(articleItem);
+            });
+        }
+
+        // 頁面加載時獲取 categoryId
+        function getCategoryIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('categoryId');
+        }
+
+        // 當頁面加載時獲取所有文章
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCategories();
+            fetchTag();
+        });
+    </script>
+
+</body>
+
+</html>
