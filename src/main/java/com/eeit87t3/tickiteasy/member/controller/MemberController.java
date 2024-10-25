@@ -428,6 +428,82 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+    //忘記密碼
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> payload) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            logger.info("收到忘記密碼請求");
+            String email = payload.get("email");
+            
+            if (email == null || !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+                logger.warn("無效的電子信箱格式：{}", email);
+                response.put("error", "請輸入有效的電子信箱");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // 檢查email是否存在
+            Member member = memberService.findByEmail(email);
+            if (member == null) {
+                logger.warn("找不到對應的會員帳號：{}", email);
+                response.put("message", "如果此電子信箱已註冊，您將收到重設密碼的郵件");
+                return ResponseEntity.ok(response);
+            }
+            
+            logger.info("開始生成重設密碼Token");
+            String resetToken = memberService.generatePasswordResetToken(email);
+            String resetLink = "http://localhost:8080/TickitEasy/reset-password?token=" + resetToken;
+            
+            try {
+                logger.info("準備發送重設密碼郵件");
+                emailService.sendPasswordResetEmail(email, resetLink);
+                logger.info("重設密碼郵件發送成功");
+                
+                response.put("message", "重設密碼連結已發送至您的電子信箱");
+                return ResponseEntity.ok(response);
+            } catch (Exception e) {
+                logger.error("發送重設密碼郵件失敗：{}", e.getMessage());
+                response.put("error", "發送郵件失敗，請稍後再試");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
+            
+        } catch (Exception e) {
+            logger.error("處理忘記密碼請求時發生錯誤：{}", e.getMessage());
+            response.put("error", "發生錯誤，請稍後再試");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    //忘記密碼重設
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody Map<String, String> payload) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            String token = payload.get("token");
+            String newPassword = payload.get("newPassword");
+            String confirmPassword = payload.get("confirmPassword");
+            
+            if (newPassword == null || !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).{8,}$")) {
+                response.put("error", "新密碼需至少8位，包含大小寫字母、數字和特殊字符");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            if (!newPassword.equals(confirmPassword)) {
+                response.put("error", "新密碼與確認密碼不一致");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            memberService.resetPassword(token, newPassword);
+            
+            response.put("message", "密碼重設成功，請使用新密碼登入");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            response.put("error", "發生錯誤，請稍後再試");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }
 
 
