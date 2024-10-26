@@ -79,4 +79,28 @@ public class MemberPageController {
     public String showTermsOfService() {
         return "policy/termsOfService";
     }
+    
+    //忘記密碼
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordPage() {
+        return "member/forgotPassword";
+    }
+    //忘記密碼重設
+    @GetMapping("/reset-password")
+    public String showResetPasswordPage(@RequestParam("token") String token, Model model) {
+        try {
+            // 檢查 token 是否有效
+            if (memberService.isValidResetToken(token)) {
+                model.addAttribute("token", token);
+                return "member/resetPassword";
+            } else {
+                model.addAttribute("error", "無效的重設密碼連結或連結已過期");
+                return "member/resetPasswordError";
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "發生錯誤，請稍後再試");
+            return "member/resetPasswordError";
+        }
+    }
+
 }

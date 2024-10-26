@@ -111,6 +111,33 @@
         .btn-fill:hover {
             background-color: var(--main-bright-orange);
         }
+        /* 密碼輸入框的容器樣式 */
+		.password-field {
+		    position: relative;
+		}
+		
+		/* 眼睛圖示的樣式 */
+		.password-toggle {
+		    position: absolute;
+		    right: 10px;
+		    top: 50%;
+		    transform: translateY(-50%);
+		    cursor: pointer;
+		    color: var(--text-gray);
+		    background: none;
+		    border: none;
+		    padding: 0;
+		}
+		
+		.password-toggle:hover {
+		    color: var(--main-blue-purple);
+		}
+		
+		/* 調整密碼輸入框右側間距，避免文字與圖示重疊 */
+		.password-field input[type="password"],
+		.password-field input[type="text"] {
+		    padding-right: 40px;
+		}
     </style>
 </head>
 
