@@ -1,4 +1,7 @@
-
+if (!Auth.isLoggedIn()) {
+    // 如果未登入，重定向到登入頁面
+    Auth.logout(); 
+  } else {
     //上傳圖片預覽
     const imageInput = document.getElementById('formFileMultiple');
     const imagePreview = document.getElementById('imagePreview');
@@ -134,6 +137,7 @@
         try {
             const response = await axios.put(`/TickitEasy/admin/api/post/PUT/${postID}`, formData, {
                 headers: {
+                    'Authorization': `Bearer ${Auth.getToken()}`,
                     'Content-Type': 'multipart/form-data' // 設置內容類型
                 }
             });
@@ -178,3 +182,4 @@
 
     // 初始化載入
     fetchPost();
+  }

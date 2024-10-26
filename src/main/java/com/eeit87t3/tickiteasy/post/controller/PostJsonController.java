@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,6 +40,8 @@ import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
+import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.post.dto.CreatePostDTO;
 import com.eeit87t3.tickiteasy.post.dto.ShowCommentDTO;
 import com.eeit87t3.tickiteasy.post.dto.ShowPostDTO;
@@ -52,6 +55,7 @@ import com.eeit87t3.tickiteasy.post.service.CommentService;
 import com.eeit87t3.tickiteasy.post.service.PostImageService;
 import com.eeit87t3.tickiteasy.post.service.PostService;
 import com.eeit87t3.tickiteasy.test.TestImagesEntity;
+import com.eeit87t3.tickiteasy.util.JWTUtil;
 
 // 後臺路徑:/admin/api/post
 // 前臺路徑:/user/post
@@ -60,6 +64,8 @@ import com.eeit87t3.tickiteasy.test.TestImagesEntity;
 @RequestMapping("/admin/api/post")
 public class PostJsonController {
 
+	@Autowired 
+	JWTUtil jwtUtil;
 	@Autowired
 	private PostService postService;
 	@Autowired
@@ -72,6 +78,8 @@ public class PostJsonController {
 	private CategoryService categoryService;
 	@Autowired
 	private TagService tagService;
+	@Autowired
+	private MemberService memberService;
 	@Autowired
 	private TagRepo tagRepo;
 	@Autowired
@@ -120,7 +128,8 @@ public class PostJsonController {
 
 	// 更新單筆貼文
 	@PutMapping("PUT/{postID}")
-	public ResponseEntity<PostEntity> updatePost(
+	public ResponseEntity<?> updatePost(
+			@RequestHeader("Authorization") String authHeader,
 			@PathVariable("postID") Integer postID,
 			@RequestParam("postTitle") String postTitle,
 	        @RequestParam("postContent") String postContent,
@@ -132,6 +141,23 @@ public class PostJsonController {
 			 // 先獲取現有的貼文
 	        PostEntity existingPost = postRepo.findById(postID)
 	                .orElseThrow(() -> new RuntimeException("Post not found"));
+	        // 從 Authorization Header 中提取 Token
+	        String token = authHeader.replace("Bearer ", "");
+	        
+	        // 從 Token 中獲取電子郵件
+	        String email = jwtUtil.getEmailFromToken(token);
+	        
+	        // 根據電子郵件獲取會員資料
+	        Member member = memberService.findByEmail(email);
+	        
+	        if (member == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid user");
+	       
+	        }
+	     // 驗證當前會員是否為該貼文的發表者
+	        if (!existingPost.getMember().getMemberID().equals(member.getMemberID())) {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to edit this post");
+	        }
 	        
 	        // 更新需要修改的屬性
 	        existingPost.setPostTitle(postTitle);
@@ -154,8 +180,10 @@ public class PostJsonController {
 	        PostEntity result = postService.update(postID, existingPost, imageFiles);
 	        return ResponseEntity.ok(result);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(null); // 發生錯誤時回傳 HTTP 400 狀態
+			  return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+		                .body("An error occurred: " + e.getMessage()); // 發生錯誤時回傳 HTTP 400 狀態和錯誤訊息
+			  // 處理 Token 無效或過期的情況
+//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
 		}
 	}
 
@@ -302,6 +330,21 @@ public class PostJsonController {
 	    }
 	}
 
-
+	@GetMapping("/member")
+	public ResponseEntity<Integer> getCurrentMember(@RequestHeader("Authorization") String authHeader) {
+	    try {
+	        String token = authHeader.replace("Bearer ", "");
+	        String email = jwtUtil.getEmailFromToken(token);
+	        Member member = memberService.findByEmail(email);
+	        
+	        if (member == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	        }
+	        
+	        return ResponseEntity.ok(member.getMemberID());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	    }
+	}
 
 }
