@@ -18,6 +18,7 @@ public interface ProdOrdersService {
 	public ProdOrders selectOrderById(Integer prodOrderID); //SELECT 單筆搜尋 依照prodOrderID
 	public List<ProdOrders> selectAllOrder(); //SELECTALL 多筆搜尋 空參 (搜尋該會員全部訂單 SELECTALL)
 	public ProdOrders findLatestProdOrder(); //找最新一筆訂單ID
+	public List<ProdOrders> findOrdersByMemberId(Integer number); //SELECT 搜尋會員訂單 依照memberID
 	
 	public Page<ProdOrders> findByDate(String number,Integer id,Integer records);
 	public Page<ProdOrders> findByProdOrdersId(Integer number, Integer id,Integer records);

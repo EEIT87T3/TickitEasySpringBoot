@@ -36,4 +36,8 @@ public interface ProdOrdersRepository extends JpaRepository<ProdOrders, Integer>
 	//透過訂單號碼查詢
 	@Query(value = "SELECT * FROM ProdOrders WHERE paymentInfo = :paymentInfo", nativeQuery = true)
 	public ProdOrders findBypaymentInfo(String paymentInfo);
+	
+	//透過訂單號碼查詢
+	@Query(value = "SELECT * FROM ProdOrders WHERE memberID = :memberID", nativeQuery = true)
+	public List<ProdOrders> findOrdersByMemberId(@Param("memberID") Integer memberId);
 }
