@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -32,7 +33,7 @@ public class ProdOrders {
 	private String payments;
 	
 	@Column(name = "paymentInfo")
-	private String paymenInfo;
+	private String paymentInfo;
 	
 	@Column(name = "status")
 	private String status;
@@ -56,6 +57,7 @@ public class ProdOrders {
 	private String phone;
 	
     @OneToMany(mappedBy = "prodOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
 	private List<ProdOrderDetails> prodOrderDetailsBean;
 
 	public ProdOrders(Integer prodOrderID,Member member, Timestamp orderDate, String payments, String paymentInfo, String status,
@@ -66,7 +68,7 @@ public class ProdOrders {
 		this.member = member;
 		this.orderDate = orderDate;
 		this.payments = payments;
-		this.paymenInfo = paymentInfo;
+		this.paymentInfo = paymentInfo;
 		this.status = status;
 		this.totalAmount = totalAmount;
 		this.shippingStatus = shippingStatus;
@@ -102,11 +104,11 @@ public class ProdOrders {
 	public void setPayments(String payments) {
 		this.payments = payments;
 	}
-	public String getPaymenInfo() {
-		return paymenInfo;
+	public String getPaymentInfo() {
+		return paymentInfo;
 	}
-	public void setPaymenInfo(String paymenInfo) {
-		this.paymenInfo = paymenInfo;
+	public void setPaymentInfo(String paymenInfo) {
+		this.paymentInfo = paymenInfo;
 	}
 	public String getStatus() {
 		return status;
@@ -155,13 +157,6 @@ public class ProdOrders {
 	}
 	public void setProdOrderDetailsBean(List<ProdOrderDetails> prodOrderDetailsBean) {
 		this.prodOrderDetailsBean = prodOrderDetailsBean;
-	}
-	@Override
-	public String toString() {
-		return "ProdOrders  [prodOrderID=" + prodOrderID + ", member=" + member + ", orderDate=" + orderDate
-				+ ", payments=" + payments + ", paymenInfo=" + paymenInfo + ", status=" + status + ", totalAmount="
-				+ totalAmount + ", shippingStatus=" + shippingStatus + ", shippingID=" + shippingID + ", recipientName="
-				+ recipientName + ", address=" + address + ", phone=" + phone + "]" + "\n";
 	}
 
 

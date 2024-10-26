@@ -7,6 +7,8 @@
     <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
     <!-- 引入 SweetAlert2 的 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <meta name="recaptcha-site-key" th:content="${recaptchaSiteKey}">
+	<script th:src="@{|https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}|}"></script>
     <style>
         :root {
             --main-blue-purple: #5F46E8;
@@ -111,6 +113,33 @@
         .btn-fill:hover {
             background-color: var(--main-bright-orange);
         }
+        /* 密碼輸入框的容器樣式 */
+		.password-field {
+		    position: relative;
+		}
+		
+		/* 眼睛圖示的樣式 */
+		.password-toggle {
+		    position: absolute;
+		    right: 10px;
+		    top: 50%;
+		    transform: translateY(-50%);
+		    cursor: pointer;
+		    color: var(--text-gray);
+		    background: none;
+		    border: none;
+		    padding: 0;
+		}
+		
+		.password-toggle:hover {
+		    color: var(--main-blue-purple);
+		}
+		
+		/* 調整密碼輸入框右側間距，避免文字與圖示重疊 */
+		.password-field input[type="password"],
+		.password-field input[type="text"] {
+		    padding-right: 40px;
+		}
     </style>
 </head>
 
@@ -166,6 +195,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- 引入 SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/member/js/recaptcha.js}"></script>
 
 
     <script>
@@ -184,17 +214,16 @@
                 document.getElementById('phone').value = '0912345678';
             });
 
-            registerForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                //獲取表單內容
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-                const name = document.getElementById('name').value.trim();
-                const nickname = document.getElementById('nickname').value.trim();
-                const birthDate = document.getElementById('birthDate').value;
-                const phone = document.getElementById('phone').value.trim();
+            registerForm.addEventListener('submit', async function (e) {
+			    e.preventDefault();
+			
+			    const email = document.getElementById('email').value.trim();
+			    const password = document.getElementById('password').value;
+			    const confirmPassword = document.getElementById('confirmPassword').value;
+			    const name = document.getElementById('name').value.trim();
+			    const nickname = document.getElementById('nickname').value.trim();
+			    const birthDate = document.getElementById('birthDate').value;
+			    const phone = document.getElementById('phone').value.trim();
 
                 // 前端驗證
                 if (!validateEmail(email)) {
@@ -232,37 +261,40 @@
                     return;
                 }
 
-                // 發送到後端
-                const payload = {
-                    email: email,
-                    password: password,
-                    confirmPassword: confirmPassword,
-                    name: name,
-                    nickname: nickname,
-                    birthDate: birthDate,
-                    phone: phone
-                };
-
-                // 發送到後端請求
-                axios.post('/TickitEasy/api/member/register', payload)
-                    .then(function (response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '註冊成功',
-                            text: response.data.message,
-                            confirmButtonText: '前往登入'
-                        }).then(() => {
-                            window.location.href = '/TickitEasy/login';
-                        });
-                    })
-                    .catch(function (error) {
-                        let errorMessage = '發生錯誤，請稍後再試。';
-                        if (error.response && error.response.data && error.response.data.error) {
-                            errorMessage = error.response.data.error;
-                        }
-                        Swal.fire('註冊失敗', errorMessage, 'error');
-                    });
-            });
+                try {
+			        Swal.showLoading();
+			        
+			        // 加入 reCAPTCHA 驗證
+			        const formData = await RecaptchaUtil.addRecaptchaToken({
+			            email: email,
+			            password: password,
+			            confirmPassword: confirmPassword,
+			            name: name,
+			            nickname: nickname,
+			            birthDate: birthDate,
+			            phone: phone
+			        }, 'register');
+			
+			        const response = await axios.post('/TickitEasy/api/member/register', formData);
+			
+			        await Swal.fire({
+			            icon: 'success',
+			            title: '註冊成功',
+			            text: response.data.message,
+			            confirmButtonText: '前往登入'
+			        });
+			        
+			        window.location.href = '/TickitEasy/login';
+			    } catch (error) {
+			        let errorMessage = '發生錯誤，請稍後再試。';
+			        if (error.response?.data?.error) {
+			            errorMessage = error.response.data.error;
+			        }
+			        Swal.fire('註冊失敗', errorMessage, 'error');
+			    } finally {
+			        Swal.hideLoading();
+			    }
+			});
 
             // 信箱正規表示式驗證
             function validateEmail(email) {
