@@ -13,17 +13,21 @@ import com.eeit87t3.tickiteasy.member.service.MemberService;
 @Controller
 @RequestMapping
 public class MemberPageController {
+	
 	@Autowired
     private MemberService memberService;
 
 	
 	@Value("${oauth.google.client-id}")
 	private String googleClientId;
-
+	
+	@Value("${google.recaptcha.site-key}")
+	private String recaptchaSiteKey;
 	
     // 顯示註冊頁面
     @GetMapping("/register")
-    public String showRegisterPage() {
+    public String showRegisterPage(Model model) {
+    	model.addAttribute("recaptchaSiteKey", recaptchaSiteKey);
         return "member/memberRegister"; 
     }
 
@@ -31,6 +35,7 @@ public class MemberPageController {
     @GetMapping("/login")
     public String showLoginPage(Model model) {
     	model.addAttribute("googleClientId", googleClientId);
+    	model.addAttribute("recaptchaSiteKey", recaptchaSiteKey);
         return "member/memberLogin";
     }
 
