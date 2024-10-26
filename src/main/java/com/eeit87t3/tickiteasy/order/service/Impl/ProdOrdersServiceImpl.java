@@ -88,7 +88,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 			prodOrders2.setMember(prodOrders.getMember());
 			prodOrders2.setOrderDate(prodOrders.getOrderDate());
 			prodOrders2.setPayments(prodOrders.getPayments());
-			prodOrders2.setPaymenInfo(prodOrders.getPaymenInfo());
+			prodOrders2.setPaymentInfo(prodOrders.getPaymentInfo());
 			prodOrders2.setStatus(prodOrders.getStatus());
 			prodOrders2.setTotalAmount(prodOrders.getTotalAmount());
 			prodOrders2.setShippingStatus(prodOrders.getShippingStatus());
@@ -153,6 +153,11 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		return por.findByMemberId(number, pageable);
 	}
 	
+	@Override
+	public List<ProdOrders> findOrdersByMemberId(Integer number) {
+		return por.findOrdersByMemberId(number);
+	}
+	
 	@Autowired
 	ProductService productService;
 	@Autowired
@@ -184,9 +189,9 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		obj.setTotalAmount(totalAmount); //交易金額 String類型
 		obj.setTradeDesc("test Description"); //交易描述
 		obj.setItemName(itemname); //商品名稱
-		obj.setReturnURL("https://9fe3-36-227-50-63.ngrok-free.app/TickitEasy/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
+		obj.setReturnURL("https://d215-118-168-74-241.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
 		obj.setNeedExtraPaidInfo("N"); //額外的付款資訊
-		obj.setClientBackURL("http://localhost:8080/TickitEasy/user/product"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
+		obj.setClientBackURL("http://localhost:8080/TickitEasy/admin/clientSide/orderPaymentCompleted"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
 				
 		String form = all.aioCheckOut(obj, null);
 		
@@ -196,7 +201,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		String orderDate = obj.getMerchantTradeDate().replace("/","-");
 		prodOrders.setOrderDate(Timestamp.valueOf(orderDate));
 		prodOrders.setStatus("未付款");
-		prodOrders.setPaymenInfo(obj.getMerchantTradeNo());
+		prodOrders.setPaymentInfo(obj.getMerchantTradeNo());
 		prodOrders.setTotalAmount(Integer.parseInt(obj.getTotalAmount()));
 		ProdOrders prodOrderSave = por.save(prodOrders);
 		

@@ -22,11 +22,9 @@ public class ProdOrderDetailsController {
 	private ProdOrderDetailsServiceImpl podsi;
 	
 	@PostMapping("prodOrderDetails")
-//	@ResponseBody
 	public String findAllByIdA(@RequestParam Integer prodOrderID,Model model){
 		List<ProdOrderDetails> allByIdA = podsi.findAllByIdA(prodOrderID);
 		model.addAttribute("allByIdA", allByIdA);
 		return "/order/prodOrderDetails";
-//		return allByIdA.toString();
 	}
 }

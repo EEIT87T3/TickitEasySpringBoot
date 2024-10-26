@@ -60,7 +60,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacUtils;
 
 @Controller
-@RequestMapping("order")
+@RequestMapping("admin/order")
 public class ProdOrdersController {
 	
 	@Autowired
@@ -69,13 +69,10 @@ public class ProdOrdersController {
 	// 首頁方法
 		@GetMapping
 		public String home(@RequestParam(value = "prodOrderID", required = false, defaultValue = "1") Integer id,Model model) {
-			
-				// 獲取某頁5筆訂單
-				Page<ProdOrders> allPage = prodOrdersService.findAllPage(id);
-				model.addAttribute("allPage", allPage);
-				return "/order/prodOrdersHomePage"; // 返回首頁				
-
-
+			// 獲取某頁5筆訂單
+			Page<ProdOrders> allPage = prodOrdersService.findAllPage(id);
+			model.addAttribute("allPage", allPage);
+			return "/order/prodOrdersHomePage"; // 返回首頁				
 		}
 		
 		// 後台新增方法
@@ -208,7 +205,6 @@ public class ProdOrdersController {
                 Model model) throws JsonMappingException, JsonProcessingException {
 			String memberEmail = jwtUtil.getEmailFromToken(jwtToken);
 			
-			
 			ObjectMapper objectMapper = new ObjectMapper();
 			List<Map<String,Object>> ticketTypesCartToCheckoutJsons  = objectMapper.readValue(ticketTypesCartToCheckoutJson, List.class); //將json轉成list
 		 	List<Map<String,Object>> checkoutItems  = objectMapper.readValue(checkoutItem, List.class); //將json轉成list
@@ -240,7 +236,7 @@ public class ProdOrdersController {
 	        	tradeDate = tradeDate.replace("/", "-");
 	        	prodOrders.setOrderDate(Timestamp.valueOf(tradeDate));
 	        	prodOrders.setPayments(paymentType);
-	        	prodOrders.setPaymenInfo(merchantTradeNo);
+	        	prodOrders.setPaymentInfo(merchantTradeNo);
 	        	prodOrders.setStatus("已付款");
 	        	prodOrders.setTotalAmount(Integer.valueOf(tradeAmt));
 	        	prodOrdersService.saveOrder(prodOrders);
@@ -254,7 +250,7 @@ public class ProdOrdersController {
 	        	tradeDate = tradeDate.replace("/", "-");
 	        	prodOrders.setOrderDate(Timestamp.valueOf(tradeDate));
 	        	prodOrders.setPayments(paymentType);
-	        	prodOrders.setPaymenInfo(merchantTradeNo);
+	        	prodOrders.setPaymentInfo(merchantTradeNo);
 	        	prodOrders.setStatus("未付款");
 	        	prodOrders.setTotalAmount(Integer.valueOf(tradeAmt));
 	        	prodOrdersService.saveOrder(prodOrders);
@@ -290,4 +286,6 @@ public class ProdOrdersController {
 		public String ClientSideProdOrderCheckOutCart() {
 			return "/order/ClientSideProdOrderCheckOutCart";
 		}
+		
+		
 }
