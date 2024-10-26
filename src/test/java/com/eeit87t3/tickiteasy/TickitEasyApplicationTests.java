@@ -98,29 +98,30 @@ class TickitEasyApplicationTests {
 		
 		CheckoutPaymentRequestForm form = new CheckoutPaymentRequestForm();
 
+		//設定每個商品的資訊
         ProductForm productForm = new ProductForm();
         productForm.setId("product_id"); //N 商家商品ID
-        productForm.setName("product_name"); //Y 商品名
+        productForm.setName("product_name"); //Y 商品名稱
         productForm.setImageUrl(""); //N 商品圖示的URL
         productForm.setQuantity(new BigDecimal("10")); //Y 商品數量
-        productForm.setPrice(new BigDecimal("10")); //Y 各商品付款金額
+        productForm.setPrice(new BigDecimal("10")); //Y 單一商品價格為10
         
         ProductPackageForm productPackageForm = new ProductPackageForm();
         productPackageForm.setId("package_id"); //Y Package list的唯一ID
-        productPackageForm.setName("shop_name"); //N Package名稱 （or Shop Name）
-        productPackageForm.setAmount(productForm.getPrice().multiply(productForm.getQuantity())); //Y 一個Package中的商品總價 =sum(products[].quantity * products[].price)
+        productPackageForm.setName("shop_name"); //N 店鋪名稱，選填
+        productPackageForm.setAmount(productForm.getPrice().multiply(productForm.getQuantity())); //Y 總金額 與form.setAmount()對應
         productPackageForm.setProducts(Arrays.asList(productForm));
 
         form.setPackages(Arrays.asList(productPackageForm));
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setAppPackageName(""); //N 在Android環境切換應用時所需的資訊，用於防止網路釣魚攻擊（phishing）
-        redirectUrls.setConfirmUrl("https://www.google.com/"); //Y 使用者授權付款後，跳轉到該商家URL
-        redirectUrls.setCancelUrl("https://www.google.com/"); //Y 使用者取消付款後，跳轉到該商家
+        redirectUrls.setConfirmUrl("https://www.google.com/"); //Y 設定支付完成後用戶跳轉的網址。
+        redirectUrls.setCancelUrl("https://www.google.com/"); //Y 設定支付取消後用戶跳轉的網址。
         form.setRedirectUrls(redirectUrls);
         
-        form.setAmount(productPackageForm.getAmount()); //Y 付款金額 = sum(packages[].amount) + sum(packages[].userFee) + options.shipping.feeAmount
+        form.setAmount(productPackageForm.getAmount()); //Y 設定付款的總金額，這裡是來自商品包裹的總價格。
         form.setCurrency("TWD"); //Y 貨幣
-        form.setOrderId("merchant_order_id"); //Y 商家訂單編號 商家管理的唯一ID
+        form.setOrderId("merchant_order_id"); //Y 設定商家的訂單編號，用於商家的管理和追蹤。
 
         String requestUri = "/v3/payments/request";
         String nonce = UUID.randomUUID().toString();
