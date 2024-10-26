@@ -17,10 +17,9 @@ import java.util.Optional;
 
 public interface ProdFavoritesRepo extends JpaRepository<ProdFavoritesEntity, ProdFavoriteID> {
 	
-	 // 查詢需要發送補貨通知的收藏記錄
+	 // 查詢需要發送補貨通知的記錄
     List<ProdFavoritesEntity> findByProductProductIDAndNotifyStatus(Integer productID, Integer notifyStatus);
     
-	
 	// 查詢特定會員的特定商品收藏狀態(檢查會員是否已收藏此商品，以決定顯示「收藏」還是「取消收藏」按鈕)
     @Query("SELECT f FROM ProdFavoritesEntity f WHERE f.member.memberID = :memberID AND f.product.productID = :productID")
     Optional<ProdFavoritesEntity> findByMemberIDAndProductID(@Param("memberID") Integer memberID, @Param("productID") Integer productID);

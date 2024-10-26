@@ -39,9 +39,9 @@ public class ProdEmailService {
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
                 
                 helper.setTo(member.getEmail());
-                helper.setSubject("商品補貨通知 - " + product.getProductName());
+                helper.setSubject("商品上架通知 - " + product.getProductName());
                 
-                ClassPathResource resource = new ClassPathResource("templates/mail/restockNotification.html");
+                ClassPathResource resource = new ClassPathResource("templates/product/restockNotification.html");
                 String content = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
                 
                 content = content.replace("{{memberName}}", member.getName())
@@ -57,7 +57,7 @@ public class ProdEmailService {
             }
             
         } catch (Exception e) {
-            throw new RuntimeException("發送補貨通知郵件失敗", e);
+            throw new RuntimeException("發送上架通知郵件失敗", e);
         }
     }
 }
