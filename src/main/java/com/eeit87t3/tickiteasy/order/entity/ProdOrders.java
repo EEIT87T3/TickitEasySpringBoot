@@ -1,7 +1,14 @@
 package com.eeit87t3.tickiteasy.order.entity;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -13,17 +20,20 @@ public class ProdOrders {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer prodOrderID; 
 	
-    @Column(name = "memberID")
-	private int memberID; 
+    @ManyToOne
+	@JoinColumn(name = "memberID", referencedColumnName = "memberID")
+    private Member member; 
 	
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "Asia/Taipei")
 	@Column(name = "orderDate")
-	private Date orderDate;
+	private Timestamp orderDate;
 	
 	@Column(name = "payments")
 	private String payments;
 	
 	@Column(name = "paymentInfo")
-	private String paymenInfo;
+	private String paymentInfo;
 	
 	@Column(name = "status")
 	private String status;
@@ -47,17 +57,18 @@ public class ProdOrders {
 	private String phone;
 	
     @OneToMany(mappedBy = "prodOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
 	private List<ProdOrderDetails> prodOrderDetailsBean;
 
-	public ProdOrders(Integer prodOrderID,int memberID, Date orderDate, String payments, String paymentInfo, String status,
+	public ProdOrders(Integer prodOrderID,Member member, Timestamp orderDate, String payments, String paymentInfo, String status,
 			int totalAmount, String shippingStatus, int shippingID, String recipientName, String address,
 			String phone) {
 		super();
 		this.prodOrderID = prodOrderID;
-		this.memberID = memberID;
+		this.member = member;
 		this.orderDate = orderDate;
 		this.payments = payments;
-		this.paymenInfo = paymentInfo;
+		this.paymentInfo = paymentInfo;
 		this.status = status;
 		this.totalAmount = totalAmount;
 		this.shippingStatus = shippingStatus;
@@ -75,16 +86,16 @@ public class ProdOrders {
 	public void setProdOrderID(Integer prodOrderID) {
 		this.prodOrderID = prodOrderID;
 	}
-	public int getMemberID() {
-		return memberID;
+	public Member getMember() {
+		return member;
 	}
-	public void setMemberID(int memberID) {
-		this.memberID = memberID;
+	public void setMember(Member member) {
+		this.member = member;
 	}
-	public Date getOrderDate() {
+	public Timestamp  getOrderDate() {
 		return orderDate;
 	}
-	public void setOrderDate(Date orderDate) {
+	public void setOrderDate(Timestamp orderDate) {
 		this.orderDate = orderDate;
 	}
 	public String getPayments() {
@@ -93,11 +104,11 @@ public class ProdOrders {
 	public void setPayments(String payments) {
 		this.payments = payments;
 	}
-	public String getPaymenInfo() {
-		return paymenInfo;
+	public String getPaymentInfo() {
+		return paymentInfo;
 	}
-	public void setPaymenInfo(String paymenInfo) {
-		this.paymenInfo = paymenInfo;
+	public void setPaymentInfo(String paymenInfo) {
+		this.paymentInfo = paymenInfo;
 	}
 	public String getStatus() {
 		return status;
@@ -141,14 +152,12 @@ public class ProdOrders {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	@Override
-	public String toString() {
-		return "ProdOrders  [prodOrderID=" + prodOrderID + ", memberID=" + memberID + ", orderDate=" + orderDate
-				+ ", payments=" + payments + ", paymenInfo=" + paymenInfo + ", status=" + status + ", totalAmount="
-				+ totalAmount + ", shippingStatus=" + shippingStatus + ", shippingID=" + shippingID + ", recipientName="
-				+ recipientName + ", address=" + address + ", phone=" + phone + "]" + "\n";
+	public List<ProdOrderDetails> getProdOrderDetailsBean() {
+		return prodOrderDetailsBean;
 	}
-
+	public void setProdOrderDetailsBean(List<ProdOrderDetails> prodOrderDetailsBean) {
+		this.prodOrderDetailsBean = prodOrderDetailsBean;
+	}
 
 
 }

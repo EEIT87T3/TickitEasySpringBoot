@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlanDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
@@ -54,82 +56,80 @@ public class FundProjService {
 	}
 	
 	/* 新增募資活動 */
-	public FundProj saveProj(
-			 String title,
-			 String categoryID,
-			 String tagID,
-			 String startDateStr,
-			 String endDateStr,
-			 String targetAmount,
-			 String currentAmount,
-			 String threshold,
-			 String postponeDateStr,
-			 String filename,
-			 String description
-			) {
+	public FundProj saveProj(FundProjDTO fundProjDTO) {
 		FundProj proj = new FundProj();
 		
+		System.out.println("新增service開始");
 		//先用categoryID找出對應到的category實體，之後再塞進proj 
-		Optional<CategoryEntity> coptional = categoryRepo.findById(Integer.valueOf(categoryID));
+		Optional<CategoryEntity> coptional = categoryRepo.findById(Integer.valueOf(fundProjDTO.getCategoryId()));
 		CategoryEntity category = coptional.get();
 		//先用tagID找出對應到的tag實體，之後再塞進proj 
-		Optional<TagEntity> toptional = tagRepo.findById(Integer.valueOf(tagID));
+		Optional<TagEntity> toptional = tagRepo.findById(Integer.valueOf(fundProjDTO.getTagId()));
 		TagEntity tag = toptional.get();
 		
         // 將請求中的日期先格式化再轉換成LocalDateTime
         // 定義datetime-local格式
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
-        // 將字符串轉換為LocalDateTime
-        LocalDateTime startDateTime = LocalDateTime.parse(startDateStr, formatter);
-        LocalDateTime endDateTime = LocalDateTime.parse(endDateStr, formatter);
-        LocalDateTime postponeDateTime = LocalDateTime.parse(postponeDateStr, formatter);
+        // fundProjDTO.getStartDate().format(formatter): 將startDate格式化成formatter格式的字串
+        // LocalDateTime.parse(＿＿＿, formatter): 將＿＿轉型成LocalDateTime
+        LocalDateTime startDateTime = LocalDateTime.parse(fundProjDTO.getStartDate().format(formatter),formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(fundProjDTO.getEndDate().format(formatter),formatter);
         
         // 設定FundProjBean屬性，日期轉成.sql.TimeStamp
-        proj.setTitle(title);
-        proj.setDescription(description);
-        proj.setImage(filename);
+        proj.setTitle(fundProjDTO.getTitle());
+        proj.setDescription(fundProjDTO.getDescription());
+        proj.setImage(fundProjDTO.getImage());
         proj.setStartDate(Timestamp.valueOf(startDateTime));
         proj.setEndDate(Timestamp.valueOf(endDateTime));
-        proj.setTargetAmount(targetAmount);
-        proj.setCurrentAmount(currentAmount);
-        proj.setThreshold(threshold);
-        proj.setPostponeDate(Timestamp.valueOf(postponeDateTime));
+        proj.setTargetAmount(fundProjDTO.getTargetAmount());
+        proj.setCurrentAmount(fundProjDTO.getCurrentAmount());
         proj.setFundCategory(category);
         proj.setFundTag(tag);
+        System.out.println(proj.getTitle());
+		System.out.println("新增service結束");
+
 		return fundProjRepo.save(proj);
 			
 	}
 	
-	/* 新增募資活動方案 */
-	public FundPlan savePlan(
-			String projectID,
-			String title,
-			String unitPrice,
-			String totalAmount,
-			String buyAmount,
-			String image,
-			String content
-			) {
-		FundPlan newFundPlan = new FundPlan();
-		
-		//先用projectID找出對應到的FundProj實體，之後再塞進plan
-		Optional<FundProj> optional = fundProjRepo.findById(Integer.valueOf(projectID));
-		FundProj fundProj = optional.get();
-		
-        // 設定FundPlan屬性
-		newFundPlan.setFundProj(fundProj);
-		newFundPlan.setPlanTitle(title);
-		newFundPlan.setPlanUnitPrice(unitPrice);
-		newFundPlan.setPlanTotalAmount(totalAmount);
-		newFundPlan.setPlanBuyAmount(buyAmount);
-		newFundPlan.setPlanImage(image);
-		newFundPlan.setPlanContent(content);
-		
-		System.out.println("savePlann is here");
-		return fundPlanRepo.save(newFundPlan);
-	}
 	
+
+	/* 前台查詢全部（id升冪、以category搜索）：分頁 */
+	public Page<FundProjDTO> findFundProjByPageAndStatus(Integer pageNumber, Integer size, Integer categoryID){
+		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"projectID");
+		Page<FundProj> fundProjPage = null;
+		
+		if ( categoryID != null) {
+			fundProjPage = fundProjRepo.findProjectByCategoryAndStatus(categoryID, pgb);
+		}else {
+			fundProjPage = fundProjRepo.findProjectByStatus(pgb);
+		}
+		//Page內建map()方法，可將A實體轉換成B實體
+		Page<FundProjDTO> dtoPage= fundProjPage.map(fundProj ->{
+			FundProjDTO dto = new FundProjDTO();
+			dto.setProjectID(fundProj.getProjectID());
+			dto.setTitle(fundProj.getTitle());
+			dto.setDescription(fundProj.getDescription());
+			dto.setImage(fundProj.getImage());
+			dto.setStartDate(fundProj.getStartDate().toLocalDateTime());
+			dto.setEndDate(fundProj.getEndDate().toLocalDateTime());
+			dto.setTargetAmount(fundProj.getTargetAmount());
+			dto.setCurrentAmount(fundProj.getCurrentAmount());
+			dto.setThreshold(fundProj.getThreshold() != null ? fundProj.getThreshold() : "N/A");
+	        // 處理 postponeDate 可能為 null 的情況
+	        if (fundProj.getPostponeDate() != null) {
+	            dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+	        }
+	        dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
+			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
+			dto.setTagString(fundProj.getFundTag().getTagString());
+			dto.setTagName(fundProj.getFundTag().getTagName());
+			dto.setStatus(fundProj.getStatus());
+			return dto;
+		});
+		return dtoPage;
+	}
 
 	/* 查詢全部（id升冪、以category搜索）：分頁 */
 	public Page<FundProjDTO> findFundProjByPage(Integer pageNumber, Integer size, Integer categoryID){
@@ -152,12 +152,17 @@ public class FundProjService {
 			dto.setEndDate(fundProj.getEndDate().toLocalDateTime());
 			dto.setTargetAmount(fundProj.getTargetAmount());
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
-			dto.setThreshold(fundProj.getThreshold());
-			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
-			dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
+			dto.setThreshold(fundProj.getThreshold() != null ? fundProj.getThreshold() : "N/A");
+	        // 處理 postponeDate 可能為 null 的情況
+	        if (fundProj.getPostponeDate() != null) {
+	            dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+	        }
+	        dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
 			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
+			dto.setStatus(fundProj.getStatus());
+
 			return dto;
 		});
 		return dtoPage;
@@ -176,14 +181,34 @@ public class FundProjService {
 			dto.setEndDate(fundProj.getEndDate().toLocalDateTime());
 			dto.setTargetAmount(fundProj.getTargetAmount());
 			dto.setCurrentAmount(fundProj.getCurrentAmount());
-			dto.setThreshold(fundProj.getThreshold());
-			dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+			dto.setThreshold(fundProj.getThreshold() != null ? fundProj.getThreshold() : "N/A");
+	        // 處理 postponeDate 可能為 null 的情況
+	        if (fundProj.getPostponeDate() != null) {
+	            dto.setPostponeDate(fundProj.getPostponeDate().toLocalDateTime());
+	        }
 			dto.setCategoryId(fundProj.getFundCategory().getCategoryId());
 			dto.setCategoryString(fundProj.getFundCategory().getCategoryString());
 			dto.setCategoryName(fundProj.getFundCategory().getCategoryName());
 			dto.setTagId(fundProj.getFundTag().getTagId());
 			dto.setTagString(fundProj.getFundTag().getTagString());
 			dto.setTagName(fundProj.getFundTag().getTagName());
+	        // 將 FundPlan 轉換為 FundPlanDTO 列表
+	        List<FundPlanDTO> planDTOList = fundProj.getFundPlan().stream().map(plan -> {
+	            FundPlanDTO planDTO = new FundPlanDTO();
+	            planDTO.setPlanID(plan.getPlanID());
+	            planDTO.setPlanTitle(plan.getPlanTitle());
+	            planDTO.setPlanContent(plan.getPlanContent());
+	            planDTO.setPlanUnitPrice(plan.getPlanUnitPrice());
+	            planDTO.setPlanTotalAmount(plan.getPlanTotalAmount());
+	            planDTO.setPlanBuyAmount(plan.getPlanBuyAmount());
+	            planDTO.setPlanImage(plan.getPlanImage());
+	            planDTO.setProjectID(fundProj.getProjectID()); // 關聯的 projectID
+	            return planDTO;
+	        }).collect(Collectors.toList());
+	        
+	        dto.setFundplanList(planDTOList);
+			dto.setStatus(fundProj.getStatus());
+
 			return dto;
 		});
 		return dto;
@@ -199,9 +224,10 @@ public class FundProjService {
 	
 	/* 查詢project最新單筆的projectID */ 
 	public String findTopProject() {
-		return String.valueOf(fundProjRepo.findTopProjectById().getProjectID()+1);
+		return String.valueOf(fundProjRepo.findTopProjectById().getProjectID());
 	}
 	
+
 	
 	/* 刪除 
 	 * 1. 刪除FundProject的同時會一併刪除該對應的plan
@@ -289,7 +315,7 @@ public class FundProjService {
 	    return fundProjRepo.save(proj);
 	}
 
-	/* 編輯募資活動方案 */
+	/* 編輯募資活動的方案 */
 	public FundPlan editPlan(
 			String projectID,
 			String planID,
@@ -324,5 +350,20 @@ public class FundProjService {
 		newFundPlan.setPlanContent(content);
 		
 		return fundPlanRepo.save(newFundPlan);
+	}
+	
+	/* 編輯募資活動的上下架狀態 */
+	public boolean editStatusById(Integer projectID, Integer updatedStatus) {
+		Optional<FundProj> optional = fundProjRepo.findById(projectID);
+		try {
+			if(optional.isPresent()) {
+				FundProj fundProj = optional.get();
+				fundProj.setStatus(updatedStatus);
+				fundProjRepo.save(fundProj);
+				return true;
+			}
+		}catch (Exception e) {
+		}
+		return false;
 	}
 }

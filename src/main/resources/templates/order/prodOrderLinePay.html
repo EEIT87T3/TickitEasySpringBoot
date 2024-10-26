@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+
+	
+</head>
+
+<body>
+
+  <script>
+    const crypto = require("crypto");
+
+function signKey(clientKey, msg) {
+  const encoder = new TextEncoder();
+  return crypto
+    .createHmac("sha256", encoder.encode(clientKey))
+    .update(encoder.encode(msg))
+    .digest("base64");
+}
+
+async function requestOnlineAPI({
+  method,
+  baseUrl = "https://sandbox-api-pay.line.me",
+  apiPath,
+  queryString = "",
+  data = null,
+  signal = null,
+}) {
+  const nonce = crypto.randomUUID();
+  let signature = "";
+
+  // 根據不同方式(method)生成MAC
+  if (method === "GET") {
+    signature = signKey(
+      f79c0cac4c3ab969f28b4b90abaf16f5,
+      f79c0cac4c3ab969f28b4b90abaf16f5 + apiPath + queryString + nonce
+    );
+  } else if (method === "POST") {
+    signature = signKey(
+      f79c0cac4c3ab969f28b4b90abaf16f5,
+      f79c0cac4c3ab969f28b4b90abaf16f5 + apiPath + JSON.stringify(data) + nonce
+    );
+  }
+  const headers = {
+    "X-LINE-ChannelId": 2006474211,
+    "X-LINE-Authorization": signature,
+    "X-LINE-Authorization-Nonce": nonce,
+  };
+
+  const response = await fetch(
+    `${baseUrl}${apiPath}${queryString !== "" ? "&" + queryString : ""}`,
+    {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+      body: data ?JSON.stringify(data) : null,
+      signal: signal,
+    }
+  );
+
+  const processedResponse = handleBigInteger(await response.text());
+
+  return processedResponse;
+}
+  </script>
+	
+</body>
+
+</html>

@@ -2,7 +2,7 @@
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymprojectDTOeaf.org/">
   <head>
     <meta charset="UTF-8" />
-        <meta th:replace="~{commons/adminHead}">
+    <meta th:replace="~{commons/adminHead}" />
     <title>募資管理 - TickitEasy 管理系統</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
@@ -90,7 +90,7 @@
         <div class="col-8"></div>
       </div>
 
-      <div class="row mb-3">
+      <!-- <div class="row mb-3">
         <div class="col-1 text-end">
           <label class="fw-medium">展延門檻</label>
         </div>
@@ -108,7 +108,7 @@
           <span th:text="${projectDTO.postponeDate}"></span>
         </div>
         <div class="col-8"></div>
-      </div>
+      </div> -->
 
       <div class="row mb-3">
         <div class="col-1 text-end">
@@ -156,7 +156,9 @@
             <label class="fw-medium">單價</label>
           </div>
           <div class="col-md-3">
-            <span th:text="${plan.planUnitPrice}"></span>
+            <span
+              th:text="${#numbers.formatInteger(plan.planUnitPrice, 1, 'COMMA')}"
+            ></span>
           </div>
         </div>
         <div class="row mb-3">

@@ -3,6 +3,9 @@ package com.eeit87t3.tickiteasy.cwdfunding.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class FundProjDTO {
@@ -37,7 +40,11 @@ public class FundProjDTO {
 
     private String tagName;
     
-//    private List<E>
+    private MultipartFile imageFile;
+    
+    private Integer status;
+    
+    private List<FundPlanDTO> fundplanList;
     
     
 	public Integer getProjectID() {
@@ -136,7 +143,23 @@ public class FundProjDTO {
 	public void setTagId(Integer tagId) {
 		this.tagId = tagId;
 	}
-
-
+	public List<FundPlanDTO> getFundplanList() {
+		return fundplanList;
+	}
+	public void setFundplanList(List<FundPlanDTO> fundplanList) {
+		this.fundplanList = fundplanList;
+	}
+	public MultipartFile getImageFile() {
+		return imageFile;
+	}
+	public void setImageFile(MultipartFile imageFile) {
+		this.imageFile = imageFile;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
 }
