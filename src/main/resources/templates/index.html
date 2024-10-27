@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <link rel="stylesheet" th:href="@{cwdfunding/css/card.css}">
+
     <!-- 引入共用的 Head -->
     <meta th:replace="~{commons/userHead}">
     
@@ -144,37 +147,36 @@
     <!-- 熱門活動 Section -->
     <div class="container mt-5">
         <h2 class="section-title">熱門活動</h2>
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="活動圖片">
-                    <div class="card-body">
-                        <h5 class="card-title">音樂會</h5>
-                        <p class="card-text">享受來自世界頂尖音樂家的美妙演出。</p>
-                        <a href="#" class="btn btn-main-bright-orange">購買票券</a>
-                    </div>
+        <div class="row row-cols-1 row-cols-md-3 mt-4">
+            <th:block th:each="event: ${topEvents}">
+                <!-- 活動卡片 -->
+                <div class="col d-flex justify-content-center mb-3">
+                    <a class="card h-100 custom-card" th:href="@{/event/{id}(id=${event.eventID})}">
+                        <div class="ratio ratio-16x9">
+                            <img th:if="${event.eventPic != null}" class="card-img-top object-fit-cover" th:src="@{${event.eventPic}}" alt="..." />
+                            <img th:unless="${event.eventPic != null}" class="card-img-top object-fit-cover" th:src="@{/images/event/EventPicDefault.png}" alt="..." />
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title fw-semibold fs-5">[[${event.eventName}]]</div>
+                            <div>
+                                <span class="city">[[${event.address.substring(0, 2)}]]</span>
+                                <span th:if="${event.place != null}" class="ms-3 place">[[${event.place}]]</span>
+                            </div>
+                            <div class="mt-2 fs-6">
+                                <span class="event-start-time">[[${event.eventStartTime}]]</span>
+                                <span class="ms-1">～</span><br>
+                                <span class="event-end-time">[[${event.eventEndTime}]]</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-flex justify-content-around">
+                                <span class="category badge bg-main-blue-purple fw-normal fs-6">[[${event.eventCategory.categoryName}]]</span>
+                                <span th:if="${event.eventTag != null}" class="tag badge bg-main-bright-orange fw-normal fs-6">[[${event.eventTag.tagName}]]</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="活動圖片">
-                    <div class="card-body">
-                        <h5 class="card-title">藝術展</h5>
-                        <p class="card-text">探索前所未見的創新藝術作品。</p>
-                        <a href="#" class="btn btn-main-bright-orange">購買票券</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="活動圖片">
-                    <div class="card-body">
-                        <h5 class="card-title">喜劇表演</h5>
-                        <p class="card-text">讓我們一起大笑，輕鬆一夏！</p>
-                        <a href="#" class="btn btn-main-bright-orange">購買票券</a>
-                    </div>
-                </div>
-            </div>
+            </th:block>
         </div>
     </div>
 
@@ -216,12 +218,7 @@
     </div>
 
     <!-- 頁腳 -->
-  <div th:replace="~{commons/userFooter}"></div>
-
-    <!-- 引入 Bootstrap 和 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
-
+    <div th:replace="~{commons/userFooter}"></div>
 </body>
 
 </html>

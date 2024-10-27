@@ -27,7 +27,9 @@ public class AdminEventsPageController {
 	private TagService tagService;
 
 	@GetMapping
-	public String findAllByDynamic() {
+	public String findAllByDynamic(Model model) {
+		model.addAttribute("categoryList", categoryService.findEventCategoryList());
+		model.addAttribute("tagList", tagService.findEventTagList());
 		return "event/findAllByDynamic";
 	}
 	

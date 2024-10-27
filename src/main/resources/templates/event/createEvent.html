@@ -4,6 +4,7 @@
 <head>
 	<meta th:replace="~{commons/adminHead}">
 	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<title>新增活動</title>
 	<style>
 		table>tbody>tr>th {
@@ -46,11 +47,11 @@
 				let formData = new FormData(createForm);
 
 				// 測試用
-				let formDataObject = {};
-				formData.forEach((value, key) => {
-					formDataObject[key] = value;
-				});
-				console.log(formDataObject);
+				// let formDataObject = {};
+				// formData.forEach((value, key) => {
+				// 	formDataObject[key] = value;
+				// });
+				// console.log(formDataObject);
 
 				axios.post(contextPath + "/admin/api/event", formData)
 					.then(res => {
@@ -59,6 +60,12 @@
 							resultDiv.classList.add("text-success");
 							resultDiv.innerText = "新增成功！";
 							createForm.reset();
+							Swal.fire({
+								title: '新增成功！',
+								icon: 'success',
+							}).then(() => {
+								window.location.href = contextPath + "/admin/event/" + res.data.eventID;
+							});
 						}
 					})
 					.catch(err => {
