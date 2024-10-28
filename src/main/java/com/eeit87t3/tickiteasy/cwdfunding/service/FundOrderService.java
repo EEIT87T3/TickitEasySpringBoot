@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
@@ -43,6 +44,7 @@ public class FundOrderService {
 	}
 	
 	/* 新增募資訂單 */
+	@Transactional
 	public void saveFundOrder(Map<String, Object> form,  Map<String, Object> fullForm) {
 		
 		/* 從form取出資料 */
@@ -83,12 +85,26 @@ public class FundOrderService {
 		fundOrder.setTickitID(tickitID);
 		fundOrder.setOrderDate(nowTimestamp);
 		
-		fundOrderRepository.save(fundOrder);
+		fundOrderRepository.saveAndFlush(fundOrder);
 	}
 
 	/* 查詢募資訂單by member ID */
 	public List<FundOrder> findFundOrderByMember(Integer memberID) {
 		return fundOrderRepository.findByMemberID(memberID);
 	}
+	
+	/* 查詢贊助過的會員ID */
+	public List<Integer> findMemberIDByProjID(Integer projectID){
+		return fundOrderRepository.memberIDList(projectID);
+	}
 
+	/* 查詢會員是否贊助過方案 */
+	public boolean isDonated(Integer projectID, Integer memberID) {
+		FundOrder fundOrder = fundOrderRepository.isDonated(projectID, memberID);
+		if(fundOrder == null) {
+			return false;
+		}else {
+			return true;
+		}
+	}
 }

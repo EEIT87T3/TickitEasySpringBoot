@@ -121,9 +121,71 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/TickitEasy/cwdfunding/js/doughnut.js"></script>
+    <script th:src="@{/Token/auth.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      $(document).ready(function () {
+      $(document).ready(async function () {
+        let memberID = await getMemberProfile();
+        // 獲取會員資料
+        async function getMemberProfile() {
+          try {
+            const response = await axios.get(
+              "http://localhost:8080/TickitEasy/member/api/fundproject/getMemberID",
+              {
+                headers: { Authorization: `Bearer ${Auth.getToken()}` },
+              }
+            );
+            console.log("API 回應:", response.data);
+            let rmemberID = response.data.memberID;
+            return rmemberID;
+          } catch (error) {
+            console.error("獲取會員資料時發生錯誤:", error);
+            return error;
+          }
+        }
+        console.log("會員ID", memberID);
+        const projectID = document
+          .getElementById("fundProject")
+          .getAttribute("data-project-id");
+        console.log("專案ID", projectID);
+
+        // 判斷此會員是否贊助過此專案
+        async function isDonated() {
+          try {
+            const response = await axios.get(
+              "/TickitEasy/member/api/fundproject/getIsDonated",
+              {
+                params: {
+                  projectID: projectID,
+                  memberID: memberID,
+                },
+              }
+            );
+            console.log("isDonated API回應", response.data);
+            return response.data;
+          } catch (error) {
+            return false;
+          }
+        }
+
+        let memberDonated = await isDonated();
+        console.log("memberDonated", memberDonated);
+        if (memberDonated) {
+          console.log(memberDonated);
+          memberIsDonated();
+          console.log("here");
+        }
+
+        //如果贊助過，將按鈕設為disabled
+        function memberIsDonated() {
+          const buyBtns = document.getElementsByClassName("btn-buy");
+          for (let i = 0; i < buyBtns.length; i++) {
+            buyBtns[i].classList.add("disabled");
+            buyBtns[i].classList.add("btn-secondary");
+            buyBtns[i].textContent = "已贊助";
+          }
+        }
+
         // 計算(結束日期-開始日期)的天數，並填入id="daysLeft"中
         let daysLeft = document.querySelector("#daysLeft");
         let timeSpan = document.querySelector("#time-span");
@@ -204,8 +266,10 @@
             ></a>
           </div>
           <div
+            id="fundProject"
             class="custom-letter-spacing fs-5 fw-medium py-4"
             th:text="${fundProjDTO.title}"
+            th:data-project-id="${fundProjDTO.projectID}"
           ></div>
           <div class="d-flex justify-content-evenly align-items-center mb-2">
             <div>

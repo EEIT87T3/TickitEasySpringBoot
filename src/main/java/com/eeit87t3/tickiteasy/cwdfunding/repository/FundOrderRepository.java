@@ -22,4 +22,11 @@ public interface FundOrderRepository extends JpaRepository<FundOrder, Integer>{
 	@Query(value = "select count(*) from fundingOrder where projectID= :p",nativeQuery = true)
 	Integer countMembers(@Param("p") Integer projectID);
 
+	// 從訂單找出有贊助過專案的會員ID
+	@Query(value = "select memberID from fundingOrder where projectID= :p",nativeQuery = true)
+	List<Integer> memberIDList(@Param("p") Integer projectID);
+	
+	//找出此會員是否贊助過此專案
+	@Query(value = "select * from fundingOrder where projectID= :p AND memberID= :m",nativeQuery = true)
+	FundOrder isDonated(@Param("p") Integer projectID, @Param("m") Integer memberID);
 }

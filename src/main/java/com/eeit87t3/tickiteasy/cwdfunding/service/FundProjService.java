@@ -22,6 +22,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlanDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
@@ -93,7 +94,7 @@ public class FundProjService {
         System.out.println(proj.getTitle());
 		System.out.println("新增service結束");
 
-		return fundProjRepo.save(proj);
+		return fundProjRepo.saveAndFlush(proj);
 			
 	}
 
@@ -276,7 +277,7 @@ public class FundProjService {
 
 	}
 	
-	/* 編輯募資活動 (尚未寫完)*/
+	/* 編輯募資活動 */
 	public FundProj editProj(
 	        String projectID,
 	        String title,
@@ -379,4 +380,6 @@ public class FundProjService {
 		}
 		return false;
 	}
+	
+
 }
