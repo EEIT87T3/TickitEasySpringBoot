@@ -4,32 +4,17 @@
 <head>
 	<meta th:replace="~{commons/adminHead}">
 	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<script src="/TickitEasy/event/js/utils.js"></script>
 	<title>活動列表</title>
 	<script>
 		$(document).ready(function () {
-
-			// 初始化常數與 function
-
-			const contextPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
-			const currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
-			function dateFormat(datetimeString) {
-				const dateObject = new Date(datetimeString);
-				const options = {
-					year: 'numeric',
-					month: 'long', // 使用 'long' 會顯示完整的月份名稱
-					day: 'numeric',
-					hour: '2-digit',
-					minute: '2-digit',
-				};
-				return dateObject.toLocaleString('zh-TW', options);
-			}
 
 			// 搜尋 Ajax
 			function search(params) {
 				let urlWithParams = contextPath + "/admin/api/event?";
 				if (params != null) {
 					Object.entries(params).forEach(([key, value]) => {
-						urlWithParams += `${key}=${value}`;
+						urlWithParams += `${key}=${value}&`;
 					});
 				}
 				console.log(urlWithParams);
@@ -73,7 +58,7 @@
 							<td>${event.eventName}</td>`;
 					
 					if (event.eventPic != null) {
-						tbodyHtml += `<td><img src="${contextPath}${event.eventPic}" alt="活動主圖" width=320px></td>`;
+						tbodyHtml += `<td><img src="${contextPath}${event.eventPic}" alt="活動主圖" width=240px></td>`;
 					} else {
 						tbodyHtml += `<td>（無圖片）</td>`;
 					}
@@ -86,7 +71,7 @@
 						tbodyHtml += `<td>（無標籤）</td>`;
 					}
 
-					tbodyHtml += `<td>${event.address.substring(0, 3)}</td>`;
+					tbodyHtml += `<td>${event.address.substring(0, 2)}</td>`;
 					tbodyHtml += `<td>${dateFormat(event.eventStartTime)}</td>`;
 
 					switch (event.status) {
@@ -153,27 +138,49 @@
 							break;
 					}
 					element.addEventListener("click", function() {
-						let param = {
-							pageNumber: this.getAttribute("data-page-num")
-						};
-						console.log(param);
-						search(param);
+						const params = getParams();
+						params.pageNumber = this.getAttribute("data-page-num");
+						// let param = {
+						// 	pageNumber: this.getAttribute("data-page-num")
+						// };
+						console.log(params);
+						search(params);
 					})
 				})
 			}
 
 
-			// 初始執行
-			search();
-
-
 			// EventListener
+			
+			// 查詢按鈕
+			document.getElementById("search").addEventListener("click", () => {
+				const params = getParams();
+				console.log(params);
+				
+				search(params);
+			})
+			// 取得查詢參數
+			function getParams() {
+				return {
+					eventName: document.getElementById("event-name").value,
+					cityName: document.getElementById("city-name").value,
+					categoryString: document.getElementById("category").value,
+					tagString: document.getElementById("tag").value,
+					searchingDate: document.getElementById("searching-date").value,
+					orderByProperty: document.getElementById("order-by").value,
+					directionString: document.getElementById("direction").value
+				}
+			}
 
 			// tbody 的「查看」按鈕
 			$("#tbody").on("click", ".event-detail", function () {
 				let eventID = this.getAttribute("data-event-id")
 				window.location.href = `${currentPath}/${eventID}`;
 			})
+
+
+			// 初始執行
+			search();
 		});
 	</script>
 </head>
@@ -185,6 +192,68 @@
 	<div class="container">
 
 		<h1>活動列表</h1>
+
+		<!-- 查詢區 -->
+		<div class="card mb-5" id="searchingDiv">
+			<div class="card-header">
+				<h5 class="mb-0">查詢與排序</h5>
+			</div>
+			<div class="card-body">
+				<div class="d-flex justify-content-around mb-2">
+					<div class="d-flex align-items-center">
+						<label for="event-name" class="text-end me-3" style="width: 100px;">活動名稱</label>
+						<input type="text" id="event-name" class="form-control">
+					</div>
+					<div class="d-flex align-items-center">
+						<label for="event-name" class="text-end me-3" style="width: 100px;">都市</label>
+						<input type="text" id="city-name" class="form-control">
+					</div>
+				</div>
+				<div class="d-flex justify-content-around mb-2">
+					<div class="d-flex align-items-center">
+						<label class="text-end me-3" style="width: 100px;">類別</label>
+						<select class="form-select" id="category">
+							<option value="" selected>（全部）</option>
+							<th:block th:each="category: ${categoryList}">
+								<option th:value="${category.categoryString}">[[${category.categoryName}]]</option>
+							</th:block>
+						</select>
+					</div>
+					<div class="d-flex align-items-center mb-2">
+						<label class="text-end me-3" style="width: 100px;">標籤</label>
+						<select class="form-select" id="tag">
+							<option value="" selected>（全部）</option>
+							<th:block th:each="tag: ${tagList}">
+								<option th:value="${tag.tagString}">[[${tag.tagName}]]</option>
+							</th:block>
+						</select>
+					</div>
+					<div class="d-flex align-items-center">
+						<label for="searching-date" class="text-end me-3" style="width: 100px;">日期</label>
+						<input type="date" id="searching-date" class="form-control">
+					</div>
+				</div>
+				<div class="d-flex justify-content-around mb-2">
+					<div class="d-flex align-items-center">
+						<label class="text-end me-3" style="width: 140px;">排序依據</label>
+						<select class="form-select" id="order-by">
+							<option value="eventStartTime" selected>活動開始時間</option>
+						</select>
+					</div>
+					<div class="d-flex align-items-center">
+						<label class="text-end me-3" style="width: 140px;">排序方向</label>
+						<select class="form-select" id="direction">
+							<option value="ASC" selected>升冪</option>
+							<option value="DESC">降冪</option>
+						</select>
+					</div>
+				</div>
+				<div class="d-flex justify-content-center align-items-center">
+					<button class="btn btn-primary" id="search">查詢</button>
+				</div>
+			</div>
+		</div>
+		
 		<table class="table table-hover">
 			<thead>
 				<tr>

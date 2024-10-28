@@ -287,14 +287,18 @@
             localStorage.removeItem("ticketTypesCart");
             localStorage.removeItem("ticketTypesCartToCheckout");
             localStorage.removeItem("totalAmount");
-            document.querySelector('form').action = window.location.href + "../../../order/ECPay"
+            if(document.querySelector(".form-select").value == "creditcart"){
+                document.querySelector('form').action = window.location.href + "../../../order/ECPay"
+            }
+            if(document.querySelector(".form-select").value == "linepay"){
+                document.querySelector('form').action = window.location.href + "../../../order/LinePay"
+            }
         }
         )
 
         document.querySelector('#takeeasy').addEventListener('click', function (e) { //一件輸入按鈕
-            console.log(localStorage.getItem('checkoutItems'));
-            console.log(checkoutItems);
-            console.log(checkoutItemsJson);
+            console.log(document.querySelector(".form-select").value);
+            
 
             document.querySelector('#name').value = '王小明';
             document.querySelector('#email').value = 'sososo8819@gmail.com';
