@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+     <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css"
+    />
+	<style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .product-price {
+            color: #e44d26;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .unfavorite-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .unfavorite-btn:hover {
+            background-color: #cc0000;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+    </style>
+    <meta th:replace="~{commons/memberHead}">
+	<title>收藏</title>
+	<script>
+		$(document).ready(function () {
+			
+			// 這裡是 JavaScript 內容
+			
+		});
+	</script>
+</head>
+
+<body>
+	<div th:replace="~{commons/memberHeader}"></div>
+    
+	<!-- 這裡是網頁內容 -->
+	<h2 style="text-align: center; margin: 20px 0;">我的收藏商品</h2>
+	
+	<div id="productContainer" class="product-grid">
+        <!-- 商品卡片將由 JavaScript 動態生成 -->
+    </div>
+    
+    <script>
+    	// 等待 DOM 載入完成
+    document.addEventListener('DOMContentLoaded', function() {
+        // 檢查是否已登入
+        if (!Auth.isLoggedIn()) {
+            Auth.logout();
+            return;
+        }
+        
+        // 載入收藏商品
+        loadFavoriteProducts();
+    });
+
+    // 載入收藏商品
+    async function loadFavoriteProducts() {
+        try {
+            const response = await axios.get('/TickitEasy/user/api/product/favorite', {
+                headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+            });
+            
+            displayProducts(response.data);
+        } catch (error) {
+            console.error('載入收藏商品失敗:', error);
+            if (error.response && error.response.status === 401) {
+                Auth.logout();
+            }
+        }
+    }
+
+    // 顯示商品列表
+    function displayProducts(products) {
+        const container = document.getElementById('productContainer');
+        container.innerHTML = ''; // 清空容器
+
+        if (products.length === 0) {
+            container.innerHTML = '<div class="empty-message">目前沒有收藏的商品</div>';
+            return;
+        }
+
+        products.forEach(product => {
+    const productCard = `
+    <a href="/TickitEasy/product/${product.productID}" class="product-link" style="text-decoration: none; color: inherit;">
+        <div class="product-card">
+            <img src="/TickitEasy${product.productPic}" alt="${product.productName}" class="product-image">
+            <div class="product-name">${product.productName}</div>
+            <div class="product-price">NT$ ${product.price}</div>
+            <div class="product-desc">${product.productDesc}</div>
+            <button class="unfavorite-btn" onclick="toggleFavorite(${product.productID}); event.preventDefault();">取消收藏</button>
+        </div>
+    </a>
+`;
+    container.innerHTML += productCard;
+});
+    }
+
+    // 處理收藏/取消收藏
+    async function toggleFavorite(productId) {
+        try {
+            const response = await axios.post(`/TickitEasy/user/api/product/favorite/${productId}`, {}, {
+                headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+            });
+            
+            // 重新載入收藏列表
+            loadFavoriteProducts();
+            
+            // 顯示操作結果
+            alert(response.data.message);
+        } catch (error) {
+            console.error('操作失敗:', error);
+            if (error.response && error.response.status === 401) {
+                Auth.logout();
+            }
+            alert('操作失敗，請稍後再試');
+        }
+    }
+    </script>
+	
+    <div th:replace="~{commons/memberFooter}"></div>
+</body>
+
+</html>

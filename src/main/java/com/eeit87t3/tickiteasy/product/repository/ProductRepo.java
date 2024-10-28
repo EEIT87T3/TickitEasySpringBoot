@@ -1,5 +1,7 @@
 package com.eeit87t3.tickiteasy.product.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,5 +29,18 @@ public interface ProductRepo extends JpaRepository<ProductEntity, Integer> {
 			    @Param("productName") String productName,
 			    Pageable pageable
 			);
+		
+		 // 查詢相同標籤的推薦商品（排除當前商品且只顯示上架商品）
+	    @Query("SELECT p FROM ProductEntity p " +
+	           "WHERE p.productTag.tagId = :tagId " +
+	           "AND p.productID != :currentProductId " +
+	           "AND p.status = 1 " +
+	           "ORDER BY p.createdDate DESC " +
+	           "LIMIT 3")  // 直接限制返回3筆推薦商品
+	    List<ProductEntity> findRecommendedProductsByTag(
+	        @Param("tagId") Integer tagId,
+	        @Param("currentProductId") Integer currentProductId
+	    );
+		
 		
 }
