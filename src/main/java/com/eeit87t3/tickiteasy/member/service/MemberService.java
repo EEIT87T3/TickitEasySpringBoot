@@ -3,7 +3,9 @@ package com.eeit87t3.tickiteasy.member.service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -352,5 +354,30 @@ public class MemberService {
     // 查詢某個年齡範圍內的會員
     public List<Member> getMembersByAgeRange(LocalDate startDate, LocalDate endDate) {
         return memberRepository.findByBirthDateBetween(startDate, endDate);
+    }
+    //統計卡片
+    public Map<String, Long> getMemberStats() {
+        Map<String, Long> stats = new HashMap<>();
+        
+        // 獲取今日註冊人數
+        LocalDate today = LocalDate.now();
+        long todayRegistrations = memberRepository.countByRegisterDate(today);
+        
+        // 獲取本週註冊人數
+        LocalDate weekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
+        long weekRegistrations = memberRepository.countByRegisterDateBetween(weekStart, today);
+        
+        // 獲取總會員數
+        long totalMembers = memberRepository.count();
+        
+        // 獲取活躍會員數（已驗證的會員）
+        long activeMembers = memberRepository.countByStatus(Member.MemberStatus.已驗證);
+        
+        stats.put("todayRegistrations", todayRegistrations);
+        stats.put("weekRegistrations", weekRegistrations);
+        stats.put("totalMembers", totalMembers);
+        stats.put("activeMembers", activeMembers);
+        
+        return stats;
     }
 }
