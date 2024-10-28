@@ -171,12 +171,10 @@
         let memberDonated = await isDonated();
         console.log("memberDonated", memberDonated);
         if (memberDonated) {
-          console.log(memberDonated);
           memberIsDonated();
-          console.log("here");
         }
 
-        //如果贊助過，將按鈕設為disabled
+        // 如果贊助過，將按鈕設為disabled
         function memberIsDonated() {
           const buyBtns = document.getElementsByClassName("btn-buy");
           for (let i = 0; i < buyBtns.length; i++) {
@@ -186,6 +184,34 @@
           }
         }
 
+        console.log("memberID", memberID);
+        console.log("projectID", projectID);
+
+        // 追蹤募資專案btn
+        const likeBtn = document.getElementById("btn-like");
+        likeBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (!Auth.isLoggedIn()) {
+            Auth.logout();
+            return;
+          }
+          axios
+            .post("/TickitEasy/member/api/fundprojectFollow", {
+              fundProjFollowPK: {
+                memberID: memberID,
+                projectID: projectID,
+              },
+            })
+            .then(function (response) {
+              console.log("追蹤API回應", response.data);
+            })
+            .catch((error) => {
+              console.log("追蹤API error", error);
+            });
+          this.classList.add("disabled");
+          this.classList.add("btn-secondary");
+          this.textContent = "已追蹤";
+        });
         // 計算(結束日期-開始日期)的天數，並填入id="daysLeft"中
         let daysLeft = document.querySelector("#daysLeft");
         let timeSpan = document.querySelector("#time-span");
@@ -319,6 +345,7 @@
             class="custom-small-text mt-2 custom-letter-spacing"
           ></small>
           <button
+            id="btn-like"
             type="button"
             class="btn border fw-bolder my-5 btn-like purple-text"
           >

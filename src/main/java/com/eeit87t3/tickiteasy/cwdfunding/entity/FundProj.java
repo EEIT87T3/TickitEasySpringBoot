@@ -63,7 +63,7 @@ public class FundProj{
 	@Column(name = "postponeDate")
 	private Timestamp postponeDate;
 	
-	@Column(name = "status")
+	@Column(name = "status",insertable = false)
 	private Integer status;
 	
 	/*
