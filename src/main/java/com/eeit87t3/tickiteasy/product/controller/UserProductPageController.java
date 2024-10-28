@@ -10,12 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping
 public class UserProductPageController {
 
 	 @Autowired
 	    private ProductService productService;
-
+	 
+	 // 前台查詢會員商品收藏頁面
+	    @GetMapping("/user/product/favorite")
+	    public String getMemberFavorites(Model model) {
+	        return "product/userProdFavorites";
+	    }
 	
 	// 前台查詢所有商品頁面
     @GetMapping("/product")
@@ -33,10 +38,12 @@ public class UserProductPageController {
     }
     
     // 前台查詢購物車頁面
-    @GetMapping("/cart")
+    @GetMapping("/user/cart")
     public String findAllProductsCart(Model model) {
         return "product/userCart";
     }
+    
+
     
     
 }

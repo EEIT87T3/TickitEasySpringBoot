@@ -13,10 +13,16 @@ import com.eeit87t3.tickiteasy.member.entity.Member;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Integer> {
     
-	 // 根據 email 查詢會員（用於登入）
+	 //根據 email 查詢會員（用於登入）
     Member findByEmail(String email);
     //根據token來查詢會員
     Optional<Member> findByVerificationToken(String token);
+    
+    // 根據 Google ID 查找會員
+    Member findByGoogleId(String googleId);
+    
+    //忘記密碼
+    Optional<Member> findByResetPasswordToken(String resetPasswordToken);
 
     // 根據 status 查詢會員列表
     List<Member> findByStatus(Member.MemberStatus status);
@@ -26,4 +32,6 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
     // 查詢年齡範圍內的會員
     List<Member> findByBirthDateBetween(LocalDate startDate, LocalDate endDate);
+    
+    
 }

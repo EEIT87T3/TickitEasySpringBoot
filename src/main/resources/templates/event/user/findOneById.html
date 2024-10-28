@@ -45,8 +45,8 @@
 					<span id="tag" class="tag badge bg-main-bright-orange fw-normal fs-6 ms-3"></span>
 				</div>
 				<div>
-					<div class="d-flex">
-						活動地點：<span id="place">地點</span><a id="google-map-link" class="ms-auto">Google Map</a>
+					<div>
+						活動地點：<span id="place">地點</span>
 					</div>
 					<div>
 						地址：<span id="address">地址</span>
@@ -67,6 +67,9 @@
 		<div class="my-4">
 			<h3 class="mb-2">活動介紹</h3>
 			<div id="event-desc"></div>
+		</div>
+		<div class="my-4">
+			<iframe id="embed-map" class="w-100 h-300px p-0 rounded" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" th:src="'https://www.google.com/maps/embed/v1/place?key=' + ${googleCloudApiKey} + '&q='"></iframe>
 		</div>
 		<div class="my-4" id="tickettypes-content">
 			<h3 class="mb-2">票種列表</h3>

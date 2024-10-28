@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
 
+import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -48,9 +49,9 @@ public class CommentEntity implements java.io.Serializable  {
 	@JoinColumn(name = "postID", insertable = false, updatable = false)
 	private PostEntity post;  // 使用 @ManyToOne 來表示多對一關聯
 	
-//	@ManyToOne
-//	@JoinColumn(name = "memberID", insertable = false, updatable = false)
-//	private MemberBean member;  // 使用 @ManyToOne 來表示多對一關聯
+	@ManyToOne
+	@JoinColumn(name = "memberID", insertable = false, updatable = false)
+	private Member member;  // 使用 @ManyToOne 來表示多對一關聯
 	
 	public Integer getPostCommentID() {
 		return postCommentID;
@@ -94,22 +95,22 @@ public class CommentEntity implements java.io.Serializable  {
 		this.commentDate = commentDate;
 	}
 
-//	public String getMemberNickname() {
-//		if (member != null) {
-//			return member.getNickname();
-//		}
-//		return null; // 或者返回一個預設值
-//	}
-//	
-//	public void setMemberNickname(String nickname) {
-//		if (member != null) {
-//			member.setNickname(nickname);
-//		} else {
-//			// 處理 member 為 null 的情況
-//			// 例如可以拋出異常或者設置一個默認值
-//			throw new IllegalStateException("MemberBean is not initialized.");
-//		}
-//	}
+	public String getNickname() {
+		if (member != null) {
+			return member.getNickname();
+		}
+		return null; // 或者返回一個預設值
+	}
+	
+	public void setNickname(String nickname) {
+		if (member != null) {
+			member.setNickname(nickname);
+		} else {
+			// 處理 member 為 null 的情況
+			// 例如可以拋出異常或者設置一個默認值
+			throw new IllegalStateException("MemberBean is not initialized.");
+		}
+	}
 
 	
 	public CommentEntity() {

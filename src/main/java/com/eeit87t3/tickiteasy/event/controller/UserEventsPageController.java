@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.event.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,9 @@ public class UserEventsPageController {
 	private CategoryService categoryService;
 	@Autowired
 	private TagService tagService;
+	
+	@Value("${google.cloud.api.key}")
+	private String googleCloudApiKey;
 
 	@GetMapping("/event")
 	public String findAll(Model model) {
@@ -33,6 +37,7 @@ public class UserEventsPageController {
 			@PathVariable Integer eventID) {
 		EventWithTicketTypesDTO eventWithTicketTypesDTO = userEventsService.findById(eventID);
 		model.addAttribute("titleEventName", eventWithTicketTypesDTO.getEvent().getEventName());
+		model.addAttribute("googleCloudApiKey", googleCloudApiKey);
 		return "event/user/findOneById";
 	}
 }

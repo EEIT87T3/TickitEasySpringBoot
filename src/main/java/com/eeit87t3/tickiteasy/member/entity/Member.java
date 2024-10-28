@@ -2,6 +2,7 @@ package com.eeit87t3.tickiteasy.member.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "members")
@@ -51,7 +52,11 @@ public class Member {
 	@Column(name = "facebookId")
     private String facebookId;
 
-    
+	@Column(name = "resetPasswordToken")
+	private String resetPasswordToken;
+
+	@Column(name = "resetPasswordTokenExpiry")
+	private LocalDateTime resetPasswordTokenExpiry;
     // 無參構造函數
     public Member() {
     }
@@ -70,6 +75,22 @@ public class Member {
     }
 
     // Getter 和 Setter 方法
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
+    }
+
+    public LocalDateTime getResetPasswordTokenExpiry() {
+        return resetPasswordTokenExpiry;
+    }
+
+    public void setResetPasswordTokenExpiry(LocalDateTime resetPasswordTokenExpiry) {
+        this.resetPasswordTokenExpiry = resetPasswordTokenExpiry;
+    }
+    
     public String getGoogleId() {
     	return googleId;
     }
@@ -198,5 +219,18 @@ public class Member {
         已驗證,
         未驗證,
         討論區停權
+    }
+    
+ // 檢查社群媒體登入狀態的方法
+    public boolean isOAuthUser() {
+        return googleId != null || facebookId != null;
+    }
+
+    // 檢查必要資料是否完整的方法
+    public boolean isProfileComplete() {
+        return name != null && !name.trim().isEmpty()
+            && nickname != null && !nickname.trim().isEmpty()
+            && phone != null && phone.matches("^09\\d{8}$")
+            && birthDate != null;
     }
 }

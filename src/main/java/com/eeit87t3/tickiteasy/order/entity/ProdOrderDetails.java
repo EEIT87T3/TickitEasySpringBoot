@@ -4,6 +4,8 @@ import java.sql.Date;
 
 import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -44,6 +46,7 @@ public class ProdOrderDetails {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prodOrderID")
+    @JsonBackReference
     private ProdOrders prodOrder;
     
 
@@ -161,16 +164,5 @@ public class ProdOrderDetails {
 	}
 
 
-	@Override
-	public String toString() {
-		return "ProdOrderDetails [prodOrderDetailId=" + prodOrderDetailId + ", productId=" + productId + ", price="
-				+ price + ", quantity=" + quantity + ", content=" + content + ", reviewTime=" + reviewTime + ", score="
-				+ score + ", ticketTypeId=" + ticketTypeId + ", ticketPrice=" + ticketPrice + ", ticketQuantity="
-				+ ticketQuantity + ", prodOrder=" + prodOrder + "]";
-	}
 
-
-	
-
-    
 }

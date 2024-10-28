@@ -2,264 +2,421 @@
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
-    <meta th:replace="~{commons/userHead}">
-    <title>會員登入 - TickitEasy</title>
-    <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        :root {
-            --main-blue-purple: #5F46E8;
-            --main-bright-orange: #FFB44D;
-            --light-orange: #F5BE74;
-            --dark-purple: #322770;
-            --text-gray: #6c757d;
-        }
+  <meta th:replace="~{commons/userHead}">
+  <meta name="google-signin-client_id" th:content="${googleClientId}">
+  <meta name="recaptcha-site-key" th:content="${recaptchaSiteKey}">
+  <title>會員登入 - TickitEasy</title>
+  <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f8f9fa;
-        }
+  <!-- Google Sign-In API -->
+	<script th:src="@{|https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}|}"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-        .login-container {
-            max-width: 500px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+  <style>
+    :root {
+      --main-blue-purple: #5F46E8;
+      --main-bright-orange: #FFB44D;
+      --light-orange: #F5BE74;
+      --dark-purple: #322770;
+      --text-gray: #6c757d;
+    }
 
-        .login-container h2 {
-            color: var(--dark-purple);
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #f8f9fa;
+    }
 
-        .form-label {
-            color: var(--dark-purple);
-            font-weight: 600;
-        }
+    .login-container {
+      max-width: 500px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
 
-        .form-control {
-            border-radius: 5px;
-        }
+    .login-container h2 {
+      color: var(--dark-purple);
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-        .btn-login {
-            background-color: var(--main-blue-purple);
-            color: #fff;
-            width: 100%;
-            padding: 10px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            margin-bottom: 15px;
-        }
+    .form-label {
+      color: var(--dark-purple);
+      font-weight: 600;
+    }
 
-        .btn-login:hover {
-            background-color: var(--dark-purple);
-        }
+    .form-control {
+      border-radius: 5px;
+    }
 
-        .btn-google {
-            background-color: #DB4437;
-            color: #fff;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
+    .btn-login {
+      background-color: var(--main-blue-purple);
+      color: #fff;
+      width: 100%;
+      padding: 10px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      margin-bottom: 15px;
+    }
 
-        .btn-google:hover {
-            background-color: #C33D2E;
-        }
+    .btn-login:hover {
+      background-color: var(--dark-purple);
+    }
 
-        .btn-facebook {
-            background-color: #4267B2;
-            color: #fff;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
+    .btn-google {
+      background-color: #DB4437;
+      color: #fff;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .btn-facebook:hover {
-            background-color: #375494;
-        }
+    .btn-google:hover {
+      background-color: #C33D2E;
+    }
 
-        .form-text {
-            color: var(--text-gray);
-        }
-        
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-        }
+    .btn-google i {
+      margin-right: 10px;
+    }
 
-        .register-link a {
-            color: var(--main-bright-orange);
-            text-decoration: none;
-            font-weight: 600;
-        }
+    .form-text {
+      color: var(--text-gray);
+    }
 
-        .register-link a:hover {
-            text-decoration: underline;
-        }
+    .register-link {
+      text-align: center;
+      margin-top: 20px;
+    }
 
-        .swal2-confirm {
-            background-color: var(--main-bright-orange) !important;
-            border: none !important;
-            border-radius: 5px !important;
-        }
+    .register-link a {
+      color: var(--main-bright-orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-        .swal2-cancel {
-            background-color: gray !important;
-            border: none !important;
-            border-radius: 5px !important;
-        }
-        
-         .btn-fill {
-            background-color: var(--light-orange);
-            color: var(--dark-purple);
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            transition: background-color 0.3s ease;
-        }
+    .register-link a:hover {
+      text-decoration: underline;
+    }
 
-        .btn-fill:hover {
-            background-color: var(--main-bright-orange);
-        }
-    </style>
+    .swal2-confirm {
+      background-color: var(--main-bright-orange) !important;
+      border: none !important;
+      border-radius: 5px !important;
+    }
+
+    .swal2-cancel {
+      background-color: gray !important;
+      border: none !important;
+      border-radius: 5px !important;
+    }
+
+    .btn-fill {
+      background-color: var(--light-orange);
+      color: var(--dark-purple);
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-fill:hover {
+      background-color: var(--main-bright-orange);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .divider span {
+      padding: 0 10px;
+      color: var(--text-gray);
+      background: #fff;
+    }
+
+    /* 密碼輸入框的容器樣式 */
+    .password-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    /* 眼睛圖示的樣式 */
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      transform: translateY(0);
+      cursor: pointer;
+      color: var(--text-gray);
+      background: none;
+      border: none;
+      padding: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+    }
+
+    .password-toggle:hover {
+      color: var(--main-blue-purple);
+    }
+
+    /* 調整密碼輸入框右側間距，避免文字與圖示重疊 */
+    .password-field input[type="password"],
+    .password-field input[type="text"] {
+      padding-right: 40px;
+      width: 100%;
+    }
+  </style>
 </head>
 
 <body>
-    <div th:replace="~{commons/userHeader}"></div>
+  <div th:replace="~{commons/userHeader}"></div>
 
-    <!-- 登入表單 -->
-    <div class="login-container">
-        <h2>TickitEasy 會員登入</h2>
-        <button id="fillFormBtn" class="btn btn-fill">一鍵填入</button>
-        <form id="loginForm">
-            <div class="mb-3">
-                <label for="email" class="form-label">電子信箱</label>
-                <input type="email" class="form-control" id="email" placeholder="請輸入您的電子信箱" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">密碼</label>
-                <input type="password" class="form-control" id="password" placeholder="請輸入密碼" required>
-            </div>
-            <button type="submit" class="btn btn-login">登入</button>
-        </form>
-
-        <!-- 第三方登入 -->
-        <button class="btn btn-google" id="googleLogin">
-            <i class="fab fa-google"></i> 使用 Google 帳號登入
-        </button>
-        <button class="btn btn-facebook" id="facebookLogin">
-            <i class="fab fa-facebook-f"></i> 使用 Facebook 帳號登入
-        </button>
-
-        <!-- 註冊連結 -->
-        <div class="register-link">
-            還不是 TickitEasy 會員嗎？<a href="/TickitEasy/register">前往註冊</a>
+  <!-- 登入表單 -->
+  <div class="login-container">
+    <h2>TickitEasy 會員登入</h2>
+    <button id="fillFormBtn" class="btn btn-fill">一鍵填入</button>
+    <form id="loginForm">
+      <div class="mb-3">
+        <label for="email" class="form-label">電子信箱</label>
+        <input type="email" class="form-control" id="email" placeholder="請輸入您的電子信箱" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">密碼</label>
+        <div class="password-field mb-1">
+          <input type="password" class="form-control" id="password" placeholder="請輸入密碼" required>
+          <button type="button" class="password-toggle">
+            <i class="fas fa-eye"></i>
+          </button>
         </div>
+        <div class="text-end">
+          <a href="/TickitEasy/forgot-password" class="text-decoration-none">忘記密碼？</a>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-login">登入</button>
+    </form>
+
+    <!-- 分隔線 -->
+    <div class="divider">
+      <span>或</span>
     </div>
 
-    <div th:replace="~{commons/userFooter}"></div>
+    <!-- 第三方登入 -->
+    <button class="btn btn-google" id="googleLogin">
+      <i class="fab fa-google"></i> 使用 Google 帳號登入
+    </button>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
+    <!-- 註冊連結 -->
+    <div class="register-link">
+      還不是 TickitEasy 會員嗎？<a href="/TickitEasy/register">前往註冊</a>
+    </div>
+  </div>
 
-    <script src="https://kit.fontawesome.com/4256e31571.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <div th:replace="~{commons/userFooter}"></div>
 
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
+  <script src="https://kit.fontawesome.com/4256e31571.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script th:src="@{/Token/auth.js}"></script>
+  <script th:src="@{/member/js/recaptcha.js}"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const loginForm = document.getElementById('loginForm');
-			const fillFormBtn = document.getElementById('fillFormBtn');
-			
-			fillFormBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('email').value = 'h969698810@yahoo.com.tw';
-                document.getElementById('password').value = 'Test1234!';
-            });
-			
-            loginForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+  <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
 
-                // 拿到表單數據
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
+      const loginForm = document.getElementById('loginForm');
+      const fillFormBtn = document.getElementById('fillFormBtn');
 
-                // 前端驗證
-                if (!validateEmail(email)) {
-                    Swal.fire('錯誤', '請輸入有效的電子信箱', 'error');
-                    return;
-                }
+      const googleClientId = /*[[${googleClientId}]]*/ '';
 
-                if (password === '') {
-                    Swal.fire('錯誤', '密碼不得為空', 'error');
-                    return;
-                }
+      // 密碼顯示/隱藏功能
+      const passwordField = document.querySelector('.password-field');
+      if (passwordField) {
+        const passwordToggle = passwordField.querySelector('.password-toggle');
+        const passwordInput = passwordField.querySelector('input');
 
-                // 準備發送的數據
-                const payload = {
-                    email: email,
-                    password: password
-                };
+        passwordToggle.addEventListener('click', function (e) {
+          e.preventDefault(); // 防止按鈕提交表單
+          const icon = this.querySelector('i');
 
-                // 發送請求到後端
-                axios.post('/TickitEasy/api/member/login', payload)
-                    .then(function (response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '登入成功',
-                            text: '歡迎回來！',
-                            confirmButtonText: '前往首頁'
-                        }).then(() => {
-                            // 將 JWT Token 保存到 localStorage
-                            localStorage.setItem('jwtToken', response.data.token);
-                            // 可以存其他的資料
-                            // localStorage.setItem('memberName', response.data.nickname);
-
-                            window.location.href = '/TickitEasy/';
-                        });
-                    })
-                    .catch(function (error) {
-                        let errorMessage = '發生錯誤，請稍後再試。';
-                        if (error.response && error.response.data && error.response.data.message) {
-                            errorMessage = error.response.data.message;
-                        }
-                        Swal.fire('登入失敗', errorMessage, 'error');
-                    });
-            });
-
-            //第三方登入
-            document.getElementById('googleLogin').addEventListener('click', function () {
-                Swal.fire('提示', 'Google 登入功能尚未實現', 'info');
-            });
-
-            document.getElementById('facebookLogin').addEventListener('click', function () {
-                Swal.fire('提示', 'Facebook 登入功能尚未實現', 'info');
-            });
-
-            // 正規表示式信箱格式
-            function validateEmail(email) {
-                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return regex.test(email);
-            }
+          if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+          } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+          }
         });
-    </script>
+      }
+
+      // 一鍵填入
+      fillFormBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.getElementById('email').value = 'h969698810@yahoo.com.tw';
+        document.getElementById('password').value = 'Test1234!';
+      });
+
+      // 一般登入表單提交
+      loginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+	
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!validateEmail(email)) {
+        Swal.fire('錯誤', '請輸入有效的電子信箱', 'error');
+        return;
+    }
+
+    if (!password) {
+        Swal.fire('錯誤', '密碼不得為空', 'error');
+        return;
+    }
+
+    try {
+        Swal.showLoading();
+        
+        // 加入 reCAPTCHA 驗證
+        const formData = await RecaptchaUtil.addRecaptchaToken({
+            email: email,
+            password: password
+        }, 'login');
+        
+        const response = await axios.post('/TickitEasy/api/member/login', formData);
+
+        Auth.setToken(response.data.token);
+
+        await Swal.fire({
+            icon: 'success',
+            title: '登入成功',
+            text: '歡迎回來！',
+            showConfirmButton: false,
+            timer: 1500
+        });
+
+        window.location.href = '/TickitEasy/';
+    } catch (error) {
+        handleError(error);
+    } finally {
+        Swal.hideLoading();
+    }
+});
+
+      // Google 登入按鈕事件
+      document.getElementById('googleLogin').addEventListener('click', function () {
+        google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleSignIn,
+          ux_mode: 'popup',
+          scope: 'email profile'
+        });
+
+        google.accounts.id.prompt();
+      });
+
+      // 處理 Google 登入
+      async function handleGoogleSignIn(response) {
+    try {
+        Swal.showLoading();
+        const credential = response.credential;
+        const payload = JSON.parse(atob(credential.split('.')[1]));
+
+        // 加入 reCAPTCHA 驗證
+        const formData = await RecaptchaUtil.addRecaptchaToken({
+            token: credential,
+            provider: 'google',
+            email: payload.email,
+            name: payload.name,
+            picture: payload.picture,
+            providerId: payload.sub
+        }, 'google_login');
+
+        const apiResponse = await axios.post('/TickitEasy/api/member/oauth/login', formData);
+        
+          if (apiResponse.data.status === 'success') {
+            Auth.setToken(apiResponse.data.token);
+
+            if (apiResponse.data.needsCompletion) {
+              window.location.href = '/TickitEasy/complete-profile';
+            } else {
+              await Swal.fire({
+                icon: 'success',
+                title: '登入成功',
+                text: '歡迎回來！',
+                showConfirmButton: false,
+                timer: 1500
+              });
+              window.location.href = '/TickitEasy/';
+            }
+          }
+        } catch (error) {
+          handleError(error);
+        } finally {
+          Swal.hideLoading();
+        }
+      }
+
+      // 錯誤處理函數
+      function handleError(error) {
+        console.error('登入失敗:', error);
+        let errorMessage = '發生錯誤，請稍後再試';
+
+        if (error.response) {
+          if (error.response.status === 401) {
+            errorMessage = '帳號或密碼錯誤';
+          } else if (error.response.status === 400) {
+            errorMessage = '請確認所有資料都已填寫正確';
+          } else if (error.response.data?.message) {
+            errorMessage = error.response.data.message;
+          }
+        } else if (error.request) {
+          errorMessage = '無法連接到伺服器，請檢查網路連線';
+        }
+
+        Swal.fire({
+          icon: 'error',
+          title: '登入失敗',
+          text: errorMessage
+        });
+      }
+
+      // Email 驗證函數
+      function validateEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+      }
+    });
+
+
+  </script>
 </body>
 
 </html>

@@ -139,8 +139,7 @@ public class TicketTypesEntity {
 
 	@Override
 	public String toString() {
-		return "TicketTypesEntity [ticketTypeID=" + ticketTypeID + ", status=" + status + ", event=" + event
-				+ ", ticketTypeNo=" + ticketTypeNo + ", typeName=" + typeName + ", typeDesc=" + typeDesc + ", price="
+		return "TicketTypesEntity [ticketTypeID=" + ticketTypeID + ", status=" + status + ", ticketTypeNo=" + ticketTypeNo + ", typeName=" + typeName + ", typeDesc=" + typeDesc + ", price="
 				+ price + ", quantityAvailable=" + quantityAvailable + ", quantityPurchased=" + quantityPurchased
 				+ ", startSaleTime=" + startSaleTime + ", endSaleTime=" + endSaleTime + "]";
 	}

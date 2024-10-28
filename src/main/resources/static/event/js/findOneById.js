@@ -31,8 +31,6 @@ $(document).ready(function () {
         } else {
             eventContent.getElementById("place").textContent = event.address;
         }
-        // Google Map 連結
-        eventContent.getElementById("google-map-link").setAttribute("href", "https://www.google.com/maps/place/" + event.address);
         // 地址
         eventContent.getElementById("address").textContent = event.address;
 
@@ -51,6 +49,9 @@ $(document).ready(function () {
         } else {
             eventContent.getElementById("event-desc").textContent = "（無活動介紹）";
         }
+
+        // Embed Map
+        eventContent.getElementById("embed-map").src += event.address;
 
 
         // ========== 票種 ==========

@@ -8,6 +8,9 @@ import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 import com.eeit87t3.tickiteasy.product.service.UserProductService;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,8 @@ public class UserProductAPIController {
 	
 	@Autowired
 	private UserProductService userProductService;
+	
+
 	
 	//前台首頁查詢商品頁面
 	@GetMapping
@@ -55,6 +60,23 @@ public class UserProductAPIController {
                 .body("An error occurred while fetching the product: " + e.getMessage());
         }
     }
+    
+    // 取得推薦商品
+    @GetMapping("/{productID}/recommend")
+    public ResponseEntity<?> findRecommendedProducts(@PathVariable Integer productID) {
+        try {
+            List<ProductDTO> recommendedProducts = userProductService.findRecommendedProducts(productID);
+            if (!recommendedProducts.isEmpty()) {
+                return ResponseEntity.ok(recommendedProducts);
+            } else {
+                return ResponseEntity.ok(Collections.emptyList());
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error fetching recommended products: " + e.getMessage());
+        }
+    }
+    
     
     //新增商品到購物車
     @PostMapping

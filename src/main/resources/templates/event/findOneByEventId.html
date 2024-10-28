@@ -4,6 +4,7 @@
 <head>
     <meta th:replace="~{commons/adminHead}">
 	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<title>活動詳情</title>
 	<style>
 		table>tbody>tr>th {
@@ -21,6 +22,10 @@
 	</style>
 	<script>
 		$(document).ready(function () {
+
+			// Bootstrap Tooltips
+			const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
 			// 初始化常數與 function
 
@@ -221,7 +226,10 @@
 					})
 					.then(res => {
 						console.log(res);
-						alert("編輯狀態成功！");
+						Swal.fire({
+							title: '編輯狀態成功！',
+							icon: 'success',
+						});
 						if (editStatus == -1) {
 							window.location.href = currentPath.substring(0, currentPath.lastIndexOf("/"));
 						} else {
@@ -230,12 +238,15 @@
 					})
 					.catch(err => {
 						console.error(err); 
-						alert("編輯狀態失敗。");
+						Swal.fire({
+							title: '編輯狀態失敗。',
+							icon: 'error',
+						});
 					})
 			}
 
 
-			// 新增票種
+			// ===== 新增票種 =====
 			const createTickettypeForm = document.getElementById("create-tickettype-form");
 
 			// 示範輸入
@@ -246,6 +257,16 @@
 				createTickettypeForm.elements["endSaleTime"].value = "2024-11-19T23:59";
 				// createTickettypeForm.elements["quantityAvailable"].value = "50";  // 暫不使用
 			})
+
+			// 啟用限制購買數量的 checkbox
+			document.getElementById("quantityAvailableCheckBox").addEventListener("change", function() {
+				if (this.checked) {
+					document.getElementsByName("quantityAvailable")[0].disabled = false;
+				} else {
+					document.getElementsByName("quantityAvailable")[0].disabled = true;
+					document.getElementsByName("quantityAvailable")[0].value = "";
+				}
+			});
 
 			// 新增票種
 			createTickettypeForm.addEventListener("submit", (event) => {
@@ -258,14 +279,20 @@
 				axios.post(`${contextPath}/admin/api/event/${eventID}/tickettype`,formData)
 					.then(res => {
 						console.log(res);
-						window.alert("新增票種成功！");
+						Swal.fire({
+							title: '新增票種成功！',
+							icon: 'success',
+						});
 						modalInstance.hide();
 						createTickettypeForm.reset();
 						getData();
 					})
 					.catch(err => {
 						console.error(err);
-						window.alert("新增票種成功！");
+						Swal.fire({
+							title: '新增票種失敗。',
+							icon: 'error',
+						});
 						modalInstance.hide();
 					})
 			})
@@ -372,9 +399,10 @@
 								</td>
 							</tr>
 							<tr>
-								<th>可購買限量</th>
-								<td>
-									<input type="number" class="form-control" name="quantityAvailable">
+								<th>可購買限量<span class="ms-1 small"  data-bs-toggle="tooltip" data-bs-title="在活動的可購買總數內，進一步限制此票種的可購買數量">(?)</span></th>
+								<td class="d-flex align-items-center">
+									<input type="checkbox" class="form-check-input m-0" id="quantityAvailableCheckBox">
+									<input type="number" class="form-control ms-2" name="quantityAvailable" disabled>
 								</td>
 							</tr>
 						</table>
