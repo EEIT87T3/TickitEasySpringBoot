@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
-    <link rel="stylesheet" th:href="@{cwdfunding/css/card.css}">
+    <script th:src="@{/event/js/utils.js}"></script>
 
     <!-- 引入共用的 Head -->
     <meta th:replace="~{commons/userHead}">
@@ -94,7 +94,36 @@
             font-size: 2rem;
             color: #fff;
         }
+
+        /* custom-card */
+        .custom-card {
+            width: 360px;
+            height: 322px;
+            text-decoration: none; /* 去除超連結下劃線 */
+            transition: box-shadow 0.3s ease; /* 添加過渡效果 */
+        }
+        .custom-card:hover {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* 減輕的懸停陰影效果 */
+        }  
     </style>
+    <script>
+        $(document).ready(function () {
+
+            // 處理活動時間顯示
+            const eventStartTimeElements = document.getElementsByClassName("event-start-time");
+            [...eventStartTimeElements].forEach(element => {
+                const originalDateTimeString = element.textContent;
+                const formattedDateTimeString = dateFormat(originalDateTimeString);
+                element.textContent = formattedDateTimeString;
+            });
+            const eventEndTimeElements = document.getElementsByClassName("event-end-time");
+            [...eventEndTimeElements].forEach(element => {
+                const originalDateTimeString = element.textContent;
+                const formattedDateTimeString = dateFormat(originalDateTimeString);
+                element.textContent = formattedDateTimeString;
+            });
+        });
+    </script>
 </head>
 
 <body>

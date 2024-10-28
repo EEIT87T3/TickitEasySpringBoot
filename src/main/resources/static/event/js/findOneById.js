@@ -45,7 +45,7 @@ $(document).ready(function () {
 
         // 活動介紹
         if (event.eventDesc != null) {
-            eventContent.getElementById("event-desc").textContent = event.eventDesc;
+            eventContent.getElementById("event-desc").innerHTML  = event.eventDesc;
         } else {
             eventContent.getElementById("event-desc").textContent = "（無活動介紹）";
         }
