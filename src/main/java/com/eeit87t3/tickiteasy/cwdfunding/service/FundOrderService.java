@@ -7,9 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundOrderRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
@@ -26,7 +32,19 @@ public class FundOrderService {
 	@Autowired
 	private FundPlanRepository fundPlanRepository;
 	
+	/* 查詢所有募資訂單 */
+	public Page<FundOrder> findFundOrderByPage(Integer pageNumber, Integer size){
+		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"orderID");
+		return fundOrderRepository.findAll(pgb);
+	}
+	
+	/* 查詢募資訂單by Tickit ID */
+	public FundOrder findFundOrderByTickitID(String tickitID) {
+		return fundOrderRepository.findByTickitID(tickitID);
+	}
+	
 	/* 新增募資訂單 */
+	@Transactional
 	public void saveFundOrder(Map<String, Object> form,  Map<String, Object> fullForm) {
 		
 		/* 從form取出資料 */
@@ -67,7 +85,7 @@ public class FundOrderService {
 		fundOrder.setTickitID(tickitID);
 		fundOrder.setOrderDate(nowTimestamp);
 		
-		fundOrderRepository.save(fundOrder);
+		fundOrderRepository.saveAndFlush(fundOrder);
 	}
 
 	/* 查詢募資訂單by member ID */
@@ -75,8 +93,18 @@ public class FundOrderService {
 		return fundOrderRepository.findByMemberID(memberID);
 	}
 	
-	/* 查詢募資訂單by Tickit ID */
-	public FundOrder findFundOrderByTickitID(String tickitID) {
-		return fundOrderRepository.findByTickitID(tickitID);
+	/* 查詢贊助過的會員ID */
+	public List<Integer> findMemberIDByProjID(Integer projectID){
+		return fundOrderRepository.memberIDList(projectID);
+	}
+
+	/* 查詢會員是否贊助過方案 */
+	public boolean isDonated(Integer projectID, Integer memberID) {
+		FundOrder fundOrder = fundOrderRepository.isDonated(projectID, memberID);
+		if(fundOrder == null) {
+			return false;
+		}else {
+			return true;
+		}
 	}
 }

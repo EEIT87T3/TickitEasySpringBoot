@@ -17,9 +17,11 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
+import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 
 @Controller
@@ -29,6 +31,9 @@ public class AdminFundProjViewController {
 	@Autowired
 	private FundProjService projService;
 
+	@Autowired
+	private FundOrderService orderService;
+	
 	@Autowired
 	private CategoryService categoryService;
 
@@ -57,6 +62,16 @@ public class AdminFundProjViewController {
 		model.addAttribute("plans",fundPlans);
 		return "cwdfunding/showOneFundProj";
 	}
+	
+	/* [頁面] 查詢所有訂單 */
+	@GetMapping("/order")
+	public String showFundOrderPage() {
+//		Integer pageSize = 10;
+//		Page<FundOrder> page = orderService.findFundOrderByPage(pageNumber,pageSize);
+//		model.addAttribute("page", page);
+
+		return "cwdfunding/showFundOrder";
+	}	
 	
 	/* [頁面] 新增募資活動 */
 	@GetMapping("/create")
@@ -87,6 +102,5 @@ public class AdminFundProjViewController {
 		return "cwdfunding/editOneFundProj";
 	}
 	
-
 
 }

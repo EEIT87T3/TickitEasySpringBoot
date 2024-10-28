@@ -5,6 +5,13 @@
     <meta th:replace="~{commons/adminHead}">
     <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<!-- summernote include -->
+	<!-- jQuery -->
+	<!-- Bootstrap 5 -->
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" rel="stylesheet">
+
 	<title>活動詳情</title>
 	<style>
 		table>tbody>tr>th {
@@ -33,6 +40,35 @@
 					minute: '2-digit',
 				};
 				return dateObject.toLocaleString('zh-TW', options);
+			}
+
+
+			// summernote
+			$('#summernote').summernote({
+				placeholder: '活動介紹',
+				tabsize: 4,
+				height: 200,
+				toolbar: [
+					['style', ['bold', 'italic', 'underline', 'clear']],
+					['font', ['strikethrough', 'superscript', 'subscript']],
+					['fontsize', ['fontsize']],
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['insert', ['link', 'picture']],
+					['view', ['fullscreen', 'help']],
+				],
+			});
+			// 將原本的活動介紹放入 summernote
+			function decodeHtml(html) {  // 將 Thymeleaf 傳來 JavaScript 
+				const txt = document.createElement("textarea");
+				txt.innerHTML = html; // 將 HTML 實體編碼賦值
+				return txt.value; // 取得解析後的 HTML
+			}
+			const encodedOriginalEventDesc = '[[${#strings.escapeJavaScript(event.eventDesc)}]]';
+			const decodedOriginalEventDesc = decodeHtml(encodedOriginalEventDesc);
+			if (encodedOriginalEventDesc !== null && !encodedOriginalEventDesc !== "") {
+				$('#summernote').summernote('code', decodedOriginalEventDesc);
+				console.log("已觸發放入");
 			}
 
 			// EventListener
@@ -154,9 +190,9 @@
 				<tr>
 					<th>活動介紹</th>
 					<td>
-						<textarea th:if="${event.eventDesc != null}" class="form-control-plaintext" readonly>[[${event.eventDesc}]]</textarea>
-						<textarea th:unless="${event.eventDesc != null}" class="form-control-plaintext" readonly>（無活動介紹）</textarea>
-						<textarea class="form-control" name="eventDesc" placeholder="編輯活動介紹"></textarea>
+						<!-- <textarea th:if="${event.eventDesc != null}" class="form-control-plaintext" readonly>[[${event.eventDesc}]]</textarea>
+						<textarea th:unless="${event.eventDesc != null}" class="form-control-plaintext" readonly>（無活動介紹）</textarea> -->
+						<textarea class="form-control" name="eventDesc" id="summernote"></textarea>
 					</td>
 				</tr>
 				<tr>

@@ -44,6 +44,8 @@ public class FundProjDTO {
     
     private Integer status;
     
+    private Integer participants;
+    
     private List<FundPlanDTO> fundplanList;
     
     
@@ -160,6 +162,12 @@ public class FundProjDTO {
 	}
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+	public Integer getParticipants() {
+		return participants;
+	}
+	public void setParticipants(Integer participants) {
+		this.participants = participants;
 	}
 
 }

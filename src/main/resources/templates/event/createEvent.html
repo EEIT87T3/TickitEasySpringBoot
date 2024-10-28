@@ -5,6 +5,13 @@
 	<meta th:replace="~{commons/adminHead}">
 	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<!-- summernote include -->
+	<!-- jQuery -->
+	<!-- Bootstrap 5 -->
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" rel="stylesheet">
+
 	<title>新增活動</title>
 	<style>
 		table>tbody>tr>th {
@@ -29,6 +36,22 @@
 			const contextPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
 			const currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
 
+
+			// summernote
+			$('#summernote').summernote({
+				placeholder: '活動介紹',
+				tabsize: 4,
+				height: 200,
+				toolbar: [
+					['style', ['bold', 'italic', 'underline', 'clear']],
+					['font', ['strikethrough', 'superscript', 'subscript']],
+					['fontsize', ['fontsize']],
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['insert', ['link', 'picture']],
+					['view', ['fullscreen', 'help']],
+				],
+			});
 
 			// EventListener
 
@@ -146,7 +169,7 @@
 					<tr>
 						<th>活動介紹</th>
 						<td>
-							<textarea class="form-control" name="eventDesc" placeholder="活動介紹"></textarea>
+							<textarea class="form-control" name="eventDesc" id="summernote"></textarea>
 						</td>
 					</tr>
 					<tr>
