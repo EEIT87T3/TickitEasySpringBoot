@@ -14,6 +14,14 @@ public class ProductDTO {
 	    private String productPic;  // 包含圖片路徑
 	    private List<String> detailPhotos;  // 詳細圖片路徑列表
 	    
+	    private Integer status; //用於補貨通知
+	    
+		public Integer getStatus() {
+			return status;
+		}
+		public void setStatus(Integer status) {
+			this.status = status;
+		}
 		public Integer getProductID() {
 			return productID;
 		}

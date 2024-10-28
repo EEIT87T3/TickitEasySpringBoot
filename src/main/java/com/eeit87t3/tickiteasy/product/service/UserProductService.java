@@ -92,6 +92,8 @@ public class UserProductService {
         dto.setTagId(entity.getProductTag() != null ? entity.getProductTag().getTagId() : null);
         dto.setProductPic(entity.getProductPic());
         // 注意：詳細圖片在這裡不設置，而是在 findProductById 方法中設置
+        
+        dto.setStatus(entity.getStatus());
         return dto;
     }
     

@@ -5,6 +5,7 @@
 	
     <!-- 在這裡放要引入的 CSS 與 JS library -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/TickitEasy/cwdfunding/css/card.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <meta th:replace="~{commons/userHead}">
 	<title>周邊商品</title>
@@ -116,8 +117,8 @@
                 <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/TickitEasy/product/${product.productID}'">
                     <img src="/TickitEasy${product.productPic}" class="card-img-top" alt="${product.productName}">
                     <div class="card-body">
-                        <h5 class="card-title">${product.productName}</h5>
-                        <p class="card-text">價格: $${product.price}</p>
+                        <h5 class="card-title fw-semibold custom-title-text">${product.productName}</h5>
+                        <p class=" fw-semibold custom-small-text">價格: $${product.price}</p>
                     </div>
                 </div>
             `;

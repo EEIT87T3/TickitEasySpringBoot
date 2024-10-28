@@ -36,7 +36,7 @@ public interface ProductRepo extends JpaRepository<ProductEntity, Integer> {
 	           "AND p.productID != :currentProductId " +
 	           "AND p.status = 1 " +
 	           "ORDER BY p.createdDate DESC " +
-	           "LIMIT 4")  // 直接限制返回4筆推薦商品
+	           "LIMIT 3")  // 直接限制返回3筆推薦商品
 	    List<ProductEntity> findRecommendedProductsByTag(
 	        @Param("tagId") Integer tagId,
 	        @Param("currentProductId") Integer currentProductId
