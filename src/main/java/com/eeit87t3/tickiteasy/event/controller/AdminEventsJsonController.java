@@ -37,11 +37,6 @@ public class AdminEventsJsonController {
 		return adminEventsService.findBySpecification(eventsSearchingDTO);
 	}
 	
-//	@GetMapping("/listing")
-//	public List<EventsEntity> findByListingAndOnsale() {
-//		return eventsService.findByListingAndOnsale();
-//	}
-	
 	@GetMapping("/{eventID}")
 	public EventWithTicketTypesDTO findById(@PathVariable Integer eventID) {
 		return new EventWithTicketTypesDTO(adminEventsService.findById(eventID));

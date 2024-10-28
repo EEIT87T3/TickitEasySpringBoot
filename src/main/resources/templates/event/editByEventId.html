@@ -4,6 +4,7 @@
 <head>
     <meta th:replace="~{commons/adminHead}">
     <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<title>活動詳情</title>
 	<style>
 		table>tbody>tr>th {
@@ -55,11 +56,12 @@
 					if (res.status == 200) {
 						resultDiv.classList.add("text-success");
 						resultDiv.innerText = "編輯成功！";
-						// createForm.reset();
-						setTimeout(() => {
-							window.alert("編輯成功！");
+						Swal.fire({
+							title: '編輯成功！',
+							icon: 'success',
+						}).then(() => {
 							window.location.href = currentPath.substring(0, currentPath.lastIndexOf("/"));
-						}, 50);
+						});
 					}
 				})
 				.catch(err => {
