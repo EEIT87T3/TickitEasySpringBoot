@@ -128,37 +128,47 @@ public class PostJsonController {
 
 	// 更新單筆貼文
 	@PutMapping("PUT/{postID}")
-	public ResponseEntity<?> updatePost(
-			@RequestHeader("Authorization") String authHeader,
-			@PathVariable("postID") Integer postID,
-			@RequestParam("postTitle") String postTitle,
+	public ResponseEntity<Map<String, Object>> updatePost(
+	        @RequestHeader("Authorization") String authHeader,
+	        @PathVariable("postID") Integer postID,
+	        @RequestParam("postTitle") String postTitle,
 	        @RequestParam("postContent") String postContent,
 	        @RequestParam(value = "postCategory.categoryId", required = false) Integer categoryId,
 	        @RequestParam(value = "postTag.tagId", required = false) Integer tagId,
 	        @RequestParam(value = "images", required = false) MultipartFile[] imageFiles) {
 
-		try {
-			 // 先獲取現有的貼文
+	    Map<String, Object> response = new HashMap<>();
+	    // 檢查授權標頭
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        response.put("success", false);
+	        response.put("message", "缺少授權標頭或格式錯誤");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	    }
+	    try {
+	        // 先獲取現有的貼文
 	        PostEntity existingPost = postRepo.findById(postID)
 	                .orElseThrow(() -> new RuntimeException("Post not found"));
+
 	        // 從 Authorization Header 中提取 Token
 	        String token = authHeader.replace("Bearer ", "");
-	        
-	        // 從 Token 中獲取電子郵件
 	        String email = jwtUtil.getEmailFromToken(token);
-	        
+
 	        // 根據電子郵件獲取會員資料
 	        Member member = memberService.findByEmail(email);
 	        
 	        if (member == null) {
-	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid user");
-	       
+	            response.put("success", false);
+	            response.put("message", "無效的使用者");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 	        }
-	     // 驗證當前會員是否為該貼文的發表者
+
+	        // 驗證當前會員是否為該貼文的發表者
 	        if (!existingPost.getMember().getMemberID().equals(member.getMemberID())) {
-	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to edit this post");
+	            response.put("success", false);
+	            response.put("message", "您無權修改此貼文");
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 	        }
-	        
+
 	        // 更新需要修改的屬性
 	        existingPost.setPostTitle(postTitle);
 	        existingPost.setPostContent(postContent);
@@ -177,15 +187,25 @@ public class PostJsonController {
 	            existingPost.setPostTag(tag);
 	        }
 
+	        // 更新貼文並回傳結果
 	        PostEntity result = postService.update(postID, existingPost, imageFiles);
-	        return ResponseEntity.ok(result);
-		} catch (Exception e) {
-			  return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-		                .body("An error occurred: " + e.getMessage()); // 發生錯誤時回傳 HTTP 400 狀態和錯誤訊息
-			  // 處理 Token 無效或過期的情況
-//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
-		}
+	        
+	        response.put("success", true);
+	        response.put("message", "貼文已成功更新");
+	        response.put("data", result); // 回傳更新後的貼文資料
+	        return ResponseEntity.ok(response);
+
+	    } catch (RuntimeException e) {
+	        response.put("success", false);
+	        response.put("message", "發生錯誤：" + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "未知錯誤：" + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
 	}
+
 
 	// 根據類別取得多筆貼文 *未完成*
 	@GetMapping("/category")
@@ -225,55 +245,81 @@ public class PostJsonController {
 
 	// 新增單筆貼文(附圖)//這不是json
 	@PostMapping("POST/")
-	public ResponseEntity<?> createPost(
-			@ModelAttribute CreatePostDTO createPostDTO,
-			@RequestParam(value = "images", required = false) MultipartFile[] imageFiles) {
+	public ResponseEntity<Map<String, Object>> createPost(
+	        @RequestHeader("Authorization") String authHeader,
+	        @ModelAttribute CreatePostDTO createPostDTO,
+	        @RequestParam(value = "images", required = false) MultipartFile[] imageFiles) {
 
-		try {
-			// 創建貼文物件
-			PostEntity newPost = new PostEntity();
-			newPost.setPostTitle(createPostDTO.getPostTitle());
-			newPost.setPostContent(createPostDTO.getPostContent());
+	    Map<String, Object> response = new HashMap<>();
+	    
+	    // 檢查授權標頭
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        response.put("success", false);
+	        response.put("message", "缺少授權標頭或格式錯誤");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	    }
+	    try {
+	        // 從 Authorization Header 中提取 Token
+	        String token = authHeader.replace("Bearer ", "");
+	        
+	        // 從 Token 中獲取電子郵件
+	        String email = jwtUtil.getEmailFromToken(token);
+	        
+	        // 根據電子郵件獲取會員資料
+	        Member member = memberService.findByEmail(email);
+	        
+	        if (member == null) {
+	            response.put("success", false);
+	            response.put("message", "無效的使用者");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	        }
+	        
+	        // 創建貼文物件
+	        PostEntity newPost = new PostEntity();
+	        newPost.setPostTitle(createPostDTO.getPostTitle());
+	        newPost.setPostContent(createPostDTO.getPostContent());
 
-			// 設置分類和標籤 (使用商品方法
-			if (createPostDTO.getCategoryID() != null) {
-				CategoryEntity category = categoryService.findProductCategoryById(createPostDTO.getCategoryID());
-				newPost.setPostCategory(category);
-			}
-			if (createPostDTO.getTagID() != null) {
-				TagEntity tag = tagService.findProductTagById(createPostDTO.getTagID());
-				newPost.setPostTag(tag);
-			}
+	        // 設置分類和標籤
+	        if (createPostDTO.getCategoryID() != null) {
+	            CategoryEntity category = categoryService.findProductCategoryById(createPostDTO.getCategoryID());
+	            newPost.setPostCategory(category);
+	        }
+	        if (createPostDTO.getTagID() != null) {
+	            TagEntity tag = tagService.findProductTagById(createPostDTO.getTagID());
+	            newPost.setPostTag(tag);
+	        }
 
-			// 設置默認值或從當前用戶會話中獲取
-			// newPost.setMemberID(getCurrentMemberId()); // 實現這個方法來獲取當前登錄用戶的ID
-			newPost.setMemberID(1); // 實現這個方法來獲取當前登錄用戶的ID
-			newPost.setStatus(1); // 假設 1 是默認狀態
+	        // 設置會員 ID 和狀態
+	        newPost.setMemberID(member.getMemberID());
+	        newPost.setStatus(1); // 假設 1 為默認狀態
 
-			// 保存到資料庫之前，先保存 newPost 以獲得 postID
-			PostEntity createdPost = postService.insert(newPost);
-			Integer postID = createdPost.getPostID();
-			
-			// 處理圖片上傳
-			if (imageFiles != null && imageFiles.length > 0) {
-				postImageService.uploadImages(imageFiles, postID);
-			} else {
+	        // 保存貼文並取得 postID
+	        PostEntity createdPost = postService.insert(newPost);
+	        Integer postID = createdPost.getPostID();
+	        
+	        // 處理圖片上傳
+	        if (imageFiles != null && imageFiles.length > 0) {
+	            postImageService.uploadImages(imageFiles, postID);
+	        }
 
-			}
-
-			// 構建回應物件
-		    Map<String, Object> response = new HashMap<>();
-		    response.put("message", "貼文新增成功！");
-		    response.put("postID", postID);
-
-		    return ResponseEntity.ok(response);  // 返回 JSON 物件，包含 postID
-		    
-//			return ResponseEntity.ok("貼文新增成功！");
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new ResponseEntity<>("圖片上傳失敗", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	        // 回應成功訊息和 postID
+	        response.put("success", true);
+	        response.put("message", "貼文新增成功！");
+	        response.put("postID", postID);
+	        
+	        return ResponseEntity.ok(response);
+	        
+	    } catch (IOException e) {
+	        response.put("success", false);
+	        response.put("message", "圖片上傳失敗");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "發生錯誤：" + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	    }
 	}
+
 
 	// 取得類別列表
 	@GetMapping("/categories")
@@ -291,58 +337,98 @@ public class PostJsonController {
 
 	// 刪除單筆貼文
 	@DeleteMapping("DELETE/{postID}")
-	public ResponseEntity<Map<String, Object>> delete(@PathVariable Integer postID) {
+	public ResponseEntity<Map<String, Object>> delete(
+	        @RequestHeader("Authorization") String authHeader,
+	        @PathVariable Integer postID) {
+
 	    Map<String, Object> response = new HashMap<>();
 	    
-	    // 檢查 postID 是否有效
+	    // 檢查授權標頭
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        response.put("success", false);
+	        response.put("message", "缺少授權標頭或格式錯誤");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	    }
+
+	    // 提取 Token
+	    String token = authHeader.replace("Bearer ", "");
+	    String email = jwtUtil.getEmailFromToken(token);
+	    Member member = memberService.findByEmail(email);
+	    
+	    // 驗證會員是否存在
+	    if (member == null) {
+	        response.put("success", false);
+	        response.put("message", "會員不存在");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	    }
+
+	    // 檢查貼文ID是否有效
 	    if (postID == null || postID <= 0) {
 	        response.put("success", false);
 	        response.put("message", "貼文ID無效");
 	        return ResponseEntity.badRequest().body(response);
 	    }
 	    
-	    // 根據 ID 找到貼文
+	    // 查找貼文
 	    PostEntity post = postService.findById(postID);
-	    
-	    // 如果找不到貼文，返回錯誤訊息
 	    if (post == null) {
 	        response.put("success", false);
 	        response.put("message", "找不到貼文");
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	    }
 	    
-	    // 如果貼文存在，取得 categoryId
-	    Integer categoryId = post.getPostCategory().getCategoryId();
-	    
-	    // 執行刪除操作
-	    Boolean isDeleted = postService.delete(postID);
+	    // 取得 categoryId
+	    Integer categoryId = (post.getPostCategory() != null) ? post.getPostCategory().getCategoryId() : null;
 
-	    // 根據刪除結果返回相應的回應
-	    if (isDeleted) {
-	        response.put("success", true);
-	        response.put("message", "貼文已成功刪除");
-	        response.put("categoryId", categoryId);  // 返回類別ID
-	        return ResponseEntity.ok(response);
-	    } else {
+	    // 刪除貼文和相關留言
+	    try {
+	        List<CommentEntity> comments = commentService.findByPostId(postID);
+	        commentService.deleteAll(comments);
+	        Boolean isDeleted = postService.delete(postID);
+
+	        if (isDeleted) {
+	            response.put("success", true);
+	            response.put("message", "貼文已成功刪除");
+	            response.put("categoryId", categoryId);
+	            return ResponseEntity.ok(response);
+	        } else {
+	            response.put("success", false);
+	            response.put("message", "刪除失敗，請稍後再試");
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	        }
+	    } catch (Exception e) {
 	        response.put("success", false);
-	        response.put("message", "刪除失敗，請稍後再試");
+	        response.put("message", "刪除過程中發生錯誤");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	    }
 	}
 
+	//讀取當前登入會員
 	@GetMapping("/member")
-	public ResponseEntity<Integer> getCurrentMember(@RequestHeader("Authorization") String authHeader) {
+	public ResponseEntity<Integer> getCurrentMember(
+			@RequestHeader(value = "Authorization") String authHeader) {
+		 // 檢查是否有提供授權標頭
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	    }
+
 	    try {
+	        // 取得 token 並解析 email
 	        String token = authHeader.replace("Bearer ", "");
 	        String email = jwtUtil.getEmailFromToken(token);
+
+	        // 根據 email 查詢會員
 	        Member member = memberService.findByEmail(email);
 	        
 	        if (member == null) {
 	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	        }
-	        
+
+	        // 返回會員 ID
 	        return ResponseEntity.ok(member.getMemberID());
 	    } catch (Exception e) {
+	        // 記錄錯誤，並返回500錯誤
+	        e.printStackTrace(); // 這樣可以幫助除錯
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	    }
 	}

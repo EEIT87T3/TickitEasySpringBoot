@@ -1,7 +1,4 @@
-if (!Auth.isLoggedIn()) {
-    // 如果未登入，重定向到登入頁面
-    Auth.logout(); 
-  } else {
+
     //上傳圖片預覽
     const imageInput = document.getElementById('formFileMultiple');
     const imagePreview = document.getElementById('imagePreview');
@@ -120,6 +117,7 @@ if (!Auth.isLoggedIn()) {
 
     // 更新貼文
     async function updatePost() {
+        console.log("updatePost called")
         const title = document.getElementById("postTitle").value;
         const content = document.getElementById("postContent").value;
         const category = document.getElementById("fullPostCategory").value;
@@ -179,7 +177,10 @@ if (!Auth.isLoggedIn()) {
             document.getElementById("updateResult").innerText = `Error: ${error.message}`;
         }
     }
-
+    if (!Auth.isLoggedIn()) {
+        // 如果未登入，重定向到登入頁面
+        Auth.logout(); 
+      } else {
     // 初始化載入
     fetchPost();
   }

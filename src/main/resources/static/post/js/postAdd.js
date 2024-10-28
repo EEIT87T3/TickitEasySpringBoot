@@ -1,8 +1,10 @@
+let currentUserID ;
 if (!Auth.isLoggedIn()) {
   // 如果未登入，重定向到登入頁面
   Auth.logout(); 
 } else {
 // 動態填充分類和標籤選項
+currentMember() ;
 axios.get('/TickitEasy/admin/api/post/categories')
   .then(response => {
     const categories = response.data;
@@ -96,7 +98,7 @@ imageInput.addEventListener('change', function () {
 
 $('#fullCreatePostForm').on('submit', function (event) {
   event.preventDefault();
-
+  const memberID =currentUserID;
   const formData = new FormData();
 
   console.log($('#fullPostCategory').val());
@@ -106,6 +108,7 @@ $('#fullCreatePostForm').on('submit', function (event) {
   formData.append('postContent', $('#fullPostContent').val());
   formData.append('categoryID', $('#fullPostCategory').val());
   formData.append('tagID', $('#fullPostTag').val());
+  formData.append('memberID', memberID);
 
   // 附加所有已上傳的檔案
   uploadedImages.forEach(file => {
