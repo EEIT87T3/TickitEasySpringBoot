@@ -5,8 +5,10 @@ import org.apache.commons.codec.digest.HmacUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.web.client.RestTemplate;
 
 import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.order.entity.CheckoutPaymentRequestForm;
@@ -47,7 +49,17 @@ import ecpay.payment.integration.domain.TradeNoAioObj;
 class TickitEasyApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void contextLoads() {				
+		String targetUrl = "https://sandbox-api-pay.line.me/v3/payments/2024102802226907110/confirm";
+
+		
+	    RestTemplate restTemplate = new RestTemplate();
+        // 使用 RestTemplate 發送 GET 請求並接收回應
+        ResponseEntity<String> response = restTemplate.getForEntity(targetUrl, String.class);
+
+        // 處理回應
+        String responseBody = response.getBody();
+        System.out.println(responseBody);
 	}
 	
 	@Test
