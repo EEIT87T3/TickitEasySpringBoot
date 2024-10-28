@@ -12,6 +12,48 @@
   .filepond--credits {
     display: none !important;
   }
+ /* 覆盖 FilePond 默认样式 */
+.filepond--item {
+    width: calc(33.33% - 0.5em); /* 设定每个文件项的宽度 */
+    height: auto; /* 允许高度自适应 */
+}
+
+/* 自定义已存在的图片样式 */
+.existing-photo {
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+}
+
+.existing-photo img {
+    max-width: 200px; /* 最大宽度为 200px */
+    max-height: 200px; /* 最大高度为 200px */
+    width: auto; /* 确保图片不超出范围 */
+    height: auto; /* 确保图片不超出范围 */
+}
+
+/* 删除图片按钮样式 */
+.delete-photo {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 18px;
+    line-height: 25px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn-primary {
+    margin-right: 0.5rem; /* 添加右邊距 */
+}
+
+  
 </style>
     <title>新增商品</title>
 </head>
@@ -23,13 +65,13 @@
         <h1>新增商品</h1>
 
         <form id="addProductForm" enctype="multipart/form-data">
-            <table class="table">
+            <table class="table display">
                 <tr>
                     <th><span class="mustMark">*</span>商品名稱</th>
                     <td><input type="text" class="form-control" name="productName" required></td>
                 </tr>
                 <tr>
-                    <th>商品圖片</th>
+                    <th>商品主圖</th>
                     <td>
                         <input type="file" class="form-control" name="imageFile" accept="image/*">
                         <div id="imagePreviewContainer" class="mt-2"></div>
@@ -71,7 +113,7 @@
                 </tr>
                 
                 <tr>
-                    <th>商品詳細圖片</th>
+                    <th>商品副圖</th>
                     <td>
                         <input type="file" id="productDetailPics" name="productDetailPics" multiple accept="image/*">
                     </td>
@@ -85,6 +127,9 @@
                 <button type="submit" id="addProductBtn" class="btn btn-primary">新增</button>
                 <button type="button" class="btn btn-secondary me-2"
                     onclick="location.href='/TickitEasy/admin/product'">返回商品列表</button>
+                <button type="button" id="autofillBtn" class="btn btn-warning">
+    				一鍵填入
+				</button>
             </div>
         </form>
     </div>
@@ -180,7 +225,17 @@
                     reader.readAsDataURL(file);
                 }
             });
-        
+            
+
+    // 示範輸入
+			document.getElementById("autofillBtn").addEventListener("click", function () {
+				document.getElementsByName("productName")[0].value = "你的名字";
+				document.getElementsByName("productDesc")[0].value = "你的名字電影周邊商品";
+				document.getElementsByName("price")[0].value = "200";
+				document.getElementsByName("stock")[0].value = "100";
+			});
+    
+
     </script>
 </body>
 

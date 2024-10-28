@@ -23,6 +23,40 @@ public class AdminProductPhotoAPIController {
 	
 	 @Autowired
 	    private ProductService productService;
+	 
+	 // 新增產品圖片
+	    @PostMapping("/{productID}")
+	    public ResponseEntity<ProductPhotoEntity> createProductPhoto(
+	            @PathVariable Integer productID,
+	            @RequestPart(value = "fileName", required = false) MultipartFile fileName)
+	    {
+	        try {
+	            ProductEntity product = productService.findProductById(productID);
+	            if (product == null) {
+	                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	            }
+	            ProductPhotoEntity newPhoto = productPhotoService.createProductPhoto(fileName, product);
+	            return new ResponseEntity<>(newPhoto, HttpStatus.CREATED);
+	        } catch (IOException e) {
+	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
+	    
+	 // 更新產品圖片
+	    @PutMapping("/{photoID}")
+	    public ResponseEntity<ProductPhotoEntity> editProductPhoto(
+	            @PathVariable Integer photoID,
+	            @RequestPart(value = "fileName", required = false) MultipartFile fileName) {
+	        try {
+	            ProductPhotoEntity updatedPhoto = productPhotoService.editProductPhoto(photoID, fileName);
+	            if (updatedPhoto == null) {
+	                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	            }
+	            return new ResponseEntity<>(updatedPhoto, HttpStatus.OK);
+	        } catch (IOException e) {
+	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
 
 
 	    // 獲取特定產品的所有圖片

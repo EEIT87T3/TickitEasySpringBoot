@@ -200,13 +200,13 @@ public class AdminMemberController {
         if (age < 20) {
             return "20歲以下";
         } else if (age < 30) {
-            return "20-29";
+            return "20-29歲";
         } else if (age < 40) {
-            return "30-39";
+            return "30-39歲";
         } else if (age < 50) {
-            return "40-49";
+            return "40-49歲";
         } else {
-            return "50 and above";
+            return "50歲以上";
         }
     }
 
@@ -221,6 +221,10 @@ public class AdminMemberController {
         }
         return data;
     }
-    
-    
+    //新增會員統計卡片
+    @GetMapping("/member/api/stats")
+    public ResponseEntity<Map<String, Long>> getMemberStats() {
+        Map<String, Long> stats = memberService.getMemberStats();
+        return ResponseEntity.ok(stats);
+    }
 }

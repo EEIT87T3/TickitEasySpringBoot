@@ -216,11 +216,11 @@ public class EventsEntity {
 	@Override
 	public String toString() {
 		return "EventsEntity [eventID=" + eventID + ", status=" + status + ", eventName=" + eventName + ", eventPic="
-				+ eventPic + ", eventCategory=" + eventCategory + ", eventTag=" + eventTag + ", eventDesc=" + eventDesc
+				+ eventPic + ", eventDesc=" + eventDesc
 				+ ", place=" + place + ", address=" + address + ", eventStartTime=" + eventStartTime + ", eventEndTime="
 				+ eventEndTime + ", startEntryTime=" + startEntryTime + ", endEntryTime=" + endEntryTime
 				+ ", earliestStartSaleTime=" + earliestStartSaleTime + ", quantityTotalAvailable="
 				+ quantityTotalAvailable + ", quantityTotalPurchased=" + quantityTotalPurchased + ", totalReviews="
-				+ totalReviews + ", totalScore=" + totalScore + ", ticketTypes=" + ticketTypes + "]";
+				+ totalReviews + ", totalScore=" + totalScore + "]";
 	}
 }
