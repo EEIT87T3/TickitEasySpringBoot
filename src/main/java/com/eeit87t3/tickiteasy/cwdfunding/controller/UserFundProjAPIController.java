@@ -3,6 +3,7 @@ package com.eeit87t3.tickiteasy.cwdfunding.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,9 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
+import com.eeit87t3.tickiteasy.cwdfunding.testemail.TestEmailService;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
@@ -40,6 +44,9 @@ public class UserFundProjAPIController {
 	
 	@Autowired
 	private FundOrderService fundOrderService;
+	
+	@Autowired
+	private TestEmailService testEmailService;
 	
 	
 	/* [API] 查詢募資活動(可以by categoryID或不By categoryID)*/
@@ -69,7 +76,6 @@ public class UserFundProjAPIController {
 	        System.out.println("token"+token);
 	        // 從 Token 中獲取電子郵件
 	        String email = jwtUtil.getEmailFromToken(token);
-	        System.out.println("email"+email);
 	        // 根據電子郵件獲取會員資料
 	        Member member = memberService.findByEmail(email);
 	        System.out.println();
@@ -94,5 +100,35 @@ public class UserFundProjAPIController {
 	public List<FundOrder> findOrderByMemberID(@RequestParam Integer memberID) {
 		return fundOrderService.findFundOrderByMember(memberID);
 	}
+	
+	/* [API] 查詢是否訂購過專案by token */
+	@GetMapping("/api/fundproject/getIsDonated")
+	public Boolean isDonated(@RequestParam Integer projectID,@RequestParam Integer memberID) {
+		boolean donated = fundOrderService.isDonated(projectID, memberID);
+		return donated;
+	}
+	
+
+	
+//	@ResponseBody
+//	@PostMapping("api/fundproject/email")
+//    public ResponseEntity<?> sendDonateEmail(@RequestParam Integer projectID) {
+//        	// 寄募資成功信
+//		    System.out.println("開始寄信api");
+//			FundProj fundProj = projService.findFundProjById(projectID);
+//			if (Integer.parseInt(fundProj.getCurrentAmount()) < Integer.parseInt(fundProj.getTargetAmount())) {
+//				System.out.println("未達目標金額");
+//				return ResponseEntity.ok().body("募資尚未成功，不寄信");
+//			} else {
+//				System.out.println("達到目標金額，開始寄信");
+//				List<Integer> memberIDList = fundOrderService.findMemberIDByProjID(projectID);
+//				for (Integer memberID : memberIDList) {
+//					Member member = memberService.getMemberById(memberID).get();
+//					String toEmail = member.getEmail();
+//					testEmailService.sendDonateSuccessEmail(toEmail);
+//				}
+//			}
+//			return ResponseEntity.ok().body("募資成功，寄信成功");
+//    }
 
 }
