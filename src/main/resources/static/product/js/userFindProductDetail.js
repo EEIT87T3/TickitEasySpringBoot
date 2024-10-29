@@ -193,15 +193,28 @@ function setNotification() {
             // 判断是跳转到购物车页面还是显示提示信息
             if (buyNow) {
                 window.location.href = '/TickitEasy/user/cart';  // 跳转到购物车页面
-            } else {
-                alert('商品已加入購物車');  // 提示商品已加入购物车
-            }
-        })
-        .catch(error => {
-            console.error('加入購物車失敗:', error);  // 处理错误
-            alert('加入購物車失敗，請稍後再試');
-        });
-    }
+            } 				else {
+				            // 如果是加入購物車，顯示 SweetAlert2 提示訊息
+				            Swal.fire({
+				                position: 'center',
+				                icon: 'success',
+				                title: '商品已加入購物車',
+				                showConfirmButton: false,
+				                timer: 1500  
+				            });
+				        }
+				    })
+				    .catch(error => {
+				        console.error('加入購物車失敗:', error);  
+				        Swal.fire({
+				            position: 'center',
+				            icon: 'error',
+				            title: '加入購物車失敗',
+				            text: '請稍後再試',
+				            showConfirmButton: true
+				        });
+				    });
+				}
 
 // 收藏功能
 function toggleFavorite() {
