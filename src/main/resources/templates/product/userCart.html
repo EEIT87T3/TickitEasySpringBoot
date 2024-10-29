@@ -227,7 +227,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-2">
-                                <img src="${item.productPic}" alt="${item.productName}" class="img-fluid">
+                                <img src="/TickitEasy${item.productPic}" alt="${item.productName}" class="img-fluid">
                             </div>
                             <div class="col-md-4">
                                 <h5 class="card-title">${item.productName}</h5>
@@ -255,8 +255,8 @@
 
 
         // 更新特定商品的數量
-        function updateQuantity(productId, newQuantity) {
-            const item = cartItems.find(item => item.productID === productId); // 查找商品
+        function updateQuantity(productID, newQuantity) {
+            const item = cartItems.find(item => item.productID === productID); // 查找商品
             if (item) {
                 item.quantity = parseInt(newQuantity); // 更新數量
                 updateCartItem(item); // 更新購物車中的商品
@@ -264,8 +264,8 @@
         }
 
         // 增加商品數量
-        function increaseQuantity(productId) {
-            const item = cartItems.find(item => item.productID === productId); // 查找商品
+        function increaseQuantity(productID) {
+            const item = cartItems.find(item => item.productID === productID); // 查找商品
             if (item) {
                 item.quantity++; // 數量增加
                 updateCartItem(item); // 更新購物車中的商品
@@ -273,8 +273,8 @@
         }
 
         // 減少商品數量
-        function decreaseQuantity(productId) {
-            const item = cartItems.find(item => item.productID === productId); // 查找商品
+        function decreaseQuantity(productID) {
+            const item = cartItems.find(item => item.productID === productID); // 查找商品
             if (item && item.quantity > 1) {
                 item.quantity--; // 數量減少
                 updateCartItem(item); // 更新購物車中的商品
@@ -303,8 +303,8 @@
         }
 
         // 刪除商品
-        function removeItem(productId) {
-            cartItems = cartItems.filter(item => item.productID !== productId); // 移除指定商品
+        function removeItem(productID) {
+            cartItems = cartItems.filter(item => item.productID !== productID); // 移除指定商品
             localStorage.setItem('cart', JSON.stringify(cartItems)); // 更新 localStorage
             renderCart(); // 重新渲染購物車
             updateTotals(); // 更新總數量和金額

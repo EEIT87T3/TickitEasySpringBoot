@@ -193,9 +193,11 @@
             </div>
         </div>
     </template>
-	<script th:inline="javascript">
-    const productID = /*[[${productID}]]*/ '';
+<script th:inline="javascript">
+    const productID = /*[[${productID}]]*/ 0;  // 使用 Thymeleaf 输出 productID 数字
+    console.log('Product ID:', productID);
 </script>
+
 	
     
 </body>
