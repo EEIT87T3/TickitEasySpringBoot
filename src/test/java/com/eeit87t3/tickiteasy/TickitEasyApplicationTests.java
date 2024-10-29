@@ -4,9 +4,14 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.web.client.RestTemplate;
 
 import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.order.entity.CheckoutPaymentRequestForm;
@@ -16,6 +21,8 @@ import com.eeit87t3.tickiteasy.order.entity.ProductPackageForm;
 import com.eeit87t3.tickiteasy.order.entity.RedirectUrls;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.mockito.ArgumentMatchers.intThat;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -47,7 +54,17 @@ import ecpay.payment.integration.domain.TradeNoAioObj;
 class TickitEasyApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void contextLoads() {				
+		String targetUrl = "https://sandbox-api-pay.line.me/v3/payments/2024102802226907110/confirm";
+
+		
+	    RestTemplate restTemplate = new RestTemplate();
+        // 使用 RestTemplate 發送 GET 請求並接收回應
+        ResponseEntity<String> response = restTemplate.getForEntity(targetUrl, String.class);
+
+        // 處理回應
+        String responseBody = response.getBody();
+        System.out.println(responseBody);
 	}
 	
 	@Test
@@ -152,5 +169,104 @@ class TickitEasyApplicationTests {
 			e.printStackTrace();
 		}
         
+	}
+	
+	@Test
+	public void testLinePay() throws JSONException {
+		
+		String body = "{\r\n"
+				+ "    \"returnCode\": \"0000\",\r\n"
+				+ "    \"returnMessage\": \"Success.\",\r\n"
+				+ "    \"info\": {\r\n"
+				+ "        \"transactionId\": 2024102802226934300,\r\n"
+				+ "        \"orderId\": \"Tickit1730118061901\",\r\n"
+				+ "        \"payInfo\": [\r\n"
+				+ "            {\r\n"
+				+ "                \"method\": \"CREDIT_CARD\",\r\n"
+				+ "                \"amount\": 1098,\r\n"
+				+ "                \"maskedCreditCardNumber\": \"************1111\"\r\n"
+				+ "            }\r\n"
+				+ "        ],\r\n"
+				+ "        \"packages\": [\r\n"
+				+ "            {\r\n"
+				+ "                \"id\": \"package_id\",\r\n"
+				+ "                \"amount\": 1098,\r\n"
+				+ "                \"userFeeAmount\": 0,\r\n"
+				+ "                \"products\": [\r\n"
+				+ "                    {\r\n"
+				+ "                        \"id\": \"9\",\r\n"
+				+ "                        \"name\": \"示範輸入活動名稱 09\",\r\n"
+				+ "                        \"quantity\": 2,\r\n"
+				+ "                        \"price\": 299\r\n"
+				+ "                    },\r\n"
+				+ "                    {\r\n"
+				+ "                        \"id\": \"3\",\r\n"
+				+ "                        \"name\": \"藍色小精靈\",\r\n"
+				+ "                        \"quantity\": 1,\r\n"
+				+ "                        \"price\": 500\r\n"
+				+ "                    }\r\n"
+				+ "                ]\r\n"
+				+ "            }\r\n"
+				+ "        ]\r\n"
+				+ "    }\r\n"
+				+ "}";
+		JSONObject jsonObject = new JSONObject(body);
+		System.out.println(jsonObject.toString());
+		
+		
+		String returnCode = jsonObject.getString("returnCode"); //0000
+		System.out.println(returnCode);
+	    String returnMessage = jsonObject.getString("returnMessage");//Success
+	    System.out.println(returnMessage);
+	    
+	    // 取得 info 裡面的 transactionId 和 orderId
+	    JSONObject info = jsonObject.getJSONObject("info");//{"transactionId":2024102802226934300,"orderId":"Tickit1730118061901","payInfo":[{"method":"CREDIT_CARD","amount":1098,"maskedCreditCardNumber":"************1111"}],"packages":[{"id":"package_id","amount":1098,"userFeeAmount":0,"products":[{"id":"9","name":"示範輸入活動名稱 09","quantity":2,"price":299},{"id":"3","name":"藍色小精靈","quantity":1,"price":500}]}]}
+	    System.out.println(info.toString());
+	    long transactionIdd = info.getLong("transactionId");//2024102802226934300
+	    System.out.println(transactionIdd);
+	    String orderIdd = info.getString("orderId");//Tickit1730118061901
+	    System.out.println(orderIdd);
+	    
+	    // 取得 payInfo 裡的第一筆資料
+	    JSONArray payInfoArray = info.getJSONArray("payInfo");
+	    System.out.println(payInfoArray);
+	    JSONObject payInfo = payInfoArray.getJSONObject(0);
+	    System.out.println(payInfo);
+	    String method = payInfo.getString("method");//CREDIT_CARD
+	    System.out.println(method);
+	    int amount = payInfo.getInt("amount");//1098
+	    System.out.println(amount);
+	    String maskedCreditCardNumber = payInfo.getString("maskedCreditCardNumber");//卡號
+	    System.out.println(maskedCreditCardNumber);
+	    // 取得 packages 裡的第一筆資料
+	    JSONArray packagesArray = info.getJSONArray("packages"); //[{"id":"package_id","amount":1098,"userFeeAmount":0,"products":[{"id":"9","name":"示範輸入活動名稱 09","quantity":2,"price":299},{"id":"3","name":"藍色小精靈","quantity":1,"price":500}]}]
+	    System.out.println(packagesArray);
+	    JSONObject packageObject = packagesArray.getJSONObject(0); //{"id":"package_id","amount":1098,"userFeeAmount":0,"products":[{"id":"9","name":"示範輸入活動名稱 09","quantity":2,"price":299},{"id":"3","name":"藍色小精靈","quantity":1,"price":500}]}
+
+	    
+	    JSONArray products = packageObject.getJSONArray("products");
+	    System.out.println(products);
+	    for(int i=0; i<products.length(); i++) {
+			JSONObject product = products.getJSONObject(i);
+			System.out.println(product);
+			String productId = product.getString("id");
+			System.out.println(productId);
+			String productName = product.getString("name");
+			System.out.println(productName);
+			int productQuantity = product.getInt("quantity");
+			System.out.println(productQuantity);
+			int productPrice = product.getInt("price");
+			System.out.println(productPrice);
+	    }
+	    System.out.println(packageObject);
+	    String packageId = packageObject.getString("id");//package_id
+	    System.out.println(packageId);
+	    int packageAmount = packageObject.getInt("amount");//1098
+	    System.out.println(packageAmount);
+	    int userFeeAmount = packageObject.getInt("userFeeAmount");//0
+	    System.out.println(userFeeAmount);
+	    
+	    
+
 	}
 }

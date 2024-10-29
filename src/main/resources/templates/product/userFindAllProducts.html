@@ -7,6 +7,7 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="/TickitEasy/cwdfunding/css/card.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <meta th:replace="~{commons/userHead}">
 	<title>周邊商品</title>
 	<script>
@@ -16,53 +17,117 @@
 			
 		});
 	</script>
+	<style>
+.row.mb-4 {
+    margin-top: 70px;  /* 調整這個值來在「所有類別」和導航欄之間增加距離 */
+}
+
+	
+	
+	.input-group {
+    margin-left: 10px;  /* 讓搜尋框與其他篩選選項保持距離 */
+}
+
+#searchInput {
+    border-color: #ccc;
+    height: 40px;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    width: 200px; /* 調整搜尋框寬度 */
+}
+
+#searchButton {
+    height: 40px;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    background-color: #007bff; /* 保持按鈕藍色 */
+    border-color: #007bff;
+}
+
+#searchButton:hover {
+    background-color: #0056b3; /* 懸停時變深一點 */
+}
+
+.form-control:focus {
+    box-shadow: none; /* 移除搜尋框聚焦時的外部陰影 */
+}
+
+.row {
+    align-items: center; /* 垂直對齊所有元素 */
+}
+
+.form-select {
+    min-width: 150px; /* 調整下拉選單寬度 */
+}
+
+#minPrice,
+#maxPrice {
+    width: 100px; /* 調整價格輸入框的寬度 */
+}
+
+#priceFilterBtn {
+    height: 38px; /* 調整按鈕高度與輸入框對齊 */
+    margin-left: 10px;
+}
+/* 隱藏數字輸入框的上下箭頭 - 針對 Chrome、Safari、Edge */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+	
+	</style>
 </head>
 
 <body>
 	<div th:replace="~{commons/userHeader}"></div>
     
 	<div class="container mt-4">
-        <h1 class="text-center mb-4">商品列表</h1>
-
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <select id="categorySelect" class="form-select">
-                    <option value="">所有類別</option>
-                    <option th:each="category : ${categoryList}" 
-                            th:value="${category.categoryId}" 
-                            th:text="${category.categoryName}"></option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <input type="number" id="minPrice" class="form-control" placeholder="最低價格">
-            </div>
-            <div class="col-md-3">
-                <input type="number" id="maxPrice" class="form-control" placeholder="最高價格">
-            </div>
-            <div class="col-md-2">
-        <button id="priceFilterBtn" class="btn btn-primary w-100">確認價格</button>
+       
+        
+       <div class="row mb-4 justify-content-start align-items-center">
+    <div class="col-md-auto">
+        <select id="categorySelect" class="form-select">
+            <option value="">所有類別</option>
+            <option th:each="category : ${categoryList}" 
+                    th:value="${category.categoryId}" 
+                    th:text="${category.categoryName}"></option>
+        </select>
     </div>
-            <div class="col-md-3">
-                <select id="sortSelect" class="form-select">
-                    <option value="0">由舊到新</option>
-                    <option value="3">最新商品</option>
-                    <option value="1">價格從低到高</option>
-                    <option value="2">價格從高到低</option>
-                </select>
-            </div>
+    <div class="col-md-auto">
+        <select id="sortSelect" class="form-select">
+            <option value="0">由舊到新</option>
+            <option value="3">最新商品</option>
+            <option value="1">價格從低到高</option>
+            <option value="2">價格從高到低</option>
+        </select>
+    </div>
+    <div class="col-md-auto">
+        <input type="number" id="minPrice" class="form-control" placeholder="最低價" style="width: 100px;">
+    </div>
+    <div class="col-md-auto">
+        <span>~</span>
+    </div>
+    <div class="col-md-auto">
+        <input type="number" id="maxPrice" class="form-control" placeholder="最高價" style="width: 100px;">
+    </div>
+    <div class="col-md-auto">
+        <button id="priceFilterBtn" class="btn btn-primary">確認價格</button>
+    </div>
+    <!-- 新增搜尋框在右側 -->
+    <div class="col-md-auto ms-auto">
+        <div class="input-group">
+            <input type="text" id="searchInput" class="form-control" placeholder="輸入商品名稱" style="border-top-left-radius: 30px; border-bottom-left-radius: 30px; height: 40px; width: 200px;">
+            <button id="searchButton" class="btn btn-primary" style="border-top-right-radius: 30px; border-bottom-right-radius: 30px; height: 40px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
         </div>
-
-        <div class="row mb-4">
-            <div class="col-md-9">
-                <input type="text" id="searchInput" class="form-control" placeholder="輸入商品名稱">
-            </div>
-            <div class="col-md-3">
-                <button id="searchButton" class="btn btn-primary w-100">搜尋</button>
-            </div>
-        </div>
+    </div>
+  </div>
 
         <div id="productList" class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- 商品卡片將通過 JavaScript 動態添加 -->
+            <!-- 這裡是商品卡片 -->
+            
         </div>
 
         <nav aria-label="Page navigation" class="mt-4">
@@ -107,24 +172,25 @@
 	}
 
 	function displayProducts(products) {
-        const productList = document.getElementById('productList');
-        productList.innerHTML = ''; // 清空現有內容
+    const productList = document.getElementById('productList');
+    productList.innerHTML = ''; // 清空現有內容
 
-        products.forEach(function(product) {
-            const productElement = document.createElement('div');
-            productElement.className = 'col';
-            productElement.innerHTML = `
+    products.forEach(function(product) {
+        // 更新每個產品的 HTML 內容
+        const productElement = `
+            <div class="col">
                 <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/TickitEasy/product/${product.productID}'">
                     <img src="/TickitEasy${product.productPic}" class="card-img-top" alt="${product.productName}">
                     <div class="card-body">
                         <h5 class="card-title fw-semibold custom-title-text">${product.productName}</h5>
-                        <p class=" fw-semibold custom-small-text">價格: $${product.price}</p>
+                        <h5 class="card-title fw-semibold custom-title-text">NT$ ${product.price}</h5>
                     </div>
                 </div>
-            `;
-            productList.appendChild(productElement);
-        });
-    }
+            </div>
+        `;
+        productList.innerHTML += productElement;
+    });
+}
 
 	function displayPagination(totalPages) {
 		const pagination = document.getElementById('pagination');

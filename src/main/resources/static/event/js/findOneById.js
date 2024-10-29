@@ -21,7 +21,7 @@ $(document).ready(function () {
         // 類別
         eventContent.getElementById("category").textContent = event.eventCategory.categoryName;
         // 標籤
-        if (event.tag != null) {
+        if (event.eventTag != null) {
             eventContent.getElementById("tag").textContent = event.eventTag.tagName;
         }
 

@@ -91,8 +91,7 @@ public class FundProjService {
         proj.setCurrentAmount(fundProjDTO.getCurrentAmount());
         proj.setFundCategory(category);
         proj.setFundTag(tag);
-        System.out.println(proj.getTitle());
-		System.out.println("新增service結束");
+
 
 		return fundProjRepo.saveAndFlush(proj);
 			

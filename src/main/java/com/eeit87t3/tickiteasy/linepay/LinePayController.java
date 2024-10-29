@@ -54,17 +54,20 @@ public class LinePayController {
         Integer projectID = Integer.parseInt(paymentData.get("projectID").toString());
         		
         
+		/* BUG 只要有請求成功到付款頁面，不論是否有付款成功皆會存進資料庫 */
         if ("0000".equals(root.get("returnCode").asText())) {
             // 在這邊跟資料庫互動
-        	fundOrderService.saveFundOrder(paymentData, paymentDataFull);
-        	boolean isReached = testEmailService.isReached(projectID); // 達目標金額
+        	boolean isSaved = fundOrderService.saveFundOrder(paymentData, paymentDataFull);
         	// 寄募資成功信
-        	if (isReached) {
-				List<String> donatedMembersEmail = testEmailService.findDonatedMembersEmail(projectID);
-				for (String email : donatedMembersEmail) {
-					testEmailService.sendDonateSuccessEmail(email);
+        	if(isSaved) {
+        		boolean isReached = fundOrderService.isReached(projectID); // 達目標金額
+	        	if (isReached) {
+					List<String> donatedMembersEmail = testEmailService.findDonatedMembersEmail(projectID);
+					for (String email : donatedMembersEmail) {
+						testEmailService.sendDonateSuccessEmail(email);
+					}
 				}
-			}
+        	}
         	return ResponseEntity.ok(root);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(root);
