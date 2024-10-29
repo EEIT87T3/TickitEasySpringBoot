@@ -199,7 +199,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		obj.setTotalAmount(totalAmount); //交易金額 String類型
 		obj.setTradeDesc("test Description"); //交易描述
 		obj.setItemName(itemname); //商品名稱
-		obj.setReturnURL("https://d215-118-168-74-241.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
+		obj.setReturnURL("https://abf1-114-25-182-128.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
 		obj.setNeedExtraPaidInfo("N"); //額外的付款資訊
 		obj.setClientBackURL("http://localhost:8080/TickitEasy/user/clientSide/orderPaymentCompleted"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
 				
@@ -384,7 +384,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setAppPackageName(""); //N 在Android環境切換應用時所需的資訊，用於防止網路釣魚攻擊（phishing）
         redirectUrls.setConfirmUrlType("SERVER");
-        redirectUrls.setConfirmUrl("https://7bda-114-25-182-128.ngrok-free.app/TickitEasy/admin/order/LinePayReturn"); //Y 設定支付完成後用戶跳轉的網址。
+        redirectUrls.setConfirmUrl("https://abf1-114-25-182-128.ngrok-free.app/TickitEasy/admin/order/LinePayReturn"); //Y 設定支付完成後用戶跳轉的網址。
         redirectUrls.setCancelUrl("http://localhost:8080/TickitEasy"); //Y 設定支付取消後用戶跳轉的網址。
         form.setRedirectUrls(redirectUrls);
         
@@ -470,27 +470,48 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		JSONObject jsonObject = new JSONObject(response.body());
 		
 		String returnCode = jsonObject.getString("returnCode");
-	    String returnMessage = jsonObject.getString("returnMessage");
-	    
+			    
 	    // 取得 info 裡面的 transactionId 和 orderId
 	    JSONObject info = jsonObject.getJSONObject("info");
-	    long transactionIdd = info.getLong("transactionId");
-	    String orderIdd = info.getString("orderId");
 	    
 	    // 取得 payInfo 裡的第一筆資料
 	    JSONArray payInfoArray = info.getJSONArray("payInfo");
-	    JSONObject payInfo = payInfoArray.getJSONObject(0);
-	    String method = payInfo.getString("method");
-	    int amount = payInfo.getInt("amount");
-	    String maskedCreditCardNumber = payInfo.getString("maskedCreditCardNumber");
 	    
 	    // 取得 packages 裡的第一筆資料
 	    JSONArray packagesArray = info.getJSONArray("packages");
-	    JSONObject packageObject = packagesArray.getJSONObject(0);
-	    String packageId = packageObject.getString("id");
-	    int packageAmount = packageObject.getInt("amount");
-	    int userFeeAmount = packageObject.getInt("userFeeAmount");
-		
-    	return response.body();
+	    JSONObject packagesObject = packagesArray.getJSONObject(0);
+	    JSONArray productsArray = packagesObject.getJSONArray("products");
+	    
+	    List<ProdOrderDetails> listsProdOrderDetails = bypaymentInfo.getProdOrderDetailsBean();//prodOrderDetails 資料庫新增
+	    listsProdOrderDetails.clear();
+	    for(int i = 0; i < productsArray.length(); i++) {
+	    	ProdOrderDetails prodOrderDetails = new ProdOrderDetails();
+	    	JSONObject product = productsArray.getJSONObject(i);
+			String productId = product.getString("id");
+			String productName = product.getString("name");
+			int productQuantity = product.getInt("quantity");
+			int productPrice = product.getInt("price");
+			
+			if(productName.contains("示範") || productName.contains("活動") || productName.contains("啟售") || productName.contains("票種")) {
+				prodOrderDetails.setProdOrder(bypaymentInfo);
+				prodOrderDetails.setTicketTypeId(Integer.parseInt(productId));
+				prodOrderDetails.setTicketPrice(productPrice);
+				prodOrderDetails.setTicketQuantity(productQuantity);
+			}else {
+				prodOrderDetails.setProdOrder(bypaymentInfo);
+				prodOrderDetails.setProductId(Integer.parseInt(productId));
+				prodOrderDetails.setPrice(productPrice);
+				prodOrderDetails.setQuantity(productQuantity);
+			}
+			listsProdOrderDetails.add(prodOrderDetails);
+	    }
+	    if("0000".equals(returnCode)) {
+			bypaymentInfo.setStatus("已付款");
+			bypaymentInfo.setProdOrderDetailsBean(listsProdOrderDetails);
+			
+			por.save(bypaymentInfo);
+			return "ok";
+		}
+	    return new RuntimeException("添加失敗, Status Code: " + response.statusCode()).toString();
     }
 }

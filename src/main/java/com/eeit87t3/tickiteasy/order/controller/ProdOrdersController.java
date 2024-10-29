@@ -308,8 +308,7 @@ public class ProdOrdersController {
 		
 		
 		@GetMapping("LinePayReturn")
-		@ResponseBody
-		public ResponseEntity LinePay(@RequestParam String transactionId,@RequestParam String orderId) throws Exception{
+		public String LinePay(@RequestParam String transactionId,@RequestParam String orderId) throws Exception{
 			System.out.println("transactionId:"+transactionId);
 			System.out.println("orderId:"+orderId);
 			
@@ -317,8 +316,7 @@ public class ProdOrdersController {
 
 			String linePayReturn = prodOrdersService.LinePayReturn(targetUrl, orderId, transactionId);
 		   
-	        // 將回應數據返回給前端
-	        return ResponseEntity.ok(linePayReturn);
+	        return "redirect:http://localhost:8080/TickitEasy/user/clientSide/orderPaymentCompleted";
 		}
 		
 }
