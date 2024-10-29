@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,8 @@ import java.util.Optional;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -196,9 +199,9 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		obj.setTotalAmount(totalAmount); //交易金額 String類型
 		obj.setTradeDesc("test Description"); //交易描述
 		obj.setItemName(itemname); //商品名稱
-		obj.setReturnURL("https://d215-118-168-74-241.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
+		obj.setReturnURL("https://abf1-114-25-182-128.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
 		obj.setNeedExtraPaidInfo("N"); //額外的付款資訊
-		obj.setClientBackURL("http://localhost:8080/TickitEasy/admin/clientSide/orderPaymentCompleted"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
+		obj.setClientBackURL("http://localhost:8080/TickitEasy/user/clientSide/orderPaymentCompleted"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
 				
 		String form = all.aioCheckOut(obj, null);
 		
@@ -346,7 +349,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
         byte[] byteArray = Base64.encodeBase64(bytes);
         return new String(byteArray);
     }
-	//LinePay主要
+	//LinePay調用
     @Override
     public String LinePay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount,String memberEmail) throws Exception {
     	CheckoutPaymentRequestForm form = new CheckoutPaymentRequestForm();
@@ -354,7 +357,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
     	List lists = new ArrayList();
     	for(Map<String,Object> list : ticketTypesCartToCheckoutJson) {
     		ProductForm productForm = new ProductForm();
-    		productForm.setId((String)list.get("ticketTypeID"));
+    		productForm.setId((String.valueOf(list.get("ticketTypeID"))));
     		productForm.setName((String)list.get("eventName"));
     		productForm.setImageUrl("");
     		productForm.setQuantity(new BigDecimal((Integer)list.get("quantity")));
@@ -380,7 +383,8 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
         form.setPackages(Arrays.asList(productPackageForm));
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setAppPackageName(""); //N 在Android環境切換應用時所需的資訊，用於防止網路釣魚攻擊（phishing）
-        redirectUrls.setConfirmUrl("http://localhost:8080/TickitEasy"); //Y 設定支付完成後用戶跳轉的網址。
+        redirectUrls.setConfirmUrlType("SERVER");
+        redirectUrls.setConfirmUrl("https://abf1-114-25-182-128.ngrok-free.app/TickitEasy/admin/order/LinePayReturn"); //Y 設定支付完成後用戶跳轉的網址。
         redirectUrls.setCancelUrl("http://localhost:8080/TickitEasy"); //Y 設定支付取消後用戶跳轉的網址。
         form.setRedirectUrls(redirectUrls);
         
@@ -388,13 +392,6 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
         form.setCurrency("TWD"); //Y 貨幣
         form.setOrderId("Tickit" + System.currentTimeMillis()); //Y 設定商家的訂單編號，用於商家的管理和追蹤。
 
-        
-        //Confirm API
-        ConfirmData confirmData = new ConfirmData();
-        confirmData.setAmount(new BigDecimal(totalAmount));
-        confirmData.setCurrency("TWD");
-        String confirmNonce = UUID.randomUUID().toString();
-        String confirmUri = "/v3/payments/2024101902221679610/confirm";
         ObjectMapper mapper = new ObjectMapper();
         try {
         	//Request API
@@ -414,11 +411,20 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		            .build();
 			// 發送請求並獲取回應
 			HttpClient client = HttpClient.newHttpClient();
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());			
 			 // 檢查回應
 		    int statusCode = response.statusCode();
 		    if (statusCode == 200) {
+		    	
+		    	ProdOrders prodOrders = new ProdOrders();
+		    	prodOrders.setMember(memberService.findByEmail(memberEmail));
+		    	prodOrders.setOrderDate(Timestamp.valueOf(LocalDateTime.now()));
+		    	prodOrders.setStatus("未付款");
+		    	prodOrders.setPayments("LinePay");
+		    	prodOrders.setPaymentInfo(form.getOrderId());
+		    	prodOrders.setTotalAmount(Integer.valueOf(totalAmount));
+		    	por.save(prodOrders);//先儲存資料
+		    	
 		        // 如果成功，返回回應內容
 		        return response.body();
 		    } else {
@@ -430,5 +436,82 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		} 
         
         return null;
+    }
+    
+    //LinePay回傳
+    @Override
+    public String LinePayReturn(String targetUrl,String orderId, String transactionId) throws Exception {
+    	ProdOrders bypaymentInfo = por.findBypaymentInfo(orderId);
+    	ObjectMapper mapper = new ObjectMapper();
+        
+    	ConfirmData confirmData = new ConfirmData();
+        confirmData.setAmount(new BigDecimal(bypaymentInfo.getTotalAmount()));
+        confirmData.setCurrency("TWD");
+    	
+    	//Confirm API
+        String jsonBody = mapper.writeValueAsString(confirmData);
+    	String nonce = UUID.randomUUID().toString();
+    	String ChannelSecret = "f79c0cac4c3ab969f28b4b90abaf16f5";
+    	String requestUri = "/v3/payments/" + transactionId + "/confirm";
+		String signature = encrypt(ChannelSecret, ChannelSecret + requestUri + mapper.writeValueAsString(confirmData) + nonce);
+		// 構建 HTTP 請求
+		HttpRequest request  = HttpRequest.newBuilder()
+	            .uri(new URI(targetUrl))
+	            .header("Content-Type", "application/json")
+	            .header("X-LINE-ChannelId", "2006474211") // 替換為你的 Channel ID
+	            .header("X-LINE-Authorization-Nonce", nonce)
+	            .header("X-LINE-Authorization", signature)
+	            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+	            .build();
+		HttpClient client = HttpClient.newHttpClient();
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		
+		// 以下明日再處理 -------------------------------------------------------------------------------------------------------------
+		JSONObject jsonObject = new JSONObject(response.body());
+		
+		String returnCode = jsonObject.getString("returnCode");
+			    
+	    // 取得 info 裡面的 transactionId 和 orderId
+	    JSONObject info = jsonObject.getJSONObject("info");
+	    
+	    // 取得 payInfo 裡的第一筆資料
+	    JSONArray payInfoArray = info.getJSONArray("payInfo");
+	    
+	    // 取得 packages 裡的第一筆資料
+	    JSONArray packagesArray = info.getJSONArray("packages");
+	    JSONObject packagesObject = packagesArray.getJSONObject(0);
+	    JSONArray productsArray = packagesObject.getJSONArray("products");
+	    
+	    List<ProdOrderDetails> listsProdOrderDetails = bypaymentInfo.getProdOrderDetailsBean();//prodOrderDetails 資料庫新增
+	    listsProdOrderDetails.clear();
+	    for(int i = 0; i < productsArray.length(); i++) {
+	    	ProdOrderDetails prodOrderDetails = new ProdOrderDetails();
+	    	JSONObject product = productsArray.getJSONObject(i);
+			String productId = product.getString("id");
+			String productName = product.getString("name");
+			int productQuantity = product.getInt("quantity");
+			int productPrice = product.getInt("price");
+			
+			if(productName.contains("示範") || productName.contains("活動") || productName.contains("啟售") || productName.contains("票種")) {
+				prodOrderDetails.setProdOrder(bypaymentInfo);
+				prodOrderDetails.setTicketTypeId(Integer.parseInt(productId));
+				prodOrderDetails.setTicketPrice(productPrice);
+				prodOrderDetails.setTicketQuantity(productQuantity);
+			}else {
+				prodOrderDetails.setProdOrder(bypaymentInfo);
+				prodOrderDetails.setProductId(Integer.parseInt(productId));
+				prodOrderDetails.setPrice(productPrice);
+				prodOrderDetails.setQuantity(productQuantity);
+			}
+			listsProdOrderDetails.add(prodOrderDetails);
+	    }
+	    if("0000".equals(returnCode)) {
+			bypaymentInfo.setStatus("已付款");
+			bypaymentInfo.setProdOrderDetailsBean(listsProdOrderDetails);
+			
+			por.save(bypaymentInfo);
+			return "ok";
+		}
+	    return new RuntimeException("添加失敗, Status Code: " + response.statusCode()).toString();
     }
 }

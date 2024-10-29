@@ -41,7 +41,7 @@ public class UserProdFavoritesService {
                 ProdFavoritesEntity favorite = existingFavorite.get();
                 int newFavoriteCount = (favorite.getFavoriteCount() == 1) ? 0 : 1;
                 prodFavoritesRepo.updateFavoriteCount(member.getMemberID(), productID, newFavoriteCount);
-                result.put("message", newFavoriteCount == 1 ? "已加入收藏" : "已取消收藏");
+                result.put("message", newFavoriteCount == 1 ? "加入收藏" : "取消收藏");
             } else {
                 // 新增收藏（使用完整的實體）
                 ProdFavoritesEntity newFavorite = new ProdFavoritesEntity(member, product);
@@ -73,7 +73,7 @@ public class UserProdFavoritesService {
                 ProdFavoritesEntity favorite = existingFavorite.get();
                 int newNotifyStatus = (favorite.getNotifyStatus() == 1) ? 0 : 1;
                 prodFavoritesRepo.updateNotifyStatus(member.getMemberID(), productID, newNotifyStatus);
-                result.put("message", newNotifyStatus == 1 ? "已設定補貨通知" : "已取消補貨通知");
+                result.put("message", newNotifyStatus == 1 ? "設定補貨通知" : "取消補貨通知");
             } else {
                 // 新增通知設定（使用完整的實體，但預設 favoriteCount 為 0）
                 ProdFavoritesEntity newFavorite = new ProdFavoritesEntity(member, product);

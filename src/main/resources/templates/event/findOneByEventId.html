@@ -155,9 +155,9 @@
 				// 活動介紹
 				const eventDescTd = eventTbodyTemplate.getElementById("event-desc");
 				if (eventData.eventDesc != null) {
-					eventDescTd.innerText = eventData.eventDesc;
+					eventDescTd.innerHTML = eventData.eventDesc;
 				} else {
-					eventDescTd.innerText = "（無活動介紹）";
+					eventDescTd.innerHTML = "（無活動介紹）";
 				}
 
 				// 地點
