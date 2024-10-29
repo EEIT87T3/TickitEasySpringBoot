@@ -83,6 +83,37 @@
         .custom-letter-spacing {
         letter-spacing: 1.25px;
       }
+    /* 調整按鈕的背景色、文字色、邊框 */
+#favoriteButton {
+    background-color: #e04e2d;   /* 使用稍微暗一些的紅色 */
+    color: white;                /* 文字顏色變成白色 */
+    border: 1px solid #e04e2d;   /* 邊框紅色 */
+    padding: 5px 12px;           /* 調整 padding 使按鈕與購物車按鈕大小一致 */
+    border-radius: 5px;          /* 保持按鈕是長方形 */
+    display: inline-flex;        /* 使文字和圖標水平對齊 */
+    align-items: center;         /* 垂直居中 */
+    font-size: 16px;             /* 調整字體大小與購物車按鈕一致 */
+    height: 38px;                /* 設定高度與購物車按鈕一致 */
+}
+
+/* 修改按鈕內的愛心圖標顏色 */
+#favoriteButton .fas.fa-heart {
+    color: white;                /* 愛心圖標變成白色 */
+}
+
+/* 當按鈕被點擊後，背景色保持紅色，文字和圖標保持白色 */
+#favoriteButton.favorited {
+    background-color: white;     /* 取消收藏後變成白色背景 */
+    color: #e04e2d;              /* 文字顏色變成稍微暗一些的紅色 */
+    border: 1px solid #e04e2d;   /* 邊框保持紅色 */
+}
+
+#favoriteButton.favorited .fas.fa-heart {
+    color: #e04e2d;              /* 愛心圖標變成紅色 */
+}
+
+
+      
     </style>
     <title>周邊商品</title>
     <script>
@@ -139,8 +170,8 @@
             <!-- 購物車按鈕區域 -->
             <div id="cartButtonsContainer" class="btn-group-wrapper">
                 <button onclick="addToCart(false)" class="btn btn-primary">加入購物車</button>
-                <button onclick="addToCart(true)" class="btn btn-success">直接購買</button>
-                <button onclick="toggleFavorite()" class="btn btn-outline-primary">
+                <button onclick="addToCart(true)" class="btn btn-secondary">直接購買</button>
+                <button id="favoriteButton"  onclick="toggleFavorite()" class="btn btn-outline-primary">
                     <i class="fas fa-heart"></i> 加入收藏
                 </button>
             </div>
@@ -162,9 +193,11 @@
             </div>
         </div>
     </template>
-	<script th:inline="javascript">
-    const productID = /*[[${productID}]]*/ '';
+<script th:inline="javascript">
+    const productID = /*[[${productID}]]*/ 0;  // 使用 Thymeleaf 输出 productID 数字
+    console.log('Product ID:', productID);
 </script>
+
 	
     
 </body>
