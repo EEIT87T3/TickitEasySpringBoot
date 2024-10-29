@@ -44,13 +44,16 @@ import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.eeit87t3.tickiteasy.member.repository.MemberRepository;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.post.dto.CreatePostDTO;
+import com.eeit87t3.tickiteasy.post.dto.ReportDTO;
 import com.eeit87t3.tickiteasy.post.dto.ShowCommentDTO;
 import com.eeit87t3.tickiteasy.post.dto.ShowPostDTO;
 import com.eeit87t3.tickiteasy.post.entity.CommentEntity;
 import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.entity.PostImagesEntity;
+import com.eeit87t3.tickiteasy.post.entity.ReportEntity;
 import com.eeit87t3.tickiteasy.post.repository.CommentRepo;
 import com.eeit87t3.tickiteasy.post.repository.PostImagesRepo;
 import com.eeit87t3.tickiteasy.post.repository.PostRepo;
@@ -58,6 +61,7 @@ import com.eeit87t3.tickiteasy.post.service.CommentService;
 import com.eeit87t3.tickiteasy.post.service.LikesPostService;
 import com.eeit87t3.tickiteasy.post.service.PostImageService;
 import com.eeit87t3.tickiteasy.post.service.PostService;
+import com.eeit87t3.tickiteasy.post.service.ReportService;
 import com.eeit87t3.tickiteasy.test.TestImagesEntity;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
 
@@ -77,6 +81,8 @@ public class PostJsonController {
 	@Autowired
 	private CommentService commentService;
 	@Autowired
+	private ReportService reportService;
+	@Autowired
 	private PostRepo postRepo;
 	@Autowired
 	private CategoryRepo categoryRepo;
@@ -92,6 +98,8 @@ public class PostJsonController {
 	private TagRepo tagRepo;
 	@Autowired
 	private CommentRepo commentRepo;
+	@Autowired
+	private MemberRepository memberRepository;
 	@Autowired
 	private ImageUtil imageUtil;
 	@Autowired
@@ -474,6 +482,94 @@ public class PostJsonController {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 	    }
 	}
+	//檢舉
+	@PostMapping("/report/{postID}")
+	public ResponseEntity<Map<String, Object>> reportPost(
+	        @PathVariable Integer postID,
+	        @RequestHeader(value = "Authorization") String authHeader,
+	        @RequestBody ReportDTO reportRequest){ 
+
+	    Map<String, Object> response = new HashMap<>();
+	    // 進行授權檢查
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.put("success", false);
+            response.put("message", "您尚未登入或沒有權限刪除貼文");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // 提取 Token
+        String token = authHeader.replace("Bearer ", "");
+        String email = jwtUtil.getEmailFromToken(token);
+        Member member = memberService.findByEmail(email);
+        
+        // 驗證會員是否存在
+        if (member == null) {
+            response.put("success", false);
+            response.put("message", "會員不存在");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+	    try {
+	        // 獲取當前時間
+	        Timestamp reportTime = new Timestamp(System.currentTimeMillis());
+
+	        // 獲取文章快照
+	        PostEntity post = postService.findById(postID);
+	        if (post == null) {
+	            response.put("success", false);
+	            response.put("message", "找不到該文章");
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	        }
+	        // 設置被檢舉者 (發佈文章的會員)
+	        Member accusedMember = post.getMember(); // 文章的會員即為被檢舉者
+
+	        // 獲取檢舉者的會員資料
+	        Member reportedMember = memberRepository.findById(reportRequest.getReportedMemberID()).orElse(null);
+	        if (reportedMember == null) {
+	            response.put("success", false);
+	            response.put("message", "找不到檢舉者");
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	        }
+	        
+	        // 建立檢舉紀錄
+	        ReportEntity report = new ReportEntity();
+	        
+	        report.setReason(reportRequest.getReason());
+	        report.setPost(post);
+	        report.setReportedMember(reportedMember); // 設定檢舉者
+	        report.setAccusedMember(accusedMember);   // 設定被檢舉者
+	        report.setReportTime(reportTime);
+	        report.setReportStatus(1);//預設1未處理
+	        
+	        // 設定文章快照的相關資料
+	        report.setSavedTitle(post.getPostTitle()); 
+	        report.setSavedContent(post.getPostContent()); 
+	        
+	        // 從 CategoryEntity 和 TagEntity 中獲取 ID
+	        if (post.getPostCategory() != null) {
+	            report.setSavedCategoryID(post.getPostCategory().getCategoryId()); // 假設有 getCategoryID()
+	        }
+	        
+	        if (post.getPostTag() != null) {
+	            report.setSavedTagID(post.getPostTag().getTagId()); // 假設有 getTagID()
+	        }
+	        report.setSavedEditTime(post.getEditTime()); 
+
+	        // 儲存檢舉紀錄
+	        reportService.save(report);
+
+	        response.put("success", true);
+	        response.put("message", "檢舉成功");
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "檢舉失敗，請稍後重試");
+	        response.put("error", e.getMessage());  // 添加詳細的錯誤訊息
+	        e.printStackTrace();  // 輸出至控制台查看完整 stack trace
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+
+	}
+
 
 
 }

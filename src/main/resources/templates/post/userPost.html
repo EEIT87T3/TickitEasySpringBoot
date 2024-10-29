@@ -45,7 +45,6 @@
             background-color: #5F46E8;
             border: none;
         }
-        
     </style>
 </head>
 
@@ -61,7 +60,7 @@
             <div class="post-actions">
                 <button id="like-btn"><i class="far fa-thumbs-up"></i><span id="likes-count"></span></button>
                 <!-- <button id="save-btn"><i class="far fa-star"></i> 收藏</button> -->
-                <button id="report-btn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>
+                <button id="reportBtn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>
                 <!-- <button id="subscribe-btn"><i class="far fa-bell"></i> 訂閱作者</button> -->
                 <button id="edit-btn" style="display: none;"><i class="fas fa-pen"></i> 編輯</button>
                 <button id="delete-btn" style="display: none;"><i class="fas fa-trash"></i> 刪除</button>
@@ -85,6 +84,23 @@
 
 
     </div>
+    <!-- 彈窗 -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>檢舉文章</h2>
+            <form id="report-form">
+                <input type="hidden" id="postID" value=postID> <!-- 此處為示範，請根據實際文章 ID 動態設置 -->
+                <div>
+                    <label for="reason">檢舉理由：</label>
+                    <textarea id="reason" required></textarea>
+                </div>
+                <button type="submit">提交檢舉</button>
+            </form>
+            <div id="response-message"></div>
+        </div>
+    </div>
+
     <div th:replace="~{commons/userFooter}"></div>
     <script>
         let currentUserID;
@@ -400,7 +416,7 @@
                     }
                 })
         });
-      
+
         // 查詢該貼文的是否按過喜歡
         function fetchLikesStatus(currentUserID, postID) {
             return new Promise((resolve, reject) => {
@@ -438,7 +454,7 @@
             // 查詢按讚數
             axios.get(`/TickitEasy/admin/api/post/likes/count/${postID}`)
                 .then(response => {
-                    const likesCount = response.data.likesCount; 
+                    const likesCount = response.data.likesCount;
 
                     currentLikesCount = likesCount;  // 更新暫存變數
                     const likeButton = document.getElementById('likes-count');
@@ -457,6 +473,55 @@
                     console.error('Error updating likes count:', error);
                 });
         }
+        // 開啟彈窗
+        const reportBtn = document.getElementById('reportBtn');
+        const reportModal = document.getElementById('reportModal');
+        const closeModal = document.getElementsByClassName('close')[0];
+
+        reportBtn.onclick = function () {
+            reportModal.style.display = "block";
+        }
+
+        // 關閉彈窗
+        closeModal.onclick = function () {
+            reportModal.style.display = "none";
+        }
+
+        // 點擊彈窗外部關閉
+        window.onclick = function (event) {
+            if (event.target === reportModal) {
+                reportModal.style.display = "none";
+            }
+        }
+
+        // 表單提交處理
+        document.getElementById('report-form').addEventListener('submit', async function (event) {
+            event.preventDefault(); // 防止表單的默認提交行為
+            if (!Auth.isLoggedIn()) {
+                // 如果未登入，重定向到登入頁面
+                Auth.logout();
+            } else {
+                // const memberID = currentUserID;
+                const reason = document.getElementById('reason').value;
+
+
+                const reportRequest = {
+                    reportedMemberID: currentUserID,
+                    reason: reason
+                };
+
+                axios.post(`/TickitEasy/admin/api/post/report/${postID}`, reportRequest, {
+                    headers: {
+                        'Authorization': `Bearer ${Auth.getToken()}`,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    console.error('檢舉成功');
+                }).catch(error => {
+                    console.error('檢舉失敗');
+                });
+            }
+        });
 
         // //收藏功能(未完成)
         // document.getElementById('save-btn').addEventListener('click', function () {
