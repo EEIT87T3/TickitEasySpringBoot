@@ -4,10 +4,15 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
 
+
+import com.eeit87t3.tickiteasy.member.entity.Member;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity @Table(name = "fundingProjFollow")
@@ -60,6 +65,19 @@ public class FundProjFollow {
 	@EmbeddedId
 	private FundProjFollowPK fundProjFollowPK;
 	
+	/*
+	 * 因PK中已有memberID, projectID，因此需設置(insertable = false, updatable =
+	 * false)避免在FundProjFollow重複寫入這兩個欄位 因為這些欄位由嵌入式複合主鍵負責。
+	 * 
+	 */    
+	@ManyToOne
+	@JoinColumn (name = "memberID", referencedColumnName = "memberID", insertable = false, updatable = false)
+	private Member member;
+    
+    @ManyToOne
+	@JoinColumn (name = "projectID", referencedColumnName = "projectID", insertable = false, updatable = false)
+	private FundProj fundProj;   
+	
 	@Column(name = "followDate")
 	private Timestamp followDate;
 
@@ -77,6 +95,22 @@ public class FundProjFollow {
 
 	public void setFollowDate(Timestamp followDate) {
 		this.followDate = followDate;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+	public FundProj getFundProj() {
+		return fundProj;
+	}
+
+	public void setFundProj(FundProj fundProj) {
+		this.fundProj = fundProj;
 	}
 	
 	

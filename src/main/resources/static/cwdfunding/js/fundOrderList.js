@@ -48,7 +48,7 @@ $(document).ready(async function () {
       obj.forEach((el) => {
         const tr = document.createElement("tr");
 
-        tr.innerHTML = `<td> <a href="/TickitEasy/fundOrderDetail/${
+        tr.innerHTML = `<td> <a href="/TickitEasy/user/fundOrderDetail/${
           el.tickitID
         }">${el.tickitID}</a></td>
          <td> ${el.orderDate} </td>

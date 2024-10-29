@@ -5,11 +5,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjFollow;
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjFollow.FundProjFollowPK;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjFollowRepository;
 
 @Service
@@ -29,6 +31,17 @@ public class FundProjFollowService {
 		
 		return fundProjFollowRepository.save(fundProjFollow);
 	}
+	// 刪除 會員追蹤專案
+	public boolean deleteFundProjFollow(FundProjFollowPK fundProjFollowPK) {
+		Optional<FundProjFollow> optional = fundProjFollowRepository.findById(fundProjFollowPK);
+		if(optional.isEmpty()) {
+			return false;
+		} else {
+			FundProjFollow fundProjFollow = optional.get();
+			fundProjFollowRepository.delete(fundProjFollow);
+			return true;
+		}
+	}
 	
 	// 根據memberID查詢所有追蹤專案	
 	public List<FundProjFollow> findByFundProjFollowPKMemberID(Integer memberID){
@@ -40,4 +53,13 @@ public class FundProjFollowService {
 		return fundProjFollowRepository.findByFundProjFollowPKProjectID(projectID);
 	}
 	
+	// 根據memberID & projectID 查詢會員是否有追蹤
+	public boolean isFollowing(FundProjFollowPK fundProjFollowPK) {
+		 Optional<FundProjFollow> optional = fundProjFollowRepository.findById(fundProjFollowPK);
+		 if(optional.isEmpty()) {
+			 return false;
+		 }else {
+			 return true;
+		 }
+	}
 }
