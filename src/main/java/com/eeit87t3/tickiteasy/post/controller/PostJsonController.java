@@ -574,6 +574,35 @@ public class PostJsonController {
 	    List<ReportEntity> reports = reportService.findAllReports(); // 你的服務方法來查詢所有檢舉
 	    return ResponseEntity.ok(reports);
 	}
+	@PutMapping("/report/{reportID}/status")
+	public ResponseEntity<Map<String, Object>> updateReportStatus(
+	        @PathVariable Integer reportID,
+	        @RequestBody Map<String, Integer> statusRequest) {
+
+	    Map<String, Object> response = new HashMap<>();
+
+	    Integer newStatus = statusRequest.get("status");
+	    if (newStatus == null || (newStatus != 1 && newStatus != 0)) {
+	        response.put("success", false);
+	        response.put("message", "狀態必須為 1 或 0");
+	        return ResponseEntity.badRequest().body(response);
+	    }
+
+	    ReportEntity report = reportService.findById(reportID);
+	    if (report == null) {
+	        response.put("success", false);
+	        response.put("message", "找不到該檢舉紀錄");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	    }
+
+	    report.setReportStatus(newStatus);
+	    reportService.save(report);
+
+	    response.put("success", true);
+	    response.put("message", "檢舉狀態已更新");
+	    return ResponseEntity.ok(response);
+	}
+
 
 
 
