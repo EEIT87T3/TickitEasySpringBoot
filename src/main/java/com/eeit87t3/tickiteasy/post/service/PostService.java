@@ -32,6 +32,8 @@ import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.repository.PostRepo;
 //import com.eeit87t3.tickiteasy.post.exception.ResourceNotFoundException;
 
+import jakarta.persistence.EntityNotFoundException;
+
 
 
 @Service
@@ -54,6 +56,9 @@ public class PostService {
 	@Autowired
 	private PostImageService postImageService;
 	
+	public PostEntity save(PostEntity post) {
+        return postRepo.save(post);
+    }
 	//取得所有貼文
 //	@Transactional(readOnly = true)
 //	public List<PostEntity> findAll(){
@@ -212,7 +217,20 @@ public class PostService {
         // 如果貼文不存在，返回 false
         return false;
     }
-
+    
+    // 更新 post 的 likesCount
+    @Transactional
+    public void updateLikesCount(Integer postId, Integer likesCount) {
+        // 查詢該 post
+        Optional<PostEntity> optionalPost = postRepo.findById(postId);
+        if (optionalPost.isPresent()) {
+            PostEntity post = optionalPost.get();
+            post.setLikesCount(likesCount); 
+            postRepo.save(post); 
+        } else {
+            throw new EntityNotFoundException("Post not found with ID: " + postId);
+        }
+    }
 
     
 }

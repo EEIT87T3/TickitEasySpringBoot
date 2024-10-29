@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.post.entity.CommentEntity;
@@ -23,6 +24,8 @@ import com.eeit87t3.tickiteasy.post.entity.PostEntity;
 import com.eeit87t3.tickiteasy.post.repository.CommentRepo;
 import com.eeit87t3.tickiteasy.post.service.CommentService;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
+
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/admin/api/post/comment")
@@ -93,6 +96,10 @@ public class CommentController {
 	    Map<String, Object> response = new HashMap<>();
 
 	    try {
+	        // 先取得原始留言
+	        CommentEntity existingComment = commentRepo.findById(commentID)
+	            .orElseThrow(() -> new RuntimeException("Comment not found"));
+
 	        // 從 Authorization Header 中提取 Token
 	        String token = authHeader.replace("Bearer ", "");
 
@@ -107,9 +114,20 @@ public class CommentController {
 	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 	        }
 
-	        CommentEntity updatedComment = commentService.update(commentID, comment);
+	        // 驗證當前會員是否為該貼文的發表者
+	        if (!existingComment.getMemberID().equals(member.getMemberID())) {
+	            response.put("success", false);
+	            response.put("message", "您無權修改此留言");
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+	        }
+
+	        // 更新留言內容
+	        existingComment.setContent(comment.getContent()); // 假設留言內容的屬性為 content
+	        existingComment.setEditTime(new Timestamp(System.currentTimeMillis())); // 設置為當前時間
+
+	        CommentEntity updatedComment = commentService.update(commentID, existingComment);
 	        response.put("success", true);
-	        response.put("message", "留言更新成功"); // 確保這裡返回了 message
+	        response.put("message", "留言更新成功");
 	        response.put("data", updatedComment); // 返回更新後的留言
 	        return ResponseEntity.ok(response);
 	    } catch (Exception e) {
@@ -120,28 +138,41 @@ public class CommentController {
 	}
 
 
+
 	// 刪除單筆留言
 	@DeleteMapping("DELETE/{commentID}")
 	public ResponseEntity<Map<String, Object>> delete(
-			@RequestHeader("Authorization") String authHeader,
-			@PathVariable Integer commentID) {
+			@RequestHeader(value = "Authorization", required = false) String authHeader,
+			@PathVariable Integer commentID,
+	        HttpSession session) {
 		 Map<String, Object> response = new HashMap<>();
+		 // 檢查 session 是否存在 admin
+		    Admin admin = (Admin) session.getAttribute("admin");
+		 // 判斷是否為後台執行
+		    if (admin != null) {
+		        // 無需進行授權檢查，執行刪除操作
+		    } else {
+		        // 進行授權檢查
+		        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+		            response.put("success", false);
+		            response.put("message", "您尚未登入或沒有權限刪除貼文");
+		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+		        }
+
+		        // 提取 Token
+		        String token = authHeader.replace("Bearer ", "");
+		        String email = jwtUtil.getEmailFromToken(token);
+		        Member member = memberService.findByEmail(email);
+		        
+		        // 驗證會員是否存在
+		        if (member == null) {
+		            response.put("success", false);
+		            response.put("message", "會員不存在");
+		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+		        }
+		    }
 		try {
-			// 從 Authorization Header 中提取 Token
-			String token = authHeader.replace("Bearer ", "");
-
-			// 從 Token 中獲取電子郵件
-			String email = jwtUtil.getEmailFromToken(token);
-
-			// 根據電子郵件獲取會員資料
-			Member member = memberService.findByEmail(email);
-
-
-	        if (member == null) {
-	            response.put("success", false);
-	            response.put("message", "Invalid user");
-	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-	        }
+			
 	        if (commentID == null || commentID <= 0) {
 	            response.put("success", false);
 	            response.put("message", "貼文ID無效");

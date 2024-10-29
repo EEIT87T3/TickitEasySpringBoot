@@ -1,6 +1,8 @@
 package com.eeit87t3.tickiteasy.post.controller;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
@@ -52,10 +55,13 @@ import com.eeit87t3.tickiteasy.post.repository.CommentRepo;
 import com.eeit87t3.tickiteasy.post.repository.PostImagesRepo;
 import com.eeit87t3.tickiteasy.post.repository.PostRepo;
 import com.eeit87t3.tickiteasy.post.service.CommentService;
+import com.eeit87t3.tickiteasy.post.service.LikesPostService;
 import com.eeit87t3.tickiteasy.post.service.PostImageService;
 import com.eeit87t3.tickiteasy.post.service.PostService;
 import com.eeit87t3.tickiteasy.test.TestImagesEntity;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
+
+import jakarta.servlet.http.HttpSession;
 
 // 後臺路徑:/admin/api/post
 // 前臺路徑:/user/post
@@ -80,6 +86,8 @@ public class PostJsonController {
 	private TagService tagService;
 	@Autowired
 	private MemberService memberService;
+	@Autowired
+	private LikesPostService  likesPostService;
 	@Autowired
 	private TagRepo tagRepo;
 	@Autowired
@@ -172,7 +180,7 @@ public class PostJsonController {
 	        // 更新需要修改的屬性
 	        existingPost.setPostTitle(postTitle);
 	        existingPost.setPostContent(postContent);
-
+	        existingPost.setEditTime(new Timestamp(System.currentTimeMillis())); // 設置為當前時間
 	        // 更新分類
 	        if (categoryId != null) {
 	            CategoryEntity category = categoryRepo.findById(categoryId)
@@ -338,30 +346,37 @@ public class PostJsonController {
 	// 刪除單筆貼文
 	@DeleteMapping("DELETE/{postID}")
 	public ResponseEntity<Map<String, Object>> delete(
-	        @RequestHeader("Authorization") String authHeader,
-	        @PathVariable Integer postID) {
+			@RequestHeader(value = "Authorization", required = false) String authHeader,
+		    @PathVariable Integer postID,
+	        HttpSession session) {
 
 	    Map<String, Object> response = new HashMap<>();
+	    // 檢查 session 是否存在 admin
+	    Admin admin = (Admin) session.getAttribute("admin");
 	    
-	    // 檢查授權標頭
-	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-	        response.put("success", false);
-	        response.put("message", "缺少授權標頭或格式錯誤");
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-	    }
+	    // 判斷是否為後台執行
+	    if (admin != null) {
+	        // 無需進行授權檢查，執行刪除操作
+	    } else {
+	        // 進行授權檢查
+	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            response.put("success", false);
+	            response.put("message", "您尚未登入或沒有權限刪除貼文");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	        }
 
-	    // 提取 Token
-	    String token = authHeader.replace("Bearer ", "");
-	    String email = jwtUtil.getEmailFromToken(token);
-	    Member member = memberService.findByEmail(email);
-	    
-	    // 驗證會員是否存在
-	    if (member == null) {
-	        response.put("success", false);
-	        response.put("message", "會員不存在");
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	        // 提取 Token
+	        String token = authHeader.replace("Bearer ", "");
+	        String email = jwtUtil.getEmailFromToken(token);
+	        Member member = memberService.findByEmail(email);
+	        
+	        // 驗證會員是否存在
+	        if (member == null) {
+	            response.put("success", false);
+	            response.put("message", "會員不存在");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	        }
 	    }
-
 	    // 檢查貼文ID是否有效
 	    if (postID == null || postID <= 0) {
 	        response.put("success", false);
@@ -380,10 +395,12 @@ public class PostJsonController {
 	    // 取得 categoryId
 	    Integer categoryId = (post.getPostCategory() != null) ? post.getPostCategory().getCategoryId() : null;
 
-	    // 刪除貼文和相關留言
+	    // 刪除貼文和相關留言和喜歡
 	    try {
 	        List<CommentEntity> comments = commentService.findByPostId(postID);
 	        commentService.deleteAll(comments);
+	        
+	        likesPostService.removeAllLikesByPostId(postID);
 	        Boolean isDeleted = postService.delete(postID);
 
 	        if (isDeleted) {
@@ -432,5 +449,31 @@ public class PostJsonController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	    }
 	}
+	// 更新 viewCount 
+	@PutMapping("/view/{postID}")
+	public ResponseEntity<Map<String, Object>> incrementViewCount(@PathVariable Integer postID) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	        // 查找 post 並更新 viewCount
+	        PostEntity post = postService.findById(postID);
+	        if (post == null) {
+	            response.put("success", false);
+	            response.put("message", "Post not found");
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	        }
+	      
+	        post.setViewCount(post.getViewCount() + 1);
+	        postService.save(post); // 保存更新後的 post
+	        
+	        response.put("success", true);
+	        response.put("message", "View count updated");
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        response.put("success", false);
+	        response.put("message", "Error updating view count");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	    }
+	}
+
 
 }

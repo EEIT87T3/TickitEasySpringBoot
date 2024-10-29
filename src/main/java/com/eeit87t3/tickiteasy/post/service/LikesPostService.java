@@ -22,6 +22,7 @@ public class LikesPostService {
     private LikesPostRepo likesPostRepo;
     @PersistenceContext
     private EntityManager entityManager;
+    
     public LikesEntity toggleLike(Integer memberID, ToggleLikeDTO request) {
         Integer postID = request.getPostID();
         boolean isLiked = request.getIsLiked();
@@ -45,7 +46,9 @@ public class LikesPostService {
             return null;  // 可以根據需要返回其他訊息
         }
     }
-
+    public boolean isLiked(Integer memberID, Integer postID) {
+        return likesPostRepo.existsByMemberIDAndPostID(memberID, postID);
+    }
     // 新增喜歡
     public LikesEntity addLike(Integer memberID, Integer postID) {
         LikesEntity like = new LikesEntity();
@@ -61,7 +64,10 @@ public class LikesPostService {
             likesPostRepo.delete(like);
         }
     }
-
+    // 新增移除該貼文的所有喜歡的方法
+    public void removeAllLikesByPostId(Integer postID) {
+        likesPostRepo.deleteByPostId(postID);
+    }
     // 查詢是否按過喜歡
     public boolean getLikeByMemberAndPost(Integer memberID, Integer postID) {
         String sql = "SELECT COUNT(*) FROM postLikes WHERE memberID = :memberID AND postID = :postID"; 

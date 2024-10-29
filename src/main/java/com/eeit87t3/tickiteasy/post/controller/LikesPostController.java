@@ -3,6 +3,7 @@ package com.eeit87t3.tickiteasy.post.controller;
 import com.eeit87t3.tickiteasy.post.dto.ToggleLikeDTO;
 import com.eeit87t3.tickiteasy.post.entity.LikesEntity;
 import com.eeit87t3.tickiteasy.post.service.LikesPostService;
+import com.eeit87t3.tickiteasy.post.service.PostService;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
@@ -26,6 +27,9 @@ public class LikesPostController {
 
     @Autowired
     private MemberService memberService;
+    
+    @Autowired
+    private PostService postService;
 
     // 新增或移除喜歡
     @PostMapping("/toggle")
@@ -38,7 +42,6 @@ public class LikesPostController {
             String token = authHeader.replace("Bearer ", "");
             String email = jwtUtil.getEmailFromToken(token);
 
-            // 根據電子郵件獲取會員資料
             Member member = memberService.findByEmail(email);
             if (member == null) {
                 response.put("success", false);
@@ -47,17 +50,19 @@ public class LikesPostController {
             }
 
             Integer memberID = member.getMemberID();
-            LikesEntity like = likesPostService.toggleLike(memberID, request);
-
-            if (like != null) {
-                // 返回按讚成功的訊息
+            Integer postID = request.getPostID(); // 從請求中獲取 postID
+            
+            if (likesPostService.isLiked(memberID, postID)) {
+                // 已經按讚，則取消按讚
+                likesPostService.removeLike(memberID, postID);
+                response.put("success", false);
+                response.put("message", "已取消按讚！");
+            } else {
+                // 未按讚，則新增按讚
+                LikesEntity like = likesPostService.addLike(memberID, postID); // 傳入 memberID 和 postID
                 response.put("success", true);
                 response.put("message", "已成功按讚！");
                 response.put("likeID", like.getLikeID());
-            } else {
-                // 返回取消按讚的訊息
-                response.put("success", false);
-                response.put("message", "已取消按讚！");
             }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -100,5 +105,12 @@ public class LikesPostController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+    
+    // 更新 post 的 likesCount
+    @PutMapping("/updateLikesCount/{postID}")
+    public ResponseEntity<String> updateLikesCount(@PathVariable Integer postID, @RequestParam Integer likesCount) {
+        postService.updateLikesCount(postID, likesCount);
+        return ResponseEntity.ok("Likes count updated successfully.");
     }
 }

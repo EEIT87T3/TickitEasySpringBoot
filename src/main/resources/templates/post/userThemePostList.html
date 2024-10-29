@@ -65,6 +65,21 @@
             background-color: #5F46E8;
             border: none;
         }
+
+        .containerList {
+            margin-top: 70px;
+        }
+
+        .active {
+            background-color: #5F46E8 !important;
+        }
+
+        /* .nav-link {
+            color: #5F46E8 !important; 
+        } */
+        .nav-link.active {
+            color: #ffffff !important;
+        }
     </style>
 </head>
 
@@ -72,7 +87,7 @@
     <div th:replace="~{commons/userHeader}"></div>
     <button class="postHomeBtn text-white px-4 py-2 rounded">回首頁</button>
     <div class="containerList">
-        <h4>文章列表</h4>
+        <!-- <h4>討論區</h4> -->
         <nav class="newestpost nav nav-pills flex-column flex-sm-row justify-content-center" id="categoryNav">
             <!-- 動態生成 -->
         </nav>
@@ -81,18 +96,7 @@
                 <span>選擇標籤:</span>
                 <select id="tagId" name="tagId" onchange="fetchPosts()">
                     <option value="" selected>請選擇標籤</option>
-                    <!-- <option value="0">所有主題</option>
-                    <option value="1">音樂</option>
-                    <option value="2">舞蹈</option>
-                    <option value="3">戲劇</option>
-                    <option value="4">音樂劇</option>
-                    <option value="5">親子</option>
-                    <option value="6">講座</option>
-                    <option value="7">展覽</option>
-                    <option value="8">電影</option>
-                    <option value="9">體育</option>
-                    <option value="10">旅遊</option>
-                    <option value="11">其他</option> -->
+
                 </select>
             </form>
 
@@ -377,10 +381,11 @@
                         <span class="theme">${post.categoryName}</span>
                         <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
                         <a href="#" class="post-title">${post.postTitle}</a>
-                        <p>${post.postContent}</p>
+                        <p>${truncateContent(post.postContent, 60)}</p>
                         <div class="article-meta">
                             <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
-                            <span>編輯日期：${new Date(post.editTime).toLocaleString()}</span>
+                            <span>${post.editTime ? `<div>編輯日期：${new Date(post.editTime).toLocaleString()}</div>` : ''}</span>
+                           
                         </div>
                     </div>
                     <div class="meta-right">
@@ -391,8 +396,17 @@
 
                 // 添加 click 事件監聽器
                 articleItem.addEventListener('click', function () {
-                    window.location.href = `/TickitEasy/user/post/${post.postID}`;
+                    axios.put(`/TickitEasy/admin/api/post/view/${post.postID}`)
+                        .then(response => {
+                            if (response.data.success) {
+                                window.location.href = `/TickitEasy/user/post/${post.postID}`; // 成功更新後再跳轉
+                            } else {
+                                console.error("Failed to update view count");
+                            }
+                        })
+                        .catch(error => console.error("Error updating view count:", error));
                 });
+
 
                 container.appendChild(articleItem);
             });
@@ -403,12 +417,21 @@
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('categoryId');
         }
-
+        //預覽字數限制
+        function truncateContent(content, limit) {
+            if (content.length > limit) {
+                return content.slice(0, limit) + '...'; // 超過限制時加上省略號
+            }
+            return content; // 沒有超過限制時直接返回內容
+        }
         // 當頁面加載時獲取所有文章
         document.addEventListener('DOMContentLoaded', () => {
             fetchCategories();
             fetchTag();
         });
+
+
+
     </script>
 
 </body>

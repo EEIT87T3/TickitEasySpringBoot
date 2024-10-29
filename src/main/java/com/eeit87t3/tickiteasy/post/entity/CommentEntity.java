@@ -43,7 +43,9 @@ public class CommentEntity implements java.io.Serializable  {
 	@Column(name = "commentDate")
 	private Timestamp commentDate;
 	
-
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
+	@Column(name = "editTime",nullable = true)
+	private Timestamp editTime;
 
 	@ManyToOne
 	@JoinColumn(name = "postID", insertable = false, updatable = false)
@@ -113,6 +115,14 @@ public class CommentEntity implements java.io.Serializable  {
 	}
 
 	
+	public Timestamp getEditTime() {
+		return editTime;
+	}
+
+	public void setEditTime(Timestamp editTime) {
+		this.editTime = editTime;
+	}
+
 	public CommentEntity() {
 		
 		

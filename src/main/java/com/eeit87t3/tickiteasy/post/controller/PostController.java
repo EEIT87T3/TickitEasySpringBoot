@@ -73,7 +73,7 @@ public class PostController {
 		 return "/post/adminEditPost"; 
 	 }
 	 
-	//新增貼文頁面 *未完成*
+	//新增貼文頁面
 	@GetMapping("/create")
 	    public String showInsertForm() {
 	        return "/post/adminAddPost";  
