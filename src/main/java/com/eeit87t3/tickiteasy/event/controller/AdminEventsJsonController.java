@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +43,17 @@ public class AdminEventsJsonController {
 		return new EventWithTicketTypesDTO(adminEventsService.findById(eventID));
 	}
 	
-	@PostMapping
-	public ResponseEntity<?> create(@ModelAttribute EventsDTO createEventsDTO) {
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> createWithFormData(@ModelAttribute EventsDTO createEventsDTO) {
+		return create(createEventsDTO);
+	}
+	
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createWithJson(@RequestBody EventsDTO createEventsDTO) {
+		return create(createEventsDTO);
+	}
+	
+	private ResponseEntity<?> create(EventsDTO createEventsDTO) {
 		String validateCreateInput = adminEventsService.validateCreateInput(createEventsDTO);
 		if ("輸入正確！".equals(validateCreateInput)) {
 			return new ResponseEntity<EventsEntity>(adminEventsService.create(createEventsDTO), HttpStatus.CREATED);

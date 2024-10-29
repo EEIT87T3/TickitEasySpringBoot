@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.eeit87t3.tickiteasy.event.dto.EventWithTicketTypesDTO;
 import com.eeit87t3.tickiteasy.event.dto.EventsSearchingDTO;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
+import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
+
+import jakarta.transaction.Transactional;
 
 /**
  * @author Chuan(chuan13)
@@ -21,6 +24,8 @@ public class UserEventsService {
 
 	@Autowired
 	private EventsProcessingService eventsProcessingService;
+	@Autowired
+	private TicketTypesProcessingService ticketTypesProcessingService;
 	
 	/**
 	 * 依條件查詢活動。
@@ -55,4 +60,18 @@ public class UserEventsService {
 		return topThreePage.getContent();
 	}
 	
+	/**
+	 * 訂單成立時，改變資料庫內的已購買數量紀錄。
+	 * 
+	 * @param ticketTypeID Integer：票種編號
+	 * @param quantityChange Integer：要新增／減少的數量
+	 * @return
+	 */
+	@Transactional
+	public TicketTypesEntity changeQuantity(Integer ticketTypeID, Integer quantityChange) {
+		TicketTypesEntity ticketTypesEntity = ticketTypesProcessingService.findById(ticketTypeID);
+		ticketTypesEntity.setQuantityPurchased(ticketTypesEntity.getQuantityPurchased() + quantityChange);
+		ticketTypesEntity.getEvent().setQuantityTotalPurchased(ticketTypesEntity.getEvent().getQuantityTotalPurchased() + quantityChange);
+		return ticketTypesEntity;
+	}
 }
