@@ -33,7 +33,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
-@RequestMapping("admin/clientSide")
+@RequestMapping("user/clientSide")
 public class ClientSideOrder {
 	
 	@Autowired

@@ -291,20 +291,45 @@
                 document.querySelector('form').action = window.location.href + "../../../order/ECPay"
             }
             if(document.querySelector(".form-select").value == "linepay"){
+
+                // axios.post("http://localhost:8080/TickitEasy/admin/order/LinePay",
+                //     {
+                //         ticketTypesCartToCheckout,
+                //         checkoutItems,
+                //         totalAmount: totalAmount,
+                //         name: document.querySelector('#name').value,
+                //         email: document.querySelector('#email').value,
+                //         phone: document.querySelector('#phone').value,
+                //         address: document.querySelector('#address').value,
+                //         paymentMethod: document.querySelector('.form-select').value,
+                //         jwtToken: document.querySelector('#jwtToken').value,
+                        
+                //     })
+                // .then(res => {
+                //     console.log(res.data);
+                // })
+                // .catch(err => {
+                //     console.error(err); 
+                // })
                 document.querySelector('form').action = window.location.href + "../../../order/LinePay"
             }
         }
         )
 
-        document.querySelector('#takeeasy').addEventListener('click', function (e) { //一件輸入按鈕
-            console.log(document.querySelector(".form-select").value);
-            
+        document.querySelector('#takeeasy').addEventListener('click', function (e) { //一件輸入按鈕            
 
+            console.log(checkoutItems);
+            console.log(checkoutItemsJson);
+            console.log(ticketTypesCartToCheckout);
+            console.log(ticketTypesCartToCheckoutJson);
+            
             document.querySelector('#name').value = '王小明';
             document.querySelector('#email').value = 'sososo8819@gmail.com';
             document.querySelector('#phone').value = '0987654321';
             document.querySelector('#address').value = '桃園市中壢區中大路300號';
         })
+
+        
 
     </script>
     <div th:replace="~{commons/userFooter}"></div>
