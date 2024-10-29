@@ -569,6 +569,12 @@ public class PostJsonController {
 	    }
 
 	}
+	@GetMapping("/reports")
+	public ResponseEntity<List<ReportEntity>> getAllReports() {
+	    List<ReportEntity> reports = reportService.findAllReports(); // 你的服務方法來查詢所有檢舉
+	    return ResponseEntity.ok(reports);
+	}
+
 
 
 

@@ -45,6 +45,40 @@
             background-color: #5F46E8;
             border: none;
         }
+         /* 彈窗樣式 */
+         .modal {
+            display: none; /* 初始為隱藏 */
+            position: fixed; /* 固定在螢幕上 */
+            z-index: 1000; /* 確保在最上層 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 全寬 */
+            height: 100%; /* 全高 */
+            background-color: rgba(0, 0, 0, 0.5); /* 背景顏色 */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 在頁面中間 */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px; /* 寬度 */
+            border-radius: 5px; /* 邊角圓滑 */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
