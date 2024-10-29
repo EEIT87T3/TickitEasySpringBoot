@@ -17,6 +17,7 @@
     <!-- 引入 Bootstrap 和其他樣式 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/TickitEasy/cwdfunding/css/indexCard.css" />
 
     <style>
         body {
@@ -214,32 +215,36 @@
         <h2 class="section-title">募資專案</h2>
         <div class="row mt-4">
             <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="募資圖片">
+                <div class="card custom-letter-spacing">
+                    <img th:src="@{/images/cwdfunding/music_journey.jpg}"
+                    class="card-img-top" alt="募資圖片">
                     <div class="card-body">
-                        <h5 class="card-title">創新科技</h5>
-                        <p class="card-text">支持最新的科技發展，成為未來的一部分！</p>
-                        <a href="#" class="btn btn-main-bright-orange">支持專案</a>
+                        <h5 class="card-title fw-semibold custom-title-text">《音樂之旅》專輯製作</h5>
+                        <p class="card-text d-inline-block text-truncate" style="max-width: 300px;">邀請大家一起回顧經典電影，每周一次，帶你重溫影史上不朽的作品。</p>
+                        <a th:href="@{/fundprojects/6}" class="btn btn-main-bright-orange">支持專案</a>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="募資圖片">
+                <div class="card custom-letter-spacing">
+                    <img th:src="@{/images/cwdfunding/time_moment.jpg}"
+                    class="card-img-top" alt="募資圖片">
                     <div class="card-body">
-                        <h5 class="card-title">環保計畫</h5>
-                        <p class="card-text">為地球盡一份心力，支持環保募資計畫。</p>
-                        <a href="#" class="btn btn-main-bright-orange">支持專案</a>
+                        <h5 class="card-title fw-semibold custom-title-text">《時光的印記》攝影展
+                        </h5>
+                        <p class="card-text d-inline-block text-truncate" style="max-width: 300px;">《時光的印記》攝影展展出捕捉瞬間的藝術作品，記錄時間流逝中的美好景象，帶給觀眾深刻的視覺體驗。</p>
+                        <a th:href="@{/fundprojects/8}" class="btn btn-main-bright-orange">支持專案</a>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="募資圖片">
+                <div class="card custom-letter-spacing">
+                    <img th:src="@{/images/cwdfunding/9e46e499-5702-495e-9485-41eee9d6d560.jpg}"
+                    class="card-img-top" alt="募資圖片">
                     <div class="card-body">
-                        <h5 class="card-title">藝術創作</h5>
-                        <p class="card-text">幫助新銳藝術家創作更多精彩作品。</p>
-                        <a href="#" class="btn btn-main-bright-orange">支持專案</a>
+                        <h5 class="card-title fw-semibold custom-title-text">未來藝術展覽</h5>
+                        <p class="card-text d-inline-block text-truncate" style="max-width: 300px;">「未來藝術展覽」匯集了最新的科技藝術作品，展示前沿藝術與科技的完美結合，邀請了多位知名藝術家共同參展。</p>
+                        <a th:href="@{/fundprojects/3}" class="btn btn-main-bright-orange">支持專案</a>
                     </div>
                 </div>
             </div>
