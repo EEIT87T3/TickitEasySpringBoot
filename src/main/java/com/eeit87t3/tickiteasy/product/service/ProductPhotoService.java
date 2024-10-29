@@ -24,6 +24,37 @@ public class ProductPhotoService {
 	@Autowired
     private ImageUtil imageUtil;
 	
+	// 新增圖片
+    public ProductPhotoEntity createProductPhoto(MultipartFile imageFile, ProductEntity product) throws IOException {
+        String baseName = UUID.randomUUID().toString();
+        String fileName = imageUtil.saveImage(ImageDirectory.PRODUCT, imageFile, baseName);
+        
+        ProductPhotoEntity productPhoto = new ProductPhotoEntity();
+        productPhoto.setFileName(fileName);
+        productPhoto.setProduct(product);
+        
+        return productPhotoRepo.save(productPhoto);
+    }
+
+    // 修改圖片
+    public ProductPhotoEntity editProductPhoto(Integer photoID, MultipartFile newImageFile) throws IOException {
+        Optional<ProductPhotoEntity> optionalPhoto = productPhotoRepo.findById(photoID);
+        if (optionalPhoto.isPresent()) {
+            ProductPhotoEntity productPhoto = optionalPhoto.get();
+            
+            // 刪除舊圖片
+            imageUtil.deleteImage(productPhoto.getFileName());
+            
+            // 儲存新圖片
+            String baseName = UUID.randomUUID().toString();
+            String newFileName = imageUtil.saveImage(ImageDirectory.PRODUCT, newImageFile, baseName);
+            
+            productPhoto.setFileName(newFileName);
+            return productPhotoRepo.save(productPhoto);
+        }
+        return null; // 或者拋出異常
+    }
+	
     
     // 刪除圖片
     public void deleteProductPhoto(Integer photoID) throws IOException {

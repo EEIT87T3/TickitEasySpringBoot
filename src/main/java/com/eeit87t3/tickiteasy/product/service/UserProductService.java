@@ -1,5 +1,6 @@
 package com.eeit87t3.tickiteasy.product.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import com.eeit87t3.tickiteasy.product.dto.ProductDTO;
 import com.eeit87t3.tickiteasy.product.entity.ProductCartItemEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductPhotoEntity;
+import com.eeit87t3.tickiteasy.product.repository.ProdFavoritesRepo;
 import com.eeit87t3.tickiteasy.product.repository.ProductPhotoRepo;
 import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
 
@@ -27,6 +29,11 @@ public class UserProductService {
 	
 	@Autowired
 	private ProductPhotoRepo productPhotoRepo;
+	
+	@Autowired
+	private ProdFavoritesRepo prodFavoritesRepo;
+	
+	
 	
 	 //前台首頁查詢商品頁面
     public Page<ProductEntity> findProductsByFilter(Integer categoryId, Integer minPrice, Integer maxPrice,
@@ -85,8 +92,33 @@ public class UserProductService {
         dto.setTagId(entity.getProductTag() != null ? entity.getProductTag().getTagId() : null);
         dto.setProductPic(entity.getProductPic());
         // 注意：詳細圖片在這裡不設置，而是在 findProductById 方法中設置
+        
+        dto.setStatus(entity.getStatus());
         return dto;
     }
+    
+    // 查詢推薦商品
+    @Transactional
+    public List<ProductDTO> findRecommendedProducts(Integer productID) {
+        // 先取得當前商品以獲取其tagId
+        Optional<ProductEntity> currentProduct = productRepo.findById(productID);
+        
+        if (currentProduct.isPresent() && currentProduct.get().getProductTag() != null) {
+            Integer tagId = currentProduct.get().getProductTag().getTagId();
+            
+            // 查詢推薦商品
+            List<ProductEntity> recommendedProducts = productRepo
+                .findRecommendedProductsByTag(tagId, productID);
+            
+            // 轉換為DTO
+            return recommendedProducts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        }
+        
+        return new ArrayList<>();
+    }
+    
 	
     //加入購物車
     public ProductCartItemEntity addToCart(Integer productID, Integer quantity) {
@@ -113,5 +145,7 @@ public class UserProductService {
         cartItem.setQuantity(newQuantity);
         return cartItem;
     }
+    
+    
 
 }

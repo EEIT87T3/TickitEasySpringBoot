@@ -22,8 +22,6 @@ import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.product.dto.ProductDTO;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
-import com.eeit87t3.tickiteasy.product.entity.ProductPhotoEntity;
-import com.eeit87t3.tickiteasy.product.repository.ProductPhotoRepo;
 import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
 
 @Service
@@ -41,6 +39,9 @@ public class ProductService {
     @Autowired
     private TagService tagService;
     
+    @Autowired
+    private ProdEmailService prodEmailService;
+    
     public List<CategoryEntity> getProductCategories() {
         return categoryService.findProductCategoryList();
     }
@@ -56,6 +57,9 @@ public class ProductService {
         if (optionalProduct.isPresent()) {
             ProductEntity product = optionalProduct.get();
             
+            // 記錄商品原始狀態
+            int oldStatus = product.getStatus();
+            
             switch (updatedProduct.getStatus()) {
                 case 0:
                     product.setStatus(0); // 下架
@@ -70,7 +74,15 @@ public class ProductService {
                     throw new IllegalArgumentException("無效的狀態值。狀態必須是 0（下架）、1（上架）或 2（補貨中）");
             }
             
-            return productRepo.save(product);
+         // 儲存更新
+            ProductEntity savedProduct = productRepo.save(product);
+            
+            // 如果狀態從2(補貨中)改為1(上架)，發送補貨通知
+            if (oldStatus == 2 && updatedProduct.getStatus() == 1) {
+            	prodEmailService.sendRestockNotification(product);
+            }
+            
+            return savedProduct;
         } else {
             throw new RuntimeException("找不到ID為 " + productID + " 的商品");
         }

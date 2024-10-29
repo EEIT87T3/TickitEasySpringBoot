@@ -1,15 +1,23 @@
 package com.eeit87t3.tickiteasy.member.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@Controller
-@RequestMapping("/TickitEasy")
-public class HomeController {
+import com.eeit87t3.tickiteasy.event.service.UserEventsService;
 
-    @GetMapping("/")
-    public String showHomePage() {
-        return "index";  // 臨時的首頁
+@Controller
+@RequestMapping
+public class HomeController {
+	
+	@Autowired
+	private UserEventsService userEventsService;
+
+    @GetMapping
+    public String showHomePage(Model model) {
+    	model.addAttribute("topEvents", userEventsService.findTopThree());
+        return "index";
     }
 }

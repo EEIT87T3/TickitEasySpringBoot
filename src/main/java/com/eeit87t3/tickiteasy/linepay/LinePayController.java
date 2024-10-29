@@ -1,5 +1,7 @@
 package com.eeit87t3.tickiteasy.linepay;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +11,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
+import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
+import com.eeit87t3.tickiteasy.cwdfunding.testemail.TestEmailService;
+import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Controller
@@ -23,6 +31,14 @@ public class LinePayController {
 	@Autowired
 	private FundOrderService fundOrderService;
 	
+	@Autowired
+	private FundProjService fundProjService;
+	
+	@Autowired
+	private MemberService memberService;
+	
+	@Autowired
+	private TestEmailService testEmailService;
 	
 	@ResponseBody
 	@PostMapping("api/linepay/request")
@@ -34,15 +50,28 @@ public class LinePayController {
 		// root: 請求無論成功失敗，linepay request api都會回傳response body
         JsonNode root = linePayService.requestAPI(paymentDataFull);
 
-        if (root != null && root.has("info")) {
-            //在這邊跟資料庫互動
+        /*寄信邏輯變數初始化*/
+        Integer projectID = Integer.parseInt(paymentData.get("projectID").toString());
+        		
+        
+        if ("0000".equals(root.get("returnCode").asText())) {
+            // 在這邊跟資料庫互動
         	fundOrderService.saveFundOrder(paymentData, paymentDataFull);
+        	boolean isReached = testEmailService.isReached(projectID); // 達目標金額
+        	// 寄募資成功信
+        	if (isReached) {
+				List<String> donatedMembersEmail = testEmailService.findDonatedMembersEmail(projectID);
+				for (String email : donatedMembersEmail) {
+					testEmailService.sendDonateSuccessEmail(email);
+				}
+			}
         	return ResponseEntity.ok(root);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(root);
         }
     }
 	
+
 	// line pay畫面，付款失敗會導向至這裡
 	@GetMapping("/test/linepay/requestNO")
 	public String linepayReqReject() {

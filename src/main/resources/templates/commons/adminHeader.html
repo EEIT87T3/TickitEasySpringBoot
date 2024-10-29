@@ -43,6 +43,9 @@
                         <li>
                             <a th:href="@{/admin/member/analytics}" class="sidebar-link"><i class="fas fa-chart-line"></i> 會員統計分析</a>
                         </li>
+                        <li>
+					        <a class="sidebar-link" th:href="@{/admin/customer-service}"><i class="fas fa-headset"></i> 線上客服</a>
+					    </li>
                     </ul>
                 </li>
                 <li>
@@ -83,10 +86,13 @@
                         class="sidebar-link dropdown-toggle"><i class="fas fa-hand-holding-usd"></i> 募資活動管理</a>
                     <ul class="collapse list-unstyled submenu" id="cwdfundingSubmenu">
                         <li>
+                            <a href="/TickitEasy/admin/fundproject/create" class="sidebar-link"><i class="fas fa-calendar-plus"></i> 新增募資活動</a>
+                        </li>
+                        <li>
                             <a href="/TickitEasy/admin/fundproject" class="sidebar-link"><i class="fas fa-calendar-day"></i> 募資活動列表</a>
                         </li>
                         <li>
-                            <a href="/TickitEasy/admin/fundproject/create" class="sidebar-link"><i class="fas fa-calendar-plus"></i> 新增募資活動</a>
+                            <a href="/TickitEasy/admin/fundproject/order" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 募資訂單列表</a>
                         </li>
                     </ul>
                 </li>
@@ -101,7 +107,7 @@
                     </ul>
                 </li>
 				<li>
-                    <a href="#" class="sidebar-link">前台首頁</a>
+                    <a th:href="@{/}" class="sidebar-link">前台首頁</a>
                 </li>
             </ul>
         </nav>

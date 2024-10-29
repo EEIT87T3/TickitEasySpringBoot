@@ -25,8 +25,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlanDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
+import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundPlanService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
@@ -42,6 +44,9 @@ public class AdminFundProjAPIController {
 	
 	@Autowired
 	private FundPlanService planService;
+	
+	@Autowired
+	private FundOrderService orderService;
 
 	@Autowired
 	private ImageUtil imageUtil;
@@ -61,6 +66,15 @@ public class AdminFundProjAPIController {
 	@GetMapping("/api/fundproject/{projectID}")
 	public FundProjDTO findByID(@PathVariable Integer projectID) {
 		return projService.findFundProjDTOById(projectID);
+	}
+	
+	/* [API] 查詢所有募資訂單 */
+	@ResponseBody
+	@GetMapping("/api/fundprojectOrder")
+	public Page<FundOrder> findOrderByPageApi(@RequestParam Integer pageNumber) {
+		Integer pageSize = 10;
+		Page<FundOrder> page = orderService.findFundOrderByPage(pageNumber,pageSize);
+		return page;
 	}
 
 	/* [API] 刪除募資活動by ID */

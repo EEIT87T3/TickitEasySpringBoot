@@ -69,9 +69,13 @@ $(document).ready(async function () {
   }
 
   const linePayButton = document.getElementById("linePayButton");
-  linePayButton.addEventListener("click", function (e) {
+  linePayButton.addEventListener("click", async function (e) {
     e.preventDefault();
-    requestLinePay();
+    try {
+      await Promise.all([requestLinePay(), sendEmail()]);
+    } catch (error) {
+      console.error("錯誤:", error);
+    }
   });
 
   //一鍵填入btn
@@ -88,9 +92,10 @@ $(document).ready(async function () {
       document.getElementById("addressDetail").value = "新生路二段 421 號";
     });
 
-  function requestLinePay() {
-    axios
-      .post("http://localhost:8080/TickitEasy/api/linepay/request", {
+  async function requestLinePay() {
+    const response = await axios.post(
+      "http://localhost:8080/TickitEasy/api/linepay/request",
+      {
         memberID: memberID,
         projectID: projectID,
         planID: planID,
@@ -122,22 +127,23 @@ $(document).ready(async function () {
             ],
           },
         ],
-      })
-      .then(function (response) {
-        const transactionId = response.data.info.transactionId;
-        const paymentUrl = response.data.info.paymentUrl.web;
-        console.log(response.data);
-        console.log("TransactionID:", transactionId);
-        console.log("paymentUrl", paymentUrl);
-        // 將 transactionId 附加到 confirmUrl 中
-        window.location.href = paymentUrl;
-        // return axios.post(
-        //   `http://localhost:8080/TickitEasy/api/linepay/confirm/${transactionID}`
-        // )
-      });
-    //   .then(function (response) {
-    //     const paymentConfirm = response.data;
-    //     console.log(paymentConfirm);
-    //   });
+      }
+    );
+    const paymentUrl = response.data.info.paymentUrl.web;
+    console.log("TransactionID:", response.data.info.transactionId);
+    console.log("paymentUrl", paymentUrl);
+
+    // 確保sendEmail執行完成後再跳轉
+    window.location.href = paymentUrl;
+  }
+
+  async function sendEmail() {
+    const response = await axios.post(
+      "/TickitEasy/member/api/fundproject/email",
+      {
+        projectID: projectID,
+      }
+    );
+    console.log("email回應資訊", response.data);
   }
 });
