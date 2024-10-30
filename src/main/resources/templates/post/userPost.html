@@ -141,7 +141,7 @@
         let currentUserID;
 
         //從url讀取postID
-        const postID = window.location.pathname.split("/")[4];
+        const postID = window.location.pathname.split("/")[3];
 
         //////////////////////////////////////////////////
         // 根據ID取得單一貼文
@@ -152,7 +152,7 @@
                     //確定獲取post再設置按鈕
                     $('.postListBtn').on('click', function () {
 
-                        window.location.href = `/TickitEasy/user/post/PostList?categoryId=${post.postCategory.categoryId}`;
+                        window.location.href = `/TickitEasy/post/PostList?categoryId=${post.postCategory.categoryId}`;
                     });
                     //圖片
                     const postImagesHTML = (post.images || []).map(image => `
@@ -202,7 +202,7 @@
                 }).then(response => {
                     const categoryId = response.data.categoryId;
                     alert('貼文已刪除');
-                    window.location.href = `/TickitEasy/user/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
+                    window.location.href = `/TickitEasy/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
                 })
                     .catch(error => {
                         console.error('Error deleting post:', error);
@@ -221,7 +221,7 @@
                 // 確保獲取成功後再進行跳轉
                 if (response.status === 200) {
                     // 可以在這裡進行其他操作，像是儲存狀態等等
-                    window.location.href = `/TickitEasy/user/post/${postID}/useredit`;
+                    window.location.href = `/TickitEasy/post/${postID}/useredit`;
                 } else {
                     console.error('Failed to load post data:', response.status);
                 }
@@ -484,7 +484,7 @@
         }
 
         function initializeLikesCount() {
-            const postID = window.location.pathname.split("/")[4]; // 獲取postID
+            const postID = window.location.pathname.split("/")[3]; // 獲取postID
 
             // 查詢按讚數
             axios.get(`/TickitEasy/admin/api/post/likes/count/${postID}`)

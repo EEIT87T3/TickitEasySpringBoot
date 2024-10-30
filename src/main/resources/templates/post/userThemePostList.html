@@ -10,6 +10,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <link rel="stylesheet" href="/TickitEasy/post/css/list.css">
 
     <style>
@@ -156,7 +157,7 @@
     <script>
         $('.postHomeBtn').on('click', function () {
 
-            window.location.href = `/TickitEasy/user/post/HomePage`;
+            window.location.href = `/TickitEasy/post/HomePage`;
         });
         let currentPostPage = 0; // 當前頁面
         // const pageSize = 6; // 每頁顯示的文章數量
@@ -229,6 +230,7 @@
 
             axios.get(url)
                 .then(response => {
+
                     const posts = response.data.content; // 獲取文章內容數組
                     updateArticleList(posts); // 更新文章列表
                     updatePagination(response.data); // 更新分頁信息
@@ -354,27 +356,33 @@
 
         // 更新文章列表的函數
         function updateArticleList(posts) {
-    const container = document.getElementById('articleList');
-    container.innerHTML = '';
+            const container = document.getElementById('articleList');
+            container.innerHTML = '';
 
-    if (posts.length === 0) {
-        container.innerHTML = `<div class="article-item"><h2>查無文章</h2></div>`;
-        return;
-    }
+            if (posts.length === 0) {
+                container.innerHTML = `<div class="article-item"><h2>查無文章</h2></div>`;
+                return;
+            }
 
-    posts.forEach(post => {
-        const articleItem = document.createElement('div');
-        articleItem.classList.add('article-item');
-        
-        // <span class="theme">${post.categoryName}</span>
-        //先建立結構再抓圖
-        articleItem.innerHTML = `
+            posts.forEach(post => {
+                const articleItem = document.createElement('div');
+                articleItem.classList.add('article-item');
+                //DOMPurify過濾html標籤
+                const sanitizeContent = DOMPurify.sanitize(post.postContent, {
+                    ALLOWED_TAGS: [], // 空陣列表示不允許任何標籤，保留純文本
+                    ALLOWED_ATTR: []  // 空陣列表示不允許任何屬性
+                });
+                console.log(' sanitizeContent' + sanitizeContent)
+                // <span class="theme">${post.categoryName}</span>
+                //先建立結構再抓圖
+                articleItem.innerHTML = `
             <img class="postImg" src="http://localhost:8080/TickitEasy/images/event/EventPicDefault.png" alt="文章縮略圖">
             <div>
                 
                 <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
                 <a href="#" class="post-title">${post.postTitle}</a>
-                <p>${truncateContent(post.postContent, 60)}</p>
+                
+                <p>${truncateContent(sanitizeContent, 60)}</p>
                 <div class="article-meta">
                     <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
                     <span>${post.editTime ? `<div>編輯日期：${new Date(post.editTime).toLocaleString()}</div>` : ''}</span>
@@ -386,34 +394,34 @@
             </div>
         `;
 
-        // 獲取圖片路徑並更新
-        axios.get(`/TickitEasy/admin/api/post/images/show/${post.postID}`)
-            .then(response => {
-                const data = response.data;
-                if (data.success && data.images.length > 0) {
-                    const firstImagePath = `http://localhost:8080/TickitEasy${data.images[0]}`;
-                    const imgElement = articleItem.querySelector('.postImg');
-                    imgElement.src = `${firstImagePath}`;
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                // 獲取圖片路徑並更新
+                axios.get(`/TickitEasy/admin/api/post/images/show/${post.postID}`)
+                    .then(response => {
+                        const data = response.data;
+                        if (data.success && data.images.length > 0) {
+                            const firstImagePath = `http://localhost:8080/TickitEasy${data.images[0]}`;
+                            const imgElement = articleItem.querySelector('.postImg');
+                            imgElement.src = `${firstImagePath}`;
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
 
-        // 添加點擊事件
-        articleItem.addEventListener('click', function () {
-            axios.put(`/TickitEasy/admin/api/post/view/${post.postID}`)
-                .then(response => {
-                    if (response.data.success) {
-                        window.location.href = `/TickitEasy/user/post/${post.postID}`;
-                    } else {
-                        console.error("Failed to update view count");
-                    }
-                })
-                .catch(error => console.error("Error updating view count:", error));
-        });
+                // 添加點擊事件
+                articleItem.addEventListener('click', function () {
+                    axios.put(`/TickitEasy/admin/api/post/view/${post.postID}`)
+                        .then(response => {
+                            if (response.data.success) {
+                                window.location.href = `/TickitEasy/post/${post.postID}`;
+                            } else {
+                                console.error("Failed to update view count");
+                            }
+                        })
+                        .catch(error => console.error("Error updating view count:", error));
+                });
 
-        container.appendChild(articleItem);
-    });
-}
+                container.appendChild(articleItem);
+            });
+        }
 
         // 頁面加載時獲取 categoryId
         function getCategoryIdFromUrl() {

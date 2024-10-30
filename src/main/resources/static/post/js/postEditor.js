@@ -56,7 +56,7 @@
         }
     });
 
-    const postID = window.location.pathname.split("/")[4];
+    const postID = window.location.pathname.split("/")[3];
 
     console.log("Post ID:", postID); // 調試用
     // 動態填充分類和標籤選項
@@ -82,7 +82,7 @@
          if (currentUrl.includes("/admin/")) {  
              window.location.href = `/TickitEasy/admin/post`; 
          } else { 
-            window.location.href = `/TickitEasy/user/post/PostList`;
+            window.location.href = `/TickitEasy/post/PostList`;
          }
         
     });
@@ -93,7 +93,9 @@
             const response = await axios.get(`/TickitEasy/admin/api/post/GET/${postID}`);
             const post = response.data;
             document.getElementById('postTitle').value = post.postTitle;
-            document.getElementById('postContent').value = post.postContent;
+            // document.getElementById('postContent').value = post.postContent;
+              // 使用 Summernote 的方法設置編輯器內容
+            $('#postContent').summernote('code', post.postContent); // 這一行已修改
             document.getElementById('fullPostCategory').value = post.postCategory.categoryId;
             document.getElementById('fullPostTag').value = post.postTag.tagId;
 
@@ -118,8 +120,13 @@
     // 更新貼文
     async function updatePost() {
         console.log("updatePost called")
+         // 禁用按鈕，避免重複點擊
+        const button = document.getElementById("saveButton");
+        button.disabled = true;
         const title = document.getElementById("postTitle").value;
-        const content = document.getElementById("postContent").value;
+        // const content = document.getElementById("postContent").value;
+        // 改用 Summernote 的方法獲取內容
+        const content = $('#postContent').summernote('code'); // 這一行已修改
         const category = document.getElementById("fullPostCategory").value;
         const tag = document.getElementById("fullPostTag").value;
 
@@ -148,10 +155,10 @@
                 if (currentUrl.includes("/admin/")) {  
                     window.location.href = `/TickitEasy/admin/post/${postID}`; 
                 } else { 
-                    window.location.href = `/TickitEasy/user/post/${postID}`;
+                    window.location.href = `/TickitEasy/post/${postID}`;
                 }
-                
-            }, 1000); // 1秒後跳轉
+                button.disabled = false;
+            }, 100); 
         } catch (error) {
             if (error.response) {
                 document.getElementById("updateResult").innerText = `Failed to update post: ${error.response.status}`;

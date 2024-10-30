@@ -107,6 +107,31 @@ public class PostJsonController {
 
 	@Autowired
 	private PostImageService postImageService;
+//	private ResponseEntity<Map<String, Object>> validateAuthorization(String authHeader) {
+//	    Map<String, Object> response = new HashMap<>();
+//	    
+//	    // 檢查授權標頭
+//	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+//	        response.put("success", false);
+//	        response.put("message", "缺少授權標頭或格式錯誤");
+//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+//	    }
+//	    
+//	    // 從 Authorization Header 中提取 Token
+//	    String token = authHeader.replace("Bearer ", "");
+//	    String email = jwtUtil.getEmailFromToken(token);
+//	    
+//	    // 根據電子郵件獲取會員資料
+//	    Member member = memberService.findByEmail(email);
+//	    
+//	    if (member == null) {
+//	        response.put("success", false);
+//	        response.put("message", "無效的使用者");
+//	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+//	    }
+//	    
+//	    return null; // 表示授權成功
+//	}
 
 	// 取得所有貼文
 	// 改用DTO獲取必要資料

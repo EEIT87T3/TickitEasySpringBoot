@@ -26,7 +26,7 @@ $('.postList').on('click', function () {
   if (currentUrl.includes("/admin/")) {
     window.location.href = `/TickitEasy/admin/post`;
   } else {
-    window.location.href = `/TickitEasy/user/post/PostList`;
+    window.location.href = `/TickitEasy/post/PostList`;
   }
 });
 
@@ -100,7 +100,11 @@ $('#fullCreatePostForm').on('submit', function (event) {
   event.preventDefault();
   const memberID =currentUserID;
   const formData = new FormData();
-
+  const button = event.target;
+    button.disabled = true;
+    console.log('按鈕禁用')
+    
+   
   console.log($('#fullPostCategory').val());
 
   // 使用formData取代json傳遞資料
@@ -126,11 +130,15 @@ $('#fullCreatePostForm').on('submit', function (event) {
       if (response.data && response.data.postID) {  // 確認回應包含 postID
         const postID = response.data.postID;  // 抓取生成的 postID
         alert("貼文新增成功！");
+        setTimeout(() => {
+          // 上傳完成後再重新啟用按鈕
+          button.disabled = false; console.log('按鈕啟用')
+        }, 100);
         const currentUrl = window.location.href;
         if (currentUrl.includes("/admin/")) {
           window.location.href = `/TickitEasy/admin/post/${postID}`;
         } else {
-          window.location.href = `/TickitEasy/user/post/${postID}`;
+          window.location.href = `/TickitEasy/post/${postID}`;
         }
 
       } else {
