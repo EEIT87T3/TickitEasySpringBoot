@@ -202,22 +202,24 @@ $(document).ready(function () {
   // 一鍵輸入：募資活動頁面
   const now = new Date();
 
-  const month = now.getMonth() + 1; // 月份是从0开始的，所以要加1
-  const day = now.getDate();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
+  const month = String(now.getMonth() + 1).padStart(2, "0"); // 月份補0
+  const day = String(now.getDate()).padStart(2, "0"); // 日期補0
+  const hours = String(now.getHours()).padStart(2, "0"); // 小時補0
+  const minutes = String(now.getMinutes()).padStart(2, "0"); // 分鐘補0
+  const seconds = String(now.getSeconds()).padStart(2, "0"); // 秒數補0
   const titleWithTime = `test${month}${day}${hours}${minutes}${seconds}`;
+  const demoTitle = `環保藝術市集${hours}${minutes}`;
   document
     .getElementById("autofillBtnProj")
     .addEventListener("click", function (e) {
       e.preventDefault();
-      document.getElementById("title").value = titleWithTime;
-      document.getElementById("categoryId").value = "6";
-      document.getElementById("tagId").value = "4";
+      document.getElementById("title").value = demoTitle;
+      document.getElementById("categoryId").value = "2";
+      document.getElementById("tagId").value = "8";
       document.getElementById("targetAmount").value = "50000";
       document.getElementById("currentAmount").value = "0";
-      document.getElementById("description").value = "test測試測試";
+      document.getElementById("description").value =
+        "「環保藝術市集」是一個集結綠色創意與環保理念的市集活動，展示循環再利用藝術作品及環保設計。";
       document.getElementById("startDate").value = "2024-06-13T01:00";
       document.getElementById("endDate").value = "2024-11-08T16:30";
       // document.getElementById("image").src =
@@ -228,11 +230,12 @@ $(document).ready(function () {
     .getElementById("autofillBtnPlan")
     .addEventListener("click", function (e) {
       e.preventDefault();
-      document.getElementById("planTitles").value = "planAA";
-      document.getElementById("planUnitPrices").value = "1000";
+      document.getElementById("planTitles").value = "環保帆布袋組合";
+      document.getElementById("planUnitPrices").value = "300";
       document.getElementById("planTotalAmounts").value = "200";
       document.getElementById("planBuyAmounts").value = "0";
-      document.getElementById("planContents").value = "test內容";
+      document.getElementById("planContents").value =
+        "環保藝術市集限定帆布袋一個，採用回收材質製成，且印有獨家設計圖案。";
     });
   // 監聽送出按鈕
   submitBtn.addEventListener("click", function () {
