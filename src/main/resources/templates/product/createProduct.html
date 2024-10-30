@@ -7,6 +7,9 @@
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
   /* 隐藏 PQINA 链接 */
   .filepond--credits {
@@ -128,7 +131,7 @@
                 <button type="button" class="btn btn-secondary me-2"
                     onclick="location.href='/TickitEasy/admin/product'">返回商品列表</button>
                 <button type="button" id="autofillBtn" class="btn btn-warning">
-    				一鍵填入
+    				一鍵輸入
 				</button>
             </div>
         </form>
@@ -192,7 +195,14 @@
                         return Promise.all(uploadPromises);
                     })
                     .then(() => {
-                        alert('商品新增成功！');
+                        // 使用 SweetAlert2 提示成功
+            Swal.fire({
+                position: 'center',
+                icon: "success",
+                title: "商品新增成功",
+                showConfirmButton: false,
+                timer: 1500
+            });
                         // 重置表單
                         addProductForm.reset();
                         pond.removeFiles();
@@ -231,6 +241,8 @@
 			document.getElementById("autofillBtn").addEventListener("click", function () {
 				document.getElementsByName("productName")[0].value = "你的名字";
 				document.getElementsByName("productDesc")[0].value = "你的名字電影周邊商品";
+				document.getElementsByName("categoryId")[0].value = "3";
+				document.getElementsByName("tagId")[0].value = "5";
 				document.getElementsByName("price")[0].value = "200";
 				document.getElementsByName("stock")[0].value = "100";
 			});

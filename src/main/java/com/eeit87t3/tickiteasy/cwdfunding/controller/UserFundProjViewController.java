@@ -75,16 +75,21 @@ public class UserFundProjViewController {
 		return "cwdfunding/cust_payPage";
 	}
 	
-	@GetMapping("/fundorderlist")
+	@GetMapping("/user/fundorderlist")
 	public String fundOrderList(Model model) {
 		return "cwdfunding/cust_fundOrderList";
 	}
 	
-	@GetMapping("/fundOrderDetail/{tickitID}")
+	@GetMapping("/user/fundOrderDetail/{tickitID}")
 	public String fundOrderDetail(@PathVariable String tickitID, Model model) {
 		FundOrder fundOrder = orderService.findFundOrderByTickitID(tickitID);
 		model.addAttribute("order",fundOrder);
 		return "cwdfunding/cust_fundOrderDetail";
 	}
 	
+	
+	@GetMapping("/user/fundproject/follow")
+	public String fundProjFollow() {
+		return "cwdfunding/cust_fundProjFollow";
+	}
 }

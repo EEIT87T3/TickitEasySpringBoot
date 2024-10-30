@@ -302,8 +302,22 @@ public class MemberService {
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
             String profilePicPath = member.getProfilePicPath();
-            return imageUtil.getImageByteArray(profilePicPath);
+            logger.info("嘗試讀取頭像路徑: {}", profilePicPath); // 添加日誌
+            
+            try {
+                byte[] imageBytes = imageUtil.getImageByteArray(profilePicPath);
+                if (imageBytes != null && imageBytes.length > 0) {
+                    logger.info("成功讀取到頭像，大小: {} bytes", imageBytes.length);
+                    return imageBytes;
+                }
+                logger.warn("頭像數據為空或長度為0");
+            } catch (IOException e) {
+                logger.error("讀取頭像失敗: {}", e.getMessage());
+            }
         }
+        
+        // 返回預設頭像
+        logger.info("返回預設頭像");
         return imageUtil.getImageByteArray("/images/member/default-avatar.png");
     }
     

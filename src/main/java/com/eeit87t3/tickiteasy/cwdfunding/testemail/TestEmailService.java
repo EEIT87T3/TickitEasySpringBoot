@@ -80,21 +80,6 @@ public class TestEmailService {
 			
 	   }
 	   
-		/* 判斷是否達到目標金額 */
-	   public boolean isReached(Integer projectID) {
-		   
-			FundProj fundProj = fundProjService.findFundProjById(projectID);
-			Integer currentAmount =Integer.parseInt(fundProj.getCurrentAmount());
-			Integer targetAmount= Integer.parseInt(fundProj.getTargetAmount());
-			System.out.println("目前金額"+currentAmount);
-			System.out.println("目標金額"+targetAmount);
-			if ( currentAmount >= targetAmount) {
-				System.out.println("已達目標金額");
-				return true;
-			} else {
-				System.out.println("未達目標金額");
-				return false;
-			}
-	   }
+
 	   
 }
