@@ -2,9 +2,11 @@ package com.eeit87t3.tickiteasy.cwdfunding.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
@@ -19,6 +22,7 @@ import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundOrderRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
+import com.eeit87t3.tickiteasy.cwdfunding.testemail.TestEmailService;
 
 @Service
 public class FundOrderService {
@@ -32,6 +36,8 @@ public class FundOrderService {
 	@Autowired
 	private FundPlanRepository fundPlanRepository;
 	
+
+	
 	/* 查詢所有募資訂單 */
 	public Page<FundOrder> findFundOrderByPage(Integer pageNumber, Integer size){
 		Pageable pgb = PageRequest.of(pageNumber-1, size,Sort.Direction.ASC,"orderID");
@@ -44,8 +50,8 @@ public class FundOrderService {
 	}
 	
 	/* 新增募資訂單 */
-	@Transactional
-	public void saveFundOrder(Map<String, Object> form,  Map<String, Object> fullForm) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public boolean saveFundOrder(Map<String, Object> form,  Map<String, Object> fullForm) {
 		
 		/* 從form取出資料 */
 		List<Map<String, Object>> packages = (List<Map<String, Object>>) form.get("packages");
@@ -71,7 +77,7 @@ public class FundOrderService {
 		String tickitID = fullForm.get("orderId").toString();
 		
 		/* 取得目前時間 */
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC+8"));
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		Timestamp nowTimestamp = Timestamp.valueOf(now.format(formatter));		
 		
@@ -85,7 +91,30 @@ public class FundOrderService {
 		fundOrder.setTickitID(tickitID);
 		fundOrder.setOrderDate(nowTimestamp);
 		
-		fundOrderRepository.saveAndFlush(fundOrder);
+		
+		try {
+			fundOrderRepository.saveAndFlush(fundOrder);
+			
+		    // 更新FundProj的currentAmount
+	        FundProj fundProj = fundProjRepository.findById(Integer.parseInt(projectIDString)).get();
+	        Integer newCurrentAmount = Integer.parseInt(fundProj.getCurrentAmount()) + Integer.parseInt(totalAmountString);
+	        fundProj.setCurrentAmount(newCurrentAmount.toString()); // 更新金額
+	        fundProjRepository.save(fundProj); // 儲存更新
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public boolean isReached(Integer projectID) {
+		Optional<FundProj> optional = fundProjRepository.findById(projectID);
+		FundProj fundProj = optional.get();
+		
+		if (Integer.parseInt(fundProj.getCurrentAmount()) >= Integer.parseInt(fundProj.getTargetAmount())) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 
 	/* 查詢募資訂單by member ID */

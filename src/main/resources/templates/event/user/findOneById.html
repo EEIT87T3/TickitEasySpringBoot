@@ -37,7 +37,9 @@
 	<template id="event-content-template">
 		<div class="row my-4">
 			<div class="col-8">
-				<img class="w-100 rounded" id="event-pic" src="/TickitEasy/images/event/EventPicDefault.png" alt="活動名稱">
+				<div class="ratio ratio-16x9">
+					<img class="w-100 rounded object-fit-cover" id="event-pic" src="/TickitEasy/images/event/EventPicDefault.png" alt="活動名稱">
+				</div>
 			</div>
 			<div class="col-4 d-flex flex-column justify-content-evenly">
 				<div>
@@ -51,6 +53,9 @@
 					<div>
 						地址：<span id="address">地址</span>
 					</div>
+					<div>
+						<button class="btn btn-sm btn-secondary" id="scroll-to-map">前往地圖</button>
+					</div>
 				</div>
 				<div>
 					活動時間：<br>
@@ -62,6 +67,9 @@
 					<span id="start-entry-time" class="ms-4">開始入場時間</span><span class="ms-1">～</span><br>
 					<span id="end-entry-time" class="ms-4">結束入場時間</span>
 				</div>
+				<div>
+					<button class="btn btn-primary" id="scroll-to-tickettypes">前往購票</button>
+				</div>
 			</div>
 		</div>
 		<div class="my-4">
@@ -72,7 +80,7 @@
 			<iframe id="embed-map" class="w-100 h-300px p-0 rounded" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" th:src="'https://www.google.com/maps/embed/v1/place?key=' + ${googleCloudApiKey} + '&q='"></iframe>
 		</div>
 		<div class="my-4" id="tickettypes-content">
-			<h3 class="mb-2">票種列表</h3>
+			<h3 class="mb-2" id="tickettype-list-title">票種列表</h3>
 			<div class="d-flex flex-column gap-2" id="tickettype-content">
 			</div>
 		</div>

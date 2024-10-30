@@ -13,7 +13,7 @@
                 </div>
                 <ul class="nav nav-pills flex-column mt-4">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/TickitEasy/profile">
+                        <a class="nav-link" href="/TickitEasy/profile">
                             <i class="fas fa-user me-2"></i> 個人資料
                         </a>
                     </li>
@@ -23,28 +23,42 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/TickitEasy/fundorderlist">
+                        <a class="nav-link" href="/TickitEasy/user/fundorderlist">
                             <i class="fas fa-donate me-2"></i> 募資紀錄
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-pen me-2"></i> 發表過的貼文
+                        <a class="nav-link" href="http://localhost:8080/TickitEasy/user/post/memberPosts">
+                            <i class="fas fa-pen me-2"></i> 我的貼文
                         </a>
                     </li>
                     <li class="nav-item">
+
+                        <a class="nav-link" href="http://localhost:8080/TickitEasy/user/post/like">
+                            <i class="fas fa-heart me-2"></i> 喜歡的貼文
+                            </a>
+                    </li>
+					<li class="nav-item">
                         <a class="nav-link" href="/TickitEasy/user/product/favorite">
                             <i class="fas fa-heart me-2"></i> 商品收藏匣
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-headset me-2"></i> 線上客服
+                        <a class="nav-link" href="/TickitEasy/user/fundproject/follow">
+                            <i class="fas fa-heart me-2"></i> 追蹤募資活動
                         </a>
                     </li>
                 </ul>
             </div>
             <div class="col-md-9">
+          <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+		<df-messenger
+		  chat-icon="https:&#x2F;&#x2F;i.imgur.com&#x2F;gFJ0oHt.png"
+		  intent="WELCOME"
+		  chat-title="TickitEasy"
+		  agent-id="f558d375-2bb2-45eb-b833-0ef9a01652da"
+		  language-code="zh-tw"
+		></df-messenger>
                 <div class="content1">
 </body>
 

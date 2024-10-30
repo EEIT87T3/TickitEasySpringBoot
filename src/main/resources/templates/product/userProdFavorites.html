@@ -137,14 +137,26 @@
             // 重新載入收藏列表
             loadFavoriteProducts();
             
-            // 顯示操作結果
-            alert(response.data.message);
+            Swal.fire({
+            position: 'center',
+            icon: "success",
+            title: response.data.message, // 根據返回的訊息動態顯示
+            showConfirmButton: false,
+            timer: 1500
+        });
         } catch (error) {
             console.error('操作失敗:', error);
             if (error.response && error.response.status === 401) {
                 Auth.logout();
             }
-            alert('操作失敗，請稍後再試');
+          // 使用 SweetAlert2 提示操作失敗
+        Swal.fire({
+            position: 'center',
+            icon: "error",
+            title: "操作失敗，請稍後再試", 
+            showConfirmButton: false,
+            timer: 1500
+        });
         }
     }
     </script>

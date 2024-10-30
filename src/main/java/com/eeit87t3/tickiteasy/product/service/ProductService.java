@@ -20,6 +20,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
+import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.product.dto.ProductDTO;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
@@ -48,6 +49,11 @@ public class ProductService {
 
     public List<TagEntity> getProductTags() {
         return tagService.findProductTagList();
+    }
+    
+    // 取得所有商品列表
+    public List<ProductEntity> getAllProducts() {
+        return productRepo.findAll();
     }
     
  // 修改商品狀態
@@ -198,7 +204,7 @@ public class ProductService {
         return productRepo.findByProductNameContaining(name, pageable);
     }
     
-   
+
     
    
 }

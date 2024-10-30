@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+  <head>
+    <!-- 在這裡放要引入的 CSS 與 JS library -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.css"
+    />
+    <style>
+      .proj-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .proj-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .proj-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+
+      .proj-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+
+      .proj-price {
+        color: var(--main-bright-orange);
+        font-size: 16px;
+        margin: 5px 0;
+      }
+
+      .proj-desc {
+        font-size: 14px;
+        color: #666;
+        margin: 5px 0;
+      }
+
+      .unfavorite-btn {
+        background-color: var(--light-orange);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .unfavorite-btn:hover {
+        background-color: var(--main-bright-orange);
+      }
+
+      .empty-message {
+        text-align: center;
+        padding: 50px;
+        font-size: 18px;
+        color: #666;
+      }
+    </style>
+    <meta th:replace="~{commons/memberHead}" />
+    <title text="TickitEasy｜ 追蹤募資活動"></title>
+    <script>
+      let memberID;
+      // 等待 DOM 載入完成
+      document.addEventListener("DOMContentLoaded", function () {
+        // 檢查是否已登入
+        if (!Auth.isLoggedIn()) {
+          Auth.logout();
+          return;
+        }
+        // 載入追蹤專案
+        loadFollowFundProjs();
+      });
+
+      // 載入追蹤專案
+      async function loadFollowFundProjs() {
+        try {
+          const response = await axios.get(
+            "/TickitEasy/member/api/fundproject/getFundFollowList",
+            {
+              headers: { Authorization: `Bearer ${Auth.getToken()}` },
+            }
+          );
+          console.log("募資專案APi回應", response.data);
+          // 從 API 回應中提取 memberID
+          memberID = response.data.memberID;
+          displayFundProjs(response.data.fundProjFollowList);
+        } catch (error) {
+          console.error("載入追蹤募資專案失敗:", error);
+          if (error.response && error.response.status === 401) {
+            Auth.logout();
+          }
+        }
+      }
+
+      // 顯示專案列表
+      function displayFundProjs(followList) {
+        const container = document.getElementById("projContainer");
+        container.innerHTML = ""; // 清空容器
+
+        if (followList.length === 0) {
+          container.innerHTML =
+            '<div class="empty-message">目前沒有收藏的商品</div>';
+          return;
+        }
+
+        followList.forEach((aFollow) => {
+          //const projCard = `${aFollow.fundProj.projectID}`;
+          const projCard = `
+                <a href="/TickitEasy/fundprojects/${aFollow.fundProj.projectID}" class="proj-link" style="text-decoration: none; color: inherit;">
+                    <div class="proj-card">
+                        <img src="/TickitEasy${aFollow.fundProj.image}" alt="${aFollow.fundProj.title}" class="proj-image">
+                        <div class="proj-name">${aFollow.fundProj.title}</div>
+                        <div class="proj-price">NT$ ${aFollow.fundProj.currentAmount}</div>
+                        <button class="unfavorite-btn" onclick="toggleFavorite(${aFollow.fundProj.projectID}); event.preventDefault();">取消收藏</button>
+                    </div>
+                </a>
+            `;
+          container.innerHTML += projCard;
+        });
+      }
+
+      // 處理收藏/取消收藏
+      async function toggleFavorite(projId) {
+        try {
+          const response = await axios.delete(
+            "/TickitEasy/member/api/fundprojectFollow",
+            {
+              params: {
+                memberID: memberID,
+                projectID: projId,
+              },
+            }
+          );
+
+          // 重新載入收藏列表
+          loadFollowFundProjs();
+
+          // 顯示操作結果
+        } catch (error) {
+          console.error("操作失敗:", error);
+          if (error.response && error.response.status === 401) {
+            Auth.logout();
+          }
+          alert("操作失敗，請稍後再試");
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <div th:replace="~{commons/memberHeader}"></div>
+
+    <!-- 這裡是網頁內容 -->
+    <h2 style="text-align: center; margin: 20px 0">我的募資活動追蹤</h2>
+
+    <div id="projContainer" class="proj-grid">
+      <!-- 商品卡片將由 JavaScript 動態生成 -->
+    </div>
+
+    <div th:replace="~{commons/memberFooter}"></div>
+  </body>
+</html>

@@ -2,7 +2,6 @@
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
-
     <!-- 在這裡放要引入的 CSS 與 JS library -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script> <!-- jQuery 要放在最前面 -->
@@ -11,144 +10,194 @@
     <script src="/TickitEasy/product/js/userFindProductDetail.js"></script>
     <meta th:replace="~{commons/userHead}">
     <style>
+        /* 縮略圖樣式 */
         .thumbnail-image {
-            width: 120px; /* 增加縮略圖寬度，防止長方形圖片被壓縮 */
-            height: auto; /* 高度自動調整 */
+            width: 120px;
+            height: auto;
             object-fit: cover;
             cursor: pointer;
             margin: 5px;
-            border: 1px solid #ccc; /* 增加邊框 */
-            padding: 2px; /* 加一點內邊距 */
         }
 
+        /* 主圖樣式 */
         .main-image {
-            width: 140%;
-            height: 350px;
+            width: 100%;
             object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.3s;
+
         }
-        
-        /* 圖片容器 */
+
+        /* 主圖容器樣式 */
         .image-container {
-            width: 750px; /* 限制主圖容器的寬度 */
+            width: 100%;
+            max-width: 600px;
             flex: 1;
         }
 
         /* 調整左右空白相等 */
         .custom-row {
             display: flex;
-            justify-content: space-between; /* 兩邊對齊，保持相等空白 */
+            justify-content: space-between;
             align-items: flex-start;
-            padding-left: 2rem; /* 控制兩邊的間距 */
+            padding-left: 2rem;
             padding-right: 2rem;
             margin: 0 auto;
-            max-width: 1200px; /* 設置容器最大寬度 */
+            max-width: 1200px;
         }
 
-        /* 調整上方空白 */
+        /* 調整上方空白及容器寬度 */
         .container {
-            margin-top: 20px; /* 縮減上方空白 */
-            width : 1000px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 1200px;
         }
 
-        /* 調整縮略圖容器的水平排列 */
+        /* 縮略圖容器的水平排列 */
         .thumbnails-container {
             display: flex;
-            justify-content: flex-start; /* 縮略圖水平排列，左對齊 */
+            justify-content: flex-start;
             gap: 10px;
             margin-top: 15px;
         }
 
-        
-
-        /* 調整數量輸入框的寬度與按鈕對齊 */
+        /* 調整數量輸入框的樣式 */
         .input-group .form-control {
-        	text-align: center; /* 讓數字置中顯示 */
+            text-align: center;
             width: auto;
             flex-grow: 0;
         }
 
-        /* 統一按鈕寬度 */
+        /* 購物車與收藏按鈕樣式 */
         .btn-group-wrapper {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
-        /* 調整文字容器 */
+        /* 調整按鈕背景色及樣式 */
+        #favoriteButton {
+            background-color: #FFB44D;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 16px;
+            height: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #favoriteButton .fas.fa-heart {
+            color: white;
+        }
+
+        #favoriteButton.favorited {
+            background-color: white;
+            color: #FFB44D;
+            border: 1px solid #FFB44D;
+        }
+
+        #favoriteButton.favorited .fas.fa-heart {
+            color: #FFB44D;
+        }
+
+        /* 文字容器樣式 */
         .text-container {
             flex: 1;
-            padding-left: 11rem;
+            padding-left: 2rem;
             padding-right: 1rem;
         }
+
+        /* 自定義字母間距 */
         .custom-letter-spacing {
-        letter-spacing: 1.25px;
-      }
-    /* 調整按鈕的背景色、文字色、邊框 */
-#favoriteButton {
-    background-color: #e04e2d;   /* 使用稍微暗一些的紅色 */
-    color: white;                /* 文字顏色變成白色 */
-    border: 1px solid #e04e2d;   /* 邊框紅色 */
-    padding: 5px 12px;           /* 調整 padding 使按鈕與購物車按鈕大小一致 */
-    border-radius: 5px;          /* 保持按鈕是長方形 */
-    display: inline-flex;        /* 使文字和圖標水平對齊 */
-    align-items: center;         /* 垂直居中 */
-    font-size: 16px;             /* 調整字體大小與購物車按鈕一致 */
-    height: 38px;                /* 設定高度與購物車按鈕一致 */
-}
+            letter-spacing: 1.25px;
+        }
 
-/* 修改按鈕內的愛心圖標顏色 */
-#favoriteButton .fas.fa-heart {
-    color: white;                /* 愛心圖標變成白色 */
-}
+        /* 推薦商品卡片樣式 */
+        .recommended-product-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
 
-/* 當按鈕被點擊後，背景色保持紅色，文字和圖標保持白色 */
-#favoriteButton.favorited {
-    background-color: white;     /* 取消收藏後變成白色背景 */
-    color: #e04e2d;              /* 文字顏色變成稍微暗一些的紅色 */
-    border: 1px solid #e04e2d;   /* 邊框保持紅色 */
-}
+        .recommended-product-card:hover {
+            transform: translateY(-5px);
+        }
 
-#favoriteButton.favorited .fas.fa-heart {
-    color: #e04e2d;              /* 愛心圖標變成紅色 */
-}
+        .recommended-product-card .card-title {
+            color: #322770;
+            font-weight: bold;
+        }
 
+        .recommended-product-card .btn-primary {
+            background-color: #5F46E8;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            transition: background-color 0.3s;
+        }
 
-      
+        .recommended-product-card .btn-primary:hover {
+            background-color: #322770;
+        }
     </style>
     <title>周邊商品</title>
     <script>
-        $(document).ready(function () {
-
-            // 這裡是 JavaScript 內容
-
+    $(document).ready(function () {
+        // 點擊主圖放大
+        $(document).on('click', '#mainImage', function() {
+            const imageUrl = $(this).attr('src');
+            const modalHtml = `
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg ">
+                        <div class="modal-content">
+                            <div class="modal-header border-0" >
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img src="${imageUrl}" class="img-fluid" alt="放大圖片">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+            $('#imageModal').modal('show');
+            $('#imageModal').on('hidden.bs.modal', function () {
+                $(this).remove();
+            });
         });
-    </script>
+    });
+</script>
+
 </head>
 
 <body>
     <div th:replace="~{commons/userHeader}"></div>
 
-    <!--  這裡是網頁內容 >-->
-
-
+    <!-- 商品詳情 -->
     <div class="container mt-5">
-        <div class="row" id="productDetail">
+        <div class="row custom-row" id="productDetail">
             <!-- 商品詳情將通過 JavaScript 動態添加 -->
         </div>
     </div>
-    
-    
+
     <h4 class="text-center mb-4">推薦商品</h4>
     <div class="row justify-content-center" id="recommendedProductsContainer">
         <!-- 推薦商品將通過 JavaScript 動態添加 -->
     </div>
-	 <!-- 商品詳情模板 -->
+
+    <!-- 商品詳情模板 -->
     <template id="productDetailTemplate">
-        <div class="col-md-6 image-container">
+        <div class="col-md-6 image-container mt-5">
             <!-- 主圖 -->
             <img id="mainImage" class="main-image" src="" alt="主圖">
             <!-- 副圖縮略圖容器 -->
-            <div class="d-flex flex-wrap mt-2" id="thumbnails"></div>
+            <div class="thumbnails-container" id="thumbnails"></div>
         </div>
         <div class="col-md-6 text-container">
             <h1 class="custom-letter-spacing fs-5 fw-medium py-4 mt-4" id="productName"></h1>
@@ -160,18 +209,18 @@
                 <button id="productStocknone" onclick="setNotification()" class="btn btn-warning ml-2">補貨通知我</button>
             </div>
 
-            <!-- 數量選擇區域，將輸入框寬度調整 -->
-            <div id="quantityInputnone" class="input-group mb-2  mt-4">
+            <!-- 數量選擇區域 -->
+            <div id="quantityInputnone" class="input-group mb-2 mt-4">
                 <button class="btn btn-outline-secondary" onclick="decreaseQuantity()">-</button>
-                <input type="number" id="quantityInput" class="form-control " value="1" min="1" onchange="updateQuantity(this.value)">
+                <input type="number" id="quantityInput" class="form-control" value="1" min="1" onchange="updateQuantity(this.value)">
                 <button class="btn btn-outline-secondary" onclick="increaseQuantity()">+</button>
             </div>
 
             <!-- 購物車按鈕區域 -->
             <div id="cartButtonsContainer" class="btn-group-wrapper">
-                <button onclick="addToCart(false)" class="btn btn-primary">加入購物車</button>
-                <button onclick="addToCart(true)" class="btn btn-secondary">直接購買</button>
-                <button id="favoriteButton"  onclick="toggleFavorite()" class="btn btn-outline-primary">
+                <button onclick="addToCart(false)" class="btn btn-primary" style="background-color: #5F46E8; border: none; border-radius: 25px; padding: 10px 20px;">加入購物車</button>
+                <button onclick="addToCart(true)" class="btn btn-secondary" style="border-radius: 25px; padding: 10px 20px;">直接購買</button>
+                <button id="favoriteButton" onclick="toggleFavorite()" class="btn btn-outline-primary">
                     <i class="fas fa-heart"></i> 加入收藏
                 </button>
             </div>
@@ -183,7 +232,7 @@
     <!-- 推薦商品模板 -->
     <template id="recommendedProductTemplate">
         <div class="col-md-3 mb-4">
-            <div class="card h-100">
+            <div class="card recommended-product-card h-100">
                 <img class="card-img-top recommended-img" src="" alt="">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title text-truncate recommended-name"></h5>
@@ -193,13 +242,11 @@
             </div>
         </div>
     </template>
-<script th:inline="javascript">
-    const productID = /*[[${productID}]]*/ 0;  // 使用 Thymeleaf 输出 productID 数字
-    console.log('Product ID:', productID);
-</script>
 
-	
-    
+    <script th:inline="javascript">
+        const productID = /*[[${productID}]]*/ 0;
+        console.log('Product ID:', productID);
+    </script>
 </body>
 
 </html>
