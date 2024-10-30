@@ -26,6 +26,7 @@
             -moz-appearance: textfield;  /* Firefox */
             appearance: none;  /* 其他瀏覽器 */
         }
+        
     </style>
 </head>
 
@@ -224,30 +225,30 @@
                 const itemElement = document.createElement('div'); // 建立每個商品的元素
                 itemElement.className = 'card mb-3';
                 itemElement.innerHTML = `
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <img src="/TickitEasy${item.productPic}" alt="${item.productName}" class="img-fluid">
-                            </div>
-                            <div class="col-md-4">
-                                <h5 class="card-title">${item.productName}</h5>
-                            </div>
-                            <div class="col-md-2">
-                                <p>單價: $${item.price}</p>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="input-group">
-                                    <button class="btn btn-outline-secondary" onclick="decreaseQuantity(${item.productID})">-</button>
-                                    <input type="number" class="form-control" value="${item.quantity}" onchange="updateQuantity(${item.productID}, this.value)">
-                                    <button class="btn btn-outline-secondary" onclick="increaseQuantity(${item.productID})">+</button>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <p>總計: $${item.price * item.quantity}</p>
-                                <button class="btn btn-danger btn-sm" onclick="removeItem(${item.productID})">刪除</button>
-                            </div>
-                        </div>
-                    </div>
+                   <div class="card-body">
+    <div class="row">
+        <div class="col-md-2 d-flex justify-content-center align-items-center">
+            <img src="/TickitEasy${item.productPic}" alt="${item.productName}" class="img-fluid">
+        </div>
+        <div class="col-md-4 d-flex justify-content-center align-items-center">
+            <h5 class="card-title">${item.productName}</h5>
+        </div>
+        <div class="col-md-2 d-flex justify-content-center align-items-center">
+            <p>價格：${item.price} 元</p>
+        </div>
+        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+            <div class="input-group justify-content-center">
+                <button class="btn btn-outline-secondary" onclick="decreaseQuantity(${item.productID})">-</button>
+                <input type="number" class="form-control text-center" value="${item.quantity}" onchange="updateQuantity(${item.productID}, this.value)">
+                <button class="btn btn-outline-secondary" onclick="increaseQuantity(${item.productID})">+</button>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+            <p>總計: ${item.price * item.quantity} 元</p>
+            <button class="btn btn-danger btn-sm" onclick="removeItem(${item.productID})">刪除</button>
+        </div>
+    </div>
+</div>
                 `;
                 cartItemsElement.appendChild(itemElement); // 將商品元素添加到購物車
             });
