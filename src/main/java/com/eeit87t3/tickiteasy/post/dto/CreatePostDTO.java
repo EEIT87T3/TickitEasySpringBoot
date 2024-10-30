@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 //@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CreatePostDTO {
-//	private Integer memberID;
+	private Integer memberID;
 	 private String postTitle;
 	 private String postContent;
 	 private String postImgUrl;
 //	 private Integer status;
 	 private Integer categoryID;
 	 private Integer tagID;
-//	public Integer getMemberID() {
-//		return memberID;
-//	}
+	public Integer getMemberID() {
+		return memberID;
+	}
 	public String getPostTitle() {
 		return postTitle;
 	}
@@ -32,9 +32,9 @@ public class CreatePostDTO {
 	public Integer getTagID() {
 		return tagID;
 	}
-//	public void setMemberID(Integer memberID) {
-//		this.memberID = memberID;
-//	}
+	public void setMemberID(Integer memberID) {
+		this.memberID = memberID;
+	}
 	public void setPostTitle(String postTitle) {
 		this.postTitle = postTitle;
 	}

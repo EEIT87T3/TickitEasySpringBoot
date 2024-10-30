@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <!-- 在這裡放要引入的 CSS 與 JS library -->
+
+  <meta th:replace="~{commons/memberHead}" />
+  <title>TickitEasy｜我的喜歡</title>
+  <script th:src="@{/post/js/getMember.js}"></script>
+  <script>
+
+    $(document).ready(function () {
+      currentMember();
+      //currentUserID來自currentMember
+      // const memberID = currentUserID;
+      currentMember()
+        .then(userID => {
+          fetchMemberLikes(userID);
+        })
+
+    });
+    function fetchMemberLikes(memberID) {
+      axios.get(`/TickitEasy/admin/api/post/likes/member/${memberID}`)
+        .then(response => {
+          const likes = response.data; // 獲取返回的喜歡列表
+
+          // 將每個喜歡項目的日期格式化
+          const formattedLikes = likes.map(like => {
+            const originalDate = like.Date;
+            console.log(originalDate);
+            const date = new Date(originalDate);
+            console.log(date);
+            // 格式化為 YYYY-MM-DD HH:mm:ss
+            const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+            console.log(formattedDate);
+            return { ...like, formattedDate }; // 將格式化後的日期加入到喜歡項目中
+          });
+          console.log('格式化後的喜歡列表:', formattedLikes); // 調試：查看格式化後的數據
+          displayLikes(formattedLikes); // 呼叫函數來顯示喜歡的內容
+        })
+        .catch(error => {
+          console.error('Error fetching member likes:', error);
+        });
+    }
+    function truncateContent(content, limit) {
+      if (content.length > limit) {
+        return content.slice(0, limit) + '...'; // 超過限制時加上省略號
+      }
+      return content; // 沒有超過限制時直接返回內容
+    }
+    function displayLikes(formattedLikes) {
+      const outputBlock = document.getElementById('outputBlock'); // 獲取表格的 tbody 元素
+      outputBlock.innerHTML = '';
+
+      formattedLikes.forEach(like => {
+        console.log('顯示的喜歡項目:', like); // 調試：查看每個喜歡項目的內容
+        const likeRow = document.createElement('tr');
+
+
+        likeRow.innerHTML = `
+            <td>${like.title}</td> <!-- 貼文標題 -->
+            <td>${truncateContent(like.content, 28)}</td>  <!-- 貼文內容 -->
+            <td>${like.formattedDate}</td> <!-- 喜歡日期 -->
+            <td>
+                <a href="/TickitEasy/user/post/${like.postID}" class="btn btn-primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </td>
+        `;
+        outputBlock.appendChild(likeRow); // 將行添加到表格中
+      });
+    }
+  </script>
+
+</head>
+
+<body>
+  <div th:replace="~{commons/memberHeader}"></div>
+  <!-- 這裡是網頁內容 -->
+  <h2>我的喜歡</h2>
+  <div id="likes-container"></div>
+  <table class="table table-striped">
+    <thead>
+      <th>貼文標題</th>
+      <th>貼文內容</th>
+      <th>喜歡日期</th>
+      <th></th>
+
+    </thead>
+    <tbody id="outputBlock"></tbody>
+  </table>
+  <div id="spinnerBlock"></div>
+  <div class="text-end" id="pageBtnBlock"></div>
+  <div th:replace="~{commons/memberFooter}"></div>
+</body>
+
+</html>

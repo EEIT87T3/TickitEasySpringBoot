@@ -2,13 +2,17 @@ package com.eeit87t3.tickiteasy.post.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,5 +68,26 @@ public class PostImagesController {
             return new ResponseEntity<>("圖片刪除失敗", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    // 查詢圖片
+   
+    @GetMapping("/show/{postID}")  // 修改為 GET 方法並包含 postID
+    public ResponseEntity<Map<String, Object>> showPostImages(
+            @PathVariable Integer postID) {
+       
+        Map<String, Object> response = new HashMap<>();
+        
+        List<String> imagePaths = postImageService.getImagePathsByPostId(postID);
+        
+        if (imagePaths.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "找不到相關圖片");
+        } else {
+            response.put("success", true);
+            response.put("images", imagePaths); // 將圖片路徑放入回應中
+        }
+
+        return ResponseEntity.ok(response); // 返回 ResponseEntity
+    }
+
 }
 

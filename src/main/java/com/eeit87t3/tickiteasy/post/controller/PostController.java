@@ -73,7 +73,7 @@ public class PostController {
 		 return "/post/adminEditPost"; 
 	 }
 	 
-	//新增貼文頁面 *未完成*
+	//新增貼文頁面
 	@GetMapping("/create")
 	    public String showInsertForm() {
 	        return "/post/adminAddPost";  
@@ -84,6 +84,12 @@ public class PostController {
 		 	model.addAttribute("postID", postID);
 	        return "post/adminPostComment"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
 	    }
+	 //檢舉頁面
+	 @GetMapping("/report")
+	 public String showReportPage() {
+		 
+		 return "post/adminReportPostList"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
+	 }
 	
 
  	

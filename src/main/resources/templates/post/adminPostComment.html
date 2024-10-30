@@ -45,12 +45,14 @@
                 <td>${comment.memberID}</td>
                 <td>${comment.content || 'N/A'}</td> 
                 <td>${comment.commentDate || 'N/A'}</td> 
+                <td>${comment.editTime || 'N/A'}</td> 
                 <td>
-                    <button class="openUpdateModal bg-blue-500 text-white px-2 py-2 rounded" data-comment-id="${comment.postCommentID}">編輯</button>
+                   
                     <button class="delete-post bg-red-500 text-white px-2 py-2 rounded" data-comment-id="${comment.postCommentID}">刪除</button>
                 </td>
             </tr>
             `;
+            // <button class="openUpdateModal bg-blue-500 text-white px-2 py-2 rounded" data-comment-id="${comment.postCommentID}">編輯</button>
         }
         // 獲取所有貼文的函數，postID 是從模板中注入的變量
         function fetchAllComments(postID) {
@@ -188,7 +190,7 @@
                         })
                         .catch(error => {
                             console.error("Error fetching comments:", error);
-                            alert("刪除失敗！");
+                            alert("刪除失敗！您可能尚未登入");
                         });
                 }
             });
@@ -234,16 +236,17 @@
 <body th:data-post-id="${postID}">
     <div th:replace="~{commons/adminHeader}"></div>
     <button class="postList bg-blue-500 text-white px-2 py-2 rounded">上一頁</button>
-    <button id="openPostModal" class=" add-post bg-blue-500 text-white px-4 py-2 rounded">新增留言</button>
-    <h1>All Comments for Post [[${postID}]]</h1>
+    <!-- <button id="openPostModal" class=" add-post bg-blue-500 text-white px-4 py-2 rounded">新增留言</button> -->
+    <h1>貼文編號:[[${postID}]]的留言列表</h1>
     <table id="commentsTable" class="display">
         <thead>
             <tr>
-                <th>Post ID</th>
-                <th>postCommentID</th>
-                <th>memberID</th>
-                <th>content</th>
-                <th>commentDate</th>
+                <th>貼文ID</th>
+                <th>留言ID</th>
+                <th>會員ID</th>
+                <th>留言內容</th>
+                <th>留言時間</th>
+                <th>編輯時間</th>
                 <th>動作</th>
             </tr>
         </thead>
@@ -254,9 +257,10 @@
                 <td th:text="${comment.memberID}"></td>
                 <td th:text="${comment.content} ?: 'N/A'"></td>
                 <td th:text="${comment.commentDate} != null ? ${comment.commentDate} : 'N/A'"></td>
+                <td th:text="${comment.editTime} != null ? ${comment.editTime} : 'N/A'"></td>
                 <td>
-                    <button class="openUpdateModal bg-blue-500 text-white px-2 py-2 rounded"
-                        th:data-comment-id="${comment.postCommentID}">編輯</button>
+                    <!-- <button class="openUpdateModal bg-blue-500 text-white px-2 py-2 rounded"
+                        th:data-comment-id="${comment.postCommentID}">編輯</button> -->
                     <button class="delete-post bg-red-500 text-white px-2 py-2 rounded"
                         data-comment-id="${comment.postCommentID}">刪除</button>
                 </td>

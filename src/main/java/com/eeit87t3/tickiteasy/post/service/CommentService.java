@@ -63,6 +63,7 @@ public class CommentService {
         return commentRepo.save(existingComment); // 返回更新後的貼文實體
     }
 	
+	//刪除單筆
 	@Transactional
     public Boolean delete(Integer commentID) {
         // 查詢貼文是否存在
@@ -77,6 +78,11 @@ public class CommentService {
         // 如果貼文不存在，返回 false
         return false;
     }
+	
+	public void deleteAll(List<CommentEntity> comments) {
+	    commentRepo.deleteAll(comments); // 批量刪除留言
+	}
+
 
     
 }
