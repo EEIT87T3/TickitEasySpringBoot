@@ -1,5 +1,6 @@
 package com.eeit87t3.tickiteasy.member.controller;
 
+import com.eeit87t3.tickiteasy.config.ReCaptchaConfig;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
@@ -31,6 +32,9 @@ public class MemberController {
 
 	private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 	
+	@Autowired
+	private ReCaptchaConfig reCaptchaConfig;
+	
     @Autowired
     private MemberService memberService;
 
@@ -43,10 +47,18 @@ public class MemberController {
     @Autowired
     private ImageUtil imageUtil;
     
+    // 在登入和註冊方法中添加驗證
+    private void validateRecaptcha(String token) {
+        if (token == null || !reCaptchaConfig.verifyRecaptcha(token)) {
+            throw new IllegalArgumentException("驗證失敗，請稍後再試");
+        }
+    }
+    //註冊
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, Object> payload) {
     	Map<String, String> response = new HashMap<>();
     	try {
+    		validateRecaptcha((String) payload.get("recaptchaToken"));
 			//拿數據
     		String email = (String) payload.get("email");
     		String password = (String) payload.get("password");
@@ -128,6 +140,7 @@ public class MemberController {
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> payload) {
         Map<String, Object> response = new HashMap<>();
         try {
+        	validateRecaptcha((String) payload.get("recaptchaToken"));
             String email = payload.get("email");
             String password = payload.get("password");
 

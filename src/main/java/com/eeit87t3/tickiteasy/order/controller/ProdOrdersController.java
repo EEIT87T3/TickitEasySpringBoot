@@ -1,6 +1,7 @@
 package com.eeit87t3.tickiteasy.order.controller;
 
 import java.sql.Date;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,15 +57,19 @@ import ecpay.payment.integration.AllInOne;
 import ecpay.payment.integration.domain.AioCheckOutALL;
 import io.micrometer.common.util.StringUtils;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacUtils;
 
+@CrossOrigin
 @Controller
 @RequestMapping("admin/order")
 public class ProdOrdersController {
 	
 	@Autowired
 	private ProdOrdersServiceImpl prodOrdersService;
+	
 	
 	// 首頁方法
 		@GetMapping
@@ -73,6 +78,11 @@ public class ProdOrdersController {
 			Page<ProdOrders> allPage = prodOrdersService.findAllPage(id);
 			model.addAttribute("allPage", allPage);
 			return "/order/prodOrdersHomePage"; // 返回首頁				
+		}
+		//前台結帳頁面
+		@GetMapping("ClientSideProdOrderCheckOutCart")
+		public String ClientSideProdOrderCheckOutCart() {
+			return "/order/ClientSideProdOrderCheckOutCart";
 		}
 		
 		// 後台新增方法
@@ -260,7 +270,6 @@ public class ProdOrdersController {
 		}
 		
 		//生成圖表 (付款狀態:待付款、已付款)
-		@CrossOrigin(origins = "http://127.0.0.1:5500")
 		@PostMapping("chartjs")
 		public ResponseEntity<Map<String, Integer>> chartjs() {
 			Map<String, Integer> result = new HashMap<>();
@@ -270,22 +279,44 @@ public class ProdOrdersController {
 		}
 		
 		//串接LinePay
-		@PostMapping
-		public String LinePay() {
-			Map<String, String> map = new HashMap<>();
-			map.put("Content-Type", "application/json");
-			map.put("X-LINE-Authorization", null);
-			map.put("X-LINE-Authorization-Nonce", UUID.randomUUID().toString());
-			map.put("X-LINE-ChannelId", "2006474211");
+		@PostMapping("LinePay")
+		public void LinePay(@RequestParam("ticketTypesCartToCheckoutJson") String ticketTypesCartToCheckoutJson,
+				@RequestParam("checkoutItems") String checkoutItem,
+                @RequestParam("totalAmount") String totalAmount,
+                @RequestParam("name") String name,
+                @RequestParam("email") String email,
+                @RequestParam("phone") String phone,
+                @RequestParam("address") String address,
+                @RequestParam("paymentMethod") String paymentMethod,
+                @RequestParam("jwtToken") String jwtToken, // token
+                HttpServletResponse response) throws Exception {
+			String memberEmail = jwtUtil.getEmailFromToken(jwtToken);
 			
-			return null;
+			ObjectMapper objectMapper = new ObjectMapper();
+			List<Map<String,Object>> ticketTypesCartToCheckoutJsons  = objectMapper.readValue(ticketTypesCartToCheckoutJson, List.class); //將json轉成list
+		 	List<Map<String,Object>> checkoutItems  = objectMapper.readValue(checkoutItem, List.class); //將json轉成list
+			String linePay = prodOrdersService.LinePay(ticketTypesCartToCheckoutJsons, checkoutItems, totalAmount, memberEmail);
+			
+			int indexOf = linePay.indexOf("web") + 6;
+			linePay = linePay.substring(indexOf);
+            int indexOf2 = linePay.indexOf("\"");
+            linePay = linePay.substring(0, indexOf2);
+  
+            response.sendRedirect(linePay);
 		}
 		
-		//前台結帳頁面
-		@GetMapping("ClientSideProdOrderCheckOutCart")
-		public String ClientSideProdOrderCheckOutCart() {
-			return "/order/ClientSideProdOrderCheckOutCart";
-		}
 		
+		
+		@GetMapping("LinePayReturn")
+		public String LinePay(@RequestParam String transactionId,@RequestParam String orderId) throws Exception{
+			System.out.println("transactionId:"+transactionId);
+			System.out.println("orderId:"+orderId);
+			
+			String targetUrl = "https://sandbox-api-pay.line.me/v3/payments/" + transactionId + "/confirm";
+
+			String linePayReturn = prodOrdersService.LinePayReturn(targetUrl, orderId, transactionId);
+		   
+	        return "redirect:http://localhost:8080/TickitEasy/user/clientSide/orderPaymentCompleted";
+		}
 		
 }

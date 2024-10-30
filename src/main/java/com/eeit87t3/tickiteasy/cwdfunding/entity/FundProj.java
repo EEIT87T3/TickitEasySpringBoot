@@ -63,7 +63,7 @@ public class FundProj{
 	@Column(name = "postponeDate")
 	private Timestamp postponeDate;
 	
-	@Column(name = "status")
+	@Column(name = "status",insertable = false)
 	private Integer status;
 	
 	/*
@@ -99,6 +99,15 @@ public class FundProj{
 	@JsonIgnore
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "fundProj")
 	private List<FundPlan> fundPlan = new ArrayList<>();
+	
+	/*
+	 * Fundproj沒有和FundPlan有關的欄位
+	 * [ mappedBy = "fundProj" ] : 
+	 * 		告訴spring容器Fundproj類別會被FundOrder類別參考，參考欄位為fundOrder的"fundProj"屬性
+	 */
+	@JsonIgnore
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "fundProj")
+	private List<FundOrder> fundOrder = new ArrayList<>();
 	
 	public FundProj() {
 		

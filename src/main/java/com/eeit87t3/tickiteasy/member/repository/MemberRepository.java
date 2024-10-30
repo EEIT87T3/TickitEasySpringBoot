@@ -33,5 +33,10 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     // 查詢年齡範圍內的會員
     List<Member> findByBirthDateBetween(LocalDate startDate, LocalDate endDate);
     
+    //會員統計卡片使用
+    long countByRegisterDate(LocalDate date);
+    long countByRegisterDateBetween(LocalDate startDate, LocalDate endDate);
+    long countByStatus(Member.MemberStatus status);
+    
     
 }

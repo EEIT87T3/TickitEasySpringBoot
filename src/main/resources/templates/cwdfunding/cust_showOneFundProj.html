@@ -75,6 +75,10 @@
         border: 10px;
         border-color: var(--main-blue-purple) !important;
       }
+      .btn-liked {
+        background-color: #b197fc !important;
+        color: #fff !important;
+      }
       .btn-buy {
         border: 1px solid;
         border-color: #ffb44d;
@@ -96,6 +100,10 @@
       .btn-like:active {
         background-color: #b197fc; /* 懸停時背景色 */
         color: #fff; /* 懸停時字體顏色 */
+      }
+
+      .btn-liked {
+        background-color: #646464;
       }
       .btn-buy:hover {
         border: 1px solid;
@@ -121,48 +129,132 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/TickitEasy/cwdfunding/js/doughnut.js"></script>
+    <script th:src="@{/Token/auth.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      $(document).ready(function () {
-        // 計算(結束日期-開始日期)的天數，並填入id="daysLeft"中
-        let daysLeft = document.querySelector("#daysLeft");
-        let timeSpan = document.querySelector("#time-span");
+      $(document).ready(async function () {
+        const projectID = $("#fundProject").data("project-id");
+        const memberID = await getMemberProfile();
+        let memberDonated = await isDonated(memberID, projectID);
+        if (memberDonated) updateDonationButton();
 
-        const currentDate = new Date();
+        let memberFollow = await isFollowing(memberID, projectID);
+        if (memberFollow) updateFollowButton();
+
+        function getMemberProfile() {
+          return axios
+            .get("/TickitEasy/member/api/fundproject/getMemberID", {
+              headers: { Authorization: `Bearer ${Auth.getToken()}` },
+            })
+            .then((response) => response.data.memberID)
+            .catch((error) => console.error("Error fetching profile:", error));
+        }
+
+        function isDonated(memberID, projectID) {
+          return axios
+            .get("/TickitEasy/member/api/fundproject/getIsDonated", {
+              params: { projectID, memberID },
+            })
+            .then((response) => response.data)
+            .catch(() => false);
+        }
+
+        function updateDonationButton() {
+          $(".btn-buy").addClass("disabled btn-secondary").text("已贊助");
+        }
+
+        function isFollowing(memberID, projectID) {
+          return axios
+            .get("/TickitEasy/member/api/fundproject/getIsFollowing", {
+              params: { projectID, memberID },
+            })
+            .then((response) => response.data)
+            .catch(() => false);
+        }
+
+        function updateFollowButton() {
+          if (!$("#btn-like").hasClass("btn-liked")) {
+            $("#btn-like")
+              .addClass("btn-liked")
+              .html('<i class="fa-solid fa-heart"></i> 已追蹤');
+          }
+        }
+
+        $("#btn-like").on("click", function (e) {
+          e.preventDefault();
+          if (!Auth.isLoggedIn()) return Auth.logout();
+          if (!$(this).hasClass("btn-liked")) {
+            axios
+              .post("/TickitEasy/member/api/fundprojectFollow", {
+                fundProjFollowPK: { memberID, projectID },
+              })
+              .then(function (response) {
+                console.log("新增追蹤API回應：", response.data);
+                $("#btn-like")
+                  .addClass("btn-liked")
+                  .html('<i class="fa-solid fa-heart"></i> 已追蹤');
+              })
+
+              .catch(console.log);
+          }
+        });
+
+        $("#btn-like").on("click", function (e) {
+          e.preventDefault();
+          if (!Auth.isLoggedIn()) return Auth.logout();
+          if ($(this).hasClass("btn-liked")) {
+            axios
+              .delete("/TickitEasy/member/api/fundprojectFollow", {
+                params: { memberID: memberID, projectID: projectID },
+              })
+              .then(() => {
+                $("#btn-like")
+                  .removeClass("btn-liked")
+                  .html(
+                    '<i class="fa-regular fa-heart btn-like-heart"></i> 開始追蹤'
+                  );
+              })
+              .catch(console.log);
+          }
+        });
         const startDate = new Date(
-          daysLeft.getAttribute("data-startdate").replace(" ", "T")
+          $("#daysLeft").data("startdate").replace(" ", "T")
         );
         const endDate = new Date(
-          daysLeft.getAttribute("data-enddate").replace(" ", "T")
+          $("#daysLeft").data("enddate").replace(" ", "T")
         );
+        const currentDate = new Date();
 
-        const timeDiff = endDate - currentDate;
-        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-        if (daysDiff > 0) {
-          daysLeft.textContent = daysDiff + " 天";
-        } else {
-          daysLeft.textContent = "募資結束";
+        const daysDiff = Math.ceil(
+          (endDate - currentDate) / (1000 * 60 * 60 * 24)
+        );
+        $("#daysLeft").text(daysDiff > 0 ? `${daysDiff} 天` : "募資結束");
+
+        $("#time-span").text(
+          `募資期間 ${formatDate(startDate)} – ${formatDate(endDate)}`
+        );
+        //呼叫函式
+        isDonating(currentDate);
+
+        function formatDate(date) {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          const hours = String(date.getHours()).padStart(2, "0");
+          const minutes = String(date.getMinutes()).padStart(2, "0");
+          return `${year}/${month}/${day} ${hours}:${minutes}`;
         }
-        // 格式化日期：2024-10-16 14:30
-        let formattedStartDate = dateFormatter(
-          daysLeft.getAttribute("data-startdate").replace(" ", "T")
-        );
-        let formattedEndDate = dateFormatter(
-          daysLeft.getAttribute("data-enddate").replace(" ", "T")
-        );
-        timeSpan.textContent = `募資期間 ${formattedStartDate} – ${formattedEndDate}`;
-        function dateFormatter(target) {
-          let targetDate = new Date(target);
-          let year = targetDate.getFullYear();
-          let month = String(targetDate.getMonth() + 1).padStart(2, "0"); // 月份從0開始，所以需要+1
-          let day = String(targetDate.getDate()).padStart(2, "0");
-          let hours = String(targetDate.getHours()).padStart(2, "0");
-          let minutes = String(targetDate.getMinutes()).padStart(2, "0");
-          let seconds = String(targetDate.getSeconds()).padStart(2, "0");
 
-          // 組合成指定格式
-          let formattedDate = `${year}/${month}/${day} ${hours}:${minutes}`;
-          return formattedDate;
+        // 是否已經開始募資？ "贊助":"非募資期間"
+        function isDonating(now) {
+          const buyBtns = document.getElementsByClassName("btn-buy");
+          for (let i = 0; i < buyBtns.length; i++) {
+            if (now < startDate || now > endDate) {
+              buyBtns[i].classList.add("disabled");
+              buyBtns[i].classList.add("btn-secondary");
+              buyBtns[i].textContent = "非贊助期間";
+            }
+          }
         }
       });
     </script>
@@ -188,8 +280,10 @@
             ></a>
           </div>
           <div
+            id="fundProject"
             class="custom-letter-spacing fs-5 fw-medium py-4"
             th:text="${fundProjDTO.title}"
+            th:data-project-id="${fundProjDTO.projectID}"
           ></div>
           <div class="d-flex justify-content-evenly align-items-center mb-2">
             <div>
@@ -212,8 +306,10 @@
                 <small class="custom-small-text2"
                   ><i class="fa-solid fa-user" style="color: #797a7c"></i
                 ></small>
-                <small class="custom-small-text2 me-2 fw-semibold"
-                  >8,628 人
+                <small
+                  class="custom-small-text2 me-2 fw-semibold"
+                  th:text="${fundProjDTO.participants}+' 人'"
+                >
                 </small>
                 <small>
                   <i
@@ -226,7 +322,7 @@
                   th:data-startdate="${fundProjDTO.startDate}"
                   th:data-enddate="${fundProjDTO.endDate}"
                   id="daysLeft"
-                  >0 天
+                >
                 </small>
               </div>
             </div>
@@ -237,10 +333,11 @@
             class="custom-small-text mt-2 custom-letter-spacing"
           ></small>
           <button
+            id="btn-like"
             type="button"
             class="btn border fw-bolder my-5 btn-like purple-text"
           >
-            <i class="fa-regular fa-heart btn-like-heart"></i> 收藏
+            <i class="fa-regular fa-heart btn-like-heart"></i> 開始追蹤
           </button>
         </div>
       </div>

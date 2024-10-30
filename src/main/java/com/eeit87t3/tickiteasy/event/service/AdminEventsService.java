@@ -1,18 +1,12 @@
 package com.eeit87t3.tickiteasy.event.service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
@@ -23,7 +17,6 @@ import com.eeit87t3.tickiteasy.event.dto.EventsDTO;
 import com.eeit87t3.tickiteasy.event.dto.EventsSearchingDTO;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
-import com.eeit87t3.tickiteasy.event.repository.EventsSpecification;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 
@@ -110,6 +103,7 @@ public class AdminEventsService {
 	 * @return 驗證結果：若正確，回傳「輸入正確！」；若錯誤，會包含錯誤訊息。
 	 */
 	public String validateCreateInput(EventsDTO createEventsDTO) {
+		System.out.println(createEventsDTO);
 
 		// 活動名稱
 		if (createEventsDTO.getEventName() != null && !createEventsDTO.getEventName().isBlank()) {  // 未輸入活動名稱

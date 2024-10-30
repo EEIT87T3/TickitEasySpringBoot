@@ -1,3 +1,6 @@
+/* 複製自：static/cwdfunding/css/card.css */
+
+
 /* Card */
 
 .custom-card {
@@ -9,27 +12,10 @@
 
 .custom-card:hover {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* 減輕的懸停陰影效果 */
-}
+}  
 
 
 /* Pagination */
-
-/* .pagenation-div .page-item {
-    border: none;
-    background-color: none;
-    border-radius: 50%;
-    color: black;
-    margin-right: 4px;
-    margin-left: 4px;
-} */
-
-/* .pagenation-div .page-item .active {
-    color: #fff;
-    background-color: #5f46e8;
-    border-radius: 50%;
-    border-width: 0.5rem;
-    box-shadow: none;
-} */
 
 /* 更改分頁按鈕的顏色 */
 .pagination .page-item .page-link {
@@ -53,4 +39,3 @@
     border-width: 0.5rem;
     box-shadow: none;
   }
-  

@@ -37,7 +37,7 @@
 				if (eventsData.length == 0) {  // 查詢無結果
 					eventsDiv.innerHTML = `
 						<div></div>
-						<div><h3>目前沒有符合條件的活動。</h3></div>
+						<div><h3 style="text-align: center">目前沒有<br>符合條件的活動。</h3></div>
 						<div></div>`;
 				} else {
 					eventsData.forEach(event => {
@@ -75,7 +75,7 @@
 						eventCard.querySelector(".category").innerText = event.eventCategory.categoryName;
 						
 						// 標籤
-						if (event.tag) {
+						if (event.eventTag) {
 							eventCard.querySelector(".tag").innerText = event.eventTag.tagName;
 						}
 	
@@ -151,7 +151,6 @@
 				
 				getData(params);
 			})
-
 			// 取得查詢參數
 			function getParams() {
 				return {
@@ -164,6 +163,16 @@
 					directionString: document.getElementById("direction").value
 				}
 			}
+			// 清空按鈕
+			document.getElementById("clear").addEventListener("click", () => {
+				document.getElementById("event-name").value = "";
+				document.getElementById("city-name").value = "";
+				document.getElementById("category").value = "";
+				document.getElementById("tag").value = "";
+				document.getElementById("searching-date").value = "";
+				document.getElementById("order-by").value = "eventStartTime";
+				document.getElementById("direction").value = "ASC";
+			})
 
 			
 			function getData(innerParams) {
@@ -181,7 +190,12 @@
 						paginationMaker(res.data);
 
 						// 回到查詢結果區頂部
-						document.getElementById("event-content").scrollIntoView({ behavior: 'smooth' });
+						const targetElement = document.getElementById("event-content");
+						const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;  // 目標元素上緣相對於 window 頂部的距離 + 目前滾輪離頂部的距離
+						window.scrollTo({
+							top: targetPosition - 70,
+							behavior: 'smooth'
+						});
 					})
 					.catch(err => {
 						console.error(err);
@@ -193,7 +207,8 @@
 
 
 			// 初始執行
-			getData({});
+			const initParams = getParams();
+			getData(initParams);
 
 
 			
@@ -263,7 +278,8 @@
 						</select>
 					</div>
 				</div>
-				<div class="d-flex justify-content-center align-items-center">
+				<div class="d-flex justify-content-evenly align-items-center">
+					<button class="btn btn-secondary" id="clear">清空</button>
 					<button class="btn btn-primary" id="search">查詢</button>
 				</div>
 			</div>

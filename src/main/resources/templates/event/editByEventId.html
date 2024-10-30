@@ -4,16 +4,29 @@
 <head>
     <meta th:replace="~{commons/adminHead}">
     <script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<!-- summernote include -->
+	<!-- jQuery -->
+	<!-- Bootstrap 5 -->
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" rel="stylesheet">
+
 	<title>活動詳情</title>
 	<style>
 		table>tbody>tr>th {
 			width: 120px;
+			min-width: 120px;
 			text-align: right;
 			vertical-align: middle;
 		}
 		table>tbody>tr>td {
 			text-align: left;
 			vertical-align: middle;
+		}
+		table>tbody>tr>td img {
+			max-width: 100%;
+			height: auto !important;
 		}
 	</style>
 	<script>
@@ -32,6 +45,34 @@
 					minute: '2-digit',
 				};
 				return dateObject.toLocaleString('zh-TW', options);
+			}
+
+
+			// summernote
+			$('#summernote').summernote({
+				placeholder: '活動介紹',
+				tabsize: 4,
+				height: 200,
+				toolbar: [
+					['style', ['bold', 'italic', 'underline', 'clear']],
+					['font', ['strikethrough', 'superscript', 'subscript']],
+					['fontsize', ['fontsize']],
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['insert', ['link', 'picture']],
+					['view', ['fullscreen', 'help']],
+				],
+			});
+			// 將原本的活動介紹放入 summernote
+			function decodeHtml(html) {  // 將 Thymeleaf 傳來 JavaScript 
+				const txt = document.createElement("textarea");
+				txt.innerHTML = html; // 將 HTML 實體編碼賦值
+				return txt.value; // 取得解析後的 HTML
+			}
+			const encodedOriginalEventDesc = '[[${#strings.escapeJavaScript(event.eventDesc)}]]';
+			const decodedOriginalEventDesc = decodeHtml(encodedOriginalEventDesc);
+			if (encodedOriginalEventDesc !== null && !encodedOriginalEventDesc !== "") {
+				$('#summernote').summernote('code', decodedOriginalEventDesc);
 			}
 
 			// EventListener
@@ -55,11 +96,12 @@
 					if (res.status == 200) {
 						resultDiv.classList.add("text-success");
 						resultDiv.innerText = "編輯成功！";
-						// createForm.reset();
-						setTimeout(() => {
-							window.alert("編輯成功！");
+						Swal.fire({
+							title: '編輯成功！',
+							icon: 'success',
+						}).then(() => {
 							window.location.href = currentPath.substring(0, currentPath.lastIndexOf("/"));
-						}, 50);
+						});
 					}
 				})
 				.catch(err => {
@@ -82,6 +124,12 @@
 			document.querySelectorAll("input[type=datetime-local]").forEach(element => {
             	element.setAttribute('min', nowFormattedString);
         	});
+
+			// 預先選中原本的類別和標籤
+			const originalCategoryString = document.getElementById("categoryString").value;
+			document.querySelector(`option[value=${originalCategoryString}]`).selected = true;
+			const originalTagString = document.getElementById("tagString").value;
+			document.querySelector(`option[value=${originalTagString}]`).selected = true;
 		});
 	</script>
 </head>
@@ -121,13 +169,15 @@
 					<td>
 						<img th:if="${event.eventPic != null}" th:src="@{${event.eventPic}}" th:alt="${event.eventName}" class="mb-2" width=320px>
 						<span th:unless="${event.eventPic != null}"><input type="text" class="form-control-plaintext" readonly value="（無圖片）"></span>
-						<input type="file" class="form-control" name="eventPicFile">
+						<input type="file" class="form-control" name="eventPicFile" accept=".jpg, .jpeg, .png, .gif">
 					</td>
 				</tr>
 				<tr>
 					<th>活動類別</th>
 					<td>
 						<input type="text" class="form-control-plaintext" readonly th:value="${event.eventCategory.categoryName}">
+						<!-- 傳遞 categoryString -->
+						<input type="hidden" id="categoryString" th:value="${event.eventCategory.categoryString}">
 						<select class="form-select" name="categoryString">
 							<option value="">（未選擇）</option>
 							<th:block th:each="category : ${categoryList}">
@@ -141,6 +191,9 @@
 					<td>
 						<input th:if="${event.eventTag != null}" type="text" class="form-control-plaintext" readonly th:value="${event.eventTag.tagName}">
 						<input th:unless="${event.eventTag != null}" type="text" class="form-control-plaintext" readonly th:value="（無標籤）">
+						<!-- 傳遞 tagString -->
+						<input th:if="${event.eventTag != null}" type="hidden" id="tagString" th:value="${event.eventTag.tagString}">
+						<input th:unless="${event.eventTag != null}" type="hidden" id="tagString" value="">
 						<select class="form-select" name="tagString">
 							<option value="">（未選擇）</option>
 							<th:block th:each="tag : ${tagList}">
@@ -152,9 +205,9 @@
 				<tr>
 					<th>活動介紹</th>
 					<td>
-						<textarea th:if="${event.eventDesc != null}" class="form-control-plaintext" readonly>[[${event.eventDesc}]]</textarea>
-						<textarea th:unless="${event.eventDesc != null}" class="form-control-plaintext" readonly>（無活動介紹）</textarea>
-						<textarea class="form-control" name="eventDesc" placeholder="編輯活動介紹"></textarea>
+						<!-- <textarea th:if="${event.eventDesc != null}" class="form-control-plaintext" readonly>[[${event.eventDesc}]]</textarea>
+						<textarea th:unless="${event.eventDesc != null}" class="form-control-plaintext" readonly>（無活動介紹）</textarea> -->
+						<textarea class="form-control" name="eventDesc" id="summernote"></textarea>
 					</td>
 				</tr>
 				<tr>

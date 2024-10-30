@@ -21,7 +21,7 @@ $(document).ready(function () {
         // 類別
         eventContent.getElementById("category").textContent = event.eventCategory.categoryName;
         // 標籤
-        if (event.tag != null) {
+        if (event.eventTag != null) {
             eventContent.getElementById("tag").textContent = event.eventTag.tagName;
         }
 
@@ -31,8 +31,6 @@ $(document).ready(function () {
         } else {
             eventContent.getElementById("place").textContent = event.address;
         }
-        // Google Map 連結
-        eventContent.getElementById("google-map-link").setAttribute("href", "https://www.google.com/maps/place/" + event.address);
         // 地址
         eventContent.getElementById("address").textContent = event.address;
 
@@ -47,11 +45,34 @@ $(document).ready(function () {
 
         // 活動介紹
         if (event.eventDesc != null) {
-            eventContent.getElementById("event-desc").textContent = event.eventDesc;
+            eventContent.getElementById("event-desc").innerHTML  = event.eventDesc;
         } else {
             eventContent.getElementById("event-desc").textContent = "（無活動介紹）";
         }
 
+        // Embed Map
+        eventContent.getElementById("embed-map").src += event.address;
+
+
+        // EventListener
+        eventContent.getElementById("scroll-to-map").addEventListener("click", () => {
+            // 滾動至地圖
+            const targetElement = document.getElementById("embed-map");
+            const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;  // 目標元素上緣相對於 window 頂部的距離 + 目前滾輪離頂部的距離
+            window.scrollTo({
+                top: targetPosition - 90,
+                behavior: 'smooth'
+            });
+        })
+        eventContent.getElementById("scroll-to-tickettypes").addEventListener("click", () => {
+            // 滾動至票種列表
+            const targetElement = document.getElementById("tickettype-list-title");
+            const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;  // 目標元素上緣相對於 window 頂部的距離 + 目前滾輪離頂部的距離
+            window.scrollTo({
+                top: targetPosition - 90,
+                behavior: 'smooth'
+            });
+        })
 
         // ========== 票種 ==========
         const ticketTypes = data.ticketTypes;

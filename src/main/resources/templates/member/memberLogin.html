@@ -4,11 +4,13 @@
 <head>
   <meta th:replace="~{commons/userHead}">
   <meta name="google-signin-client_id" th:content="${googleClientId}">
+  <meta name="recaptcha-site-key" th:content="${recaptchaSiteKey}">
   <title>會員登入 - TickitEasy</title>
   <link rel="icon" type="image/svg+xml" th:href="@{/logo/LogoColor.svg}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <!-- Google Sign-In API -->
+	<script th:src="@{|https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}|}"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
@@ -243,6 +245,7 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script th:src="@{/Token/auth.js}"></script>
+  <script th:src="@{/member/js/recaptcha.js}"></script>
 
   <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function () {
@@ -283,45 +286,49 @@
 
       // 一般登入表單提交
       loginForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
+    e.preventDefault();
+	
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
 
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
+    if (!validateEmail(email)) {
+        Swal.fire('錯誤', '請輸入有效的電子信箱', 'error');
+        return;
+    }
 
-        if (!validateEmail(email)) {
-          Swal.fire('錯誤', '請輸入有效的電子信箱', 'error');
-          return;
-        }
+    if (!password) {
+        Swal.fire('錯誤', '密碼不得為空', 'error');
+        return;
+    }
 
-        if (!password) {
-          Swal.fire('錯誤', '密碼不得為空', 'error');
-          return;
-        }
-
-        try {
-          Swal.showLoading();
-          const response = await axios.post('/TickitEasy/api/member/login', {
+    try {
+        Swal.showLoading();
+        
+        // 加入 reCAPTCHA 驗證
+        const formData = await RecaptchaUtil.addRecaptchaToken({
             email: email,
             password: password
-          });
+        }, 'login');
+        
+        const response = await axios.post('/TickitEasy/api/member/login', formData);
 
-          Auth.setToken(response.data.token);
+        Auth.setToken(response.data.token);
 
-          await Swal.fire({
+        await Swal.fire({
             icon: 'success',
             title: '登入成功',
             text: '歡迎回來！',
             showConfirmButton: false,
             timer: 1500
-          });
+        });
 
-          window.location.href = '/TickitEasy/';
-        } catch (error) {
-          handleError(error);
-        } finally {
-          Swal.hideLoading();
-        }
-      });
+        window.location.href = '/TickitEasy/';
+    } catch (error) {
+        handleError(error);
+    } finally {
+        Swal.hideLoading();
+    }
+});
 
       // Google 登入按鈕事件
       document.getElementById('googleLogin').addEventListener('click', function () {
@@ -337,20 +344,23 @@
 
       // 處理 Google 登入
       async function handleGoogleSignIn(response) {
-        try {
-          Swal.showLoading();
-          const credential = response.credential;
-          const payload = JSON.parse(atob(credential.split('.')[1]));
+    try {
+        Swal.showLoading();
+        const credential = response.credential;
+        const payload = JSON.parse(atob(credential.split('.')[1]));
 
-          const apiResponse = await axios.post('/TickitEasy/api/member/oauth/login', {
+        // 加入 reCAPTCHA 驗證
+        const formData = await RecaptchaUtil.addRecaptchaToken({
             token: credential,
             provider: 'google',
             email: payload.email,
             name: payload.name,
             picture: payload.picture,
             providerId: payload.sub
-          });
+        }, 'google_login');
 
+        const apiResponse = await axios.post('/TickitEasy/api/member/oauth/login', formData);
+        
           if (apiResponse.data.status === 'success') {
             Auth.setToken(apiResponse.data.token);
 

@@ -25,5 +25,6 @@ public interface ProdOrdersService {
 	public Page<ProdOrders> findByMemberId(Integer number, Integer id,Integer records);
 	
 	public String ECPay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount,String memberEmail);
-	
+	public String LinePay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount,String memberEmail) throws Exception;
+	public String LinePayReturn(String targetUrl,String orderId,String transactionId) throws Exception;
 }

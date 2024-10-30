@@ -4,23 +4,41 @@
 <head>
     <meta th:replace="~{commons/adminHead}">
 	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<title>活動詳情</title>
 	<style>
-		table>tbody>tr>th {
-			width: 120px;
-			text-align: right;
-			vertical-align: middle;
-		}
-		table>tbody>tr>td {
-			text-align: left;
-			vertical-align: middle;
-		}
 		.mustMark {
             color: red;
         }
+		#event-tbody>tr>th, #create-tickettype-table tr>th {
+			width: 120px;
+			min-width: 120px;
+			text-align: right;
+			vertical-align: middle;
+		}
+		#event-tbody>tr>td, #create-tickettype-table tr>td {
+			text-align: left;
+			vertical-align: middle;
+		}
+		#event-desc img {
+			max-width: 100%;
+			height: auto !important;
+		}
+		#tickettype-thead>tr>th {
+			text-align: center;
+			vertical-align: middle;
+		}
+		#tickettype-tbody>tr>td {
+			text-align: center;
+			vertical-align: middle;
+		}
 	</style>
 	<script>
 		$(document).ready(function () {
+
+			// Bootstrap Tooltips
+			const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
 			// 初始化常數與 function
 
@@ -39,6 +57,13 @@
 				};
 				return dateObject.toLocaleString('zh-TW', options);
 			}
+
+			// 設定日期時間欄位最小值
+			const now = new Date();
+			const nowFormattedString = now.toISOString().slice(0, 16);
+			document.querySelectorAll("input[type=datetime-local]").forEach(element => {
+            	element.setAttribute('min', nowFormattedString);
+        	});
 
 			// status-button maker
 			function statusButtonMaker(status) {
@@ -127,11 +152,15 @@
 				// 活動主圖
 				eventPicTd = eventTbodyTemplate.getElementById("event-pic");
 				if (eventData.eventPic != null) {
-					const img = document.createElement("img");
+					const div = document.createElement("div");  // ratio 包裝 div
+					div.classList.add("ratio", "ratio-16x9");
+					div.setAttribute("style", "width: 640px;");
+					const img = document.createElement("img");  // 實際 img
 					img.setAttribute("src", contextPath + eventData.eventPic);
 					img.setAttribute("alt", eventData.eventName);
-					img.setAttribute("width", "320px");
-					eventPicTd.append(img);
+					img.classList.add("object-fit-cover")
+					div.append(img);
+					eventPicTd.append(div);
 				} else {
 					eventPicTd.innerText = "（無圖片）";
 				}
@@ -150,9 +179,9 @@
 				// 活動介紹
 				const eventDescTd = eventTbodyTemplate.getElementById("event-desc");
 				if (eventData.eventDesc != null) {
-					eventDescTd.innerText = eventData.eventDesc;
+					eventDescTd.innerHTML = eventData.eventDesc;
 				} else {
-					eventDescTd.innerText = "（無活動介紹）";
+					eventDescTd.innerHTML = "（無活動介紹）";
 				}
 
 				// 地點
@@ -221,7 +250,10 @@
 					})
 					.then(res => {
 						console.log(res);
-						alert("編輯狀態成功！");
+						Swal.fire({
+							title: '編輯狀態成功！',
+							icon: 'success',
+						});
 						if (editStatus == -1) {
 							window.location.href = currentPath.substring(0, currentPath.lastIndexOf("/"));
 						} else {
@@ -230,22 +262,40 @@
 					})
 					.catch(err => {
 						console.error(err); 
-						alert("編輯狀態失敗。");
+						Swal.fire({
+							title: '編輯狀態失敗。',
+							icon: 'error',
+						});
 					})
 			}
 
 
-			// 新增票種
+			// ===== 新增票種 =====
 			const createTickettypeForm = document.getElementById("create-tickettype-form");
 
 			// 示範輸入
-			document.getElementById("demo").addEventListener("click", () => {
-				createTickettypeForm.elements["typeName"].value = "示範輸入票種名稱 01";
-				createTickettypeForm.elements["price"].value = "100";
-				createTickettypeForm.elements["startSaleTime"].value = "2024-11-10T00:00";
-				createTickettypeForm.elements["endSaleTime"].value = "2024-11-19T23:59";
-				// createTickettypeForm.elements["quantityAvailable"].value = "50";  // 暫不使用
+			document.getElementById("demo1").addEventListener("click", () => {
+				createTickettypeForm.elements["typeName"].value = "預售票";
+				createTickettypeForm.elements["price"].value = "350";
+				createTickettypeForm.elements["startSaleTime"].value = "2024-11-09T00:00";
+				createTickettypeForm.elements["endSaleTime"].value = "2024-12-27T23:59";
 			})
+			document.getElementById("demo2").addEventListener("click", () => {
+				createTickettypeForm.elements["typeName"].value = "展期票";
+				createTickettypeForm.elements["price"].value = "450";
+				createTickettypeForm.elements["startSaleTime"].value = "2024-12-28T00:00";
+				createTickettypeForm.elements["endSaleTime"].value = "2025-04-06T15:59";
+			})
+
+			// 啟用限制購買數量的 checkbox
+			document.getElementById("quantityAvailableCheckBox").addEventListener("change", function() {
+				if (this.checked) {
+					document.getElementsByName("quantityAvailable")[0].disabled = false;
+				} else {
+					document.getElementsByName("quantityAvailable")[0].disabled = true;
+					document.getElementsByName("quantityAvailable")[0].value = "";
+				}
+			});
 
 			// 新增票種
 			createTickettypeForm.addEventListener("submit", (event) => {
@@ -258,15 +308,29 @@
 				axios.post(`${contextPath}/admin/api/event/${eventID}/tickettype`,formData)
 					.then(res => {
 						console.log(res);
-						window.alert("新增票種成功！");
+						Swal.fire({
+							title: '新增票種成功！',
+							icon: 'success',
+						});
 						modalInstance.hide();
+						// 復原「限制購買數量」欄位
+						document.getElementById("quantityAvailableCheckBox").checked = false;
+						document.getElementsByName("quantityAvailable")[0].disabled = true;
+						document.getElementsByName("quantityAvailable")[0].value = "";
 						createTickettypeForm.reset();
 						getData();
 					})
 					.catch(err => {
 						console.error(err);
-						window.alert("新增票種成功！");
+						Swal.fire({
+							title: '新增票種失敗。',
+							icon: 'error',
+						});
 						modalInstance.hide();
+						// 復原「限制購買數量」欄位
+						document.getElementById("quantityAvailableCheckBox").checked = false;
+						document.getElementsByName("quantityAvailable")[0].disabled = true;
+						document.getElementsByName("quantityAvailable")[0].value = "";
 					})
 			})
 
@@ -303,9 +367,14 @@
 	<!--  這裡是網頁內容 >-->
 	<div id="container" class="container">
 		<h1>活動詳情</h1>
-		<table class="table table-hover" th:unless="${error}">
+		<table class="table table-hover" style="table-layout: fixed;" th:unless="${error}">
 			<tbody id="event-tbody">
-				<!-- spinner -->
+				<td colspan="2" class="d-flex justify-content-center">
+					<!-- Spinner -->
+					<div class="spinner-border m-5" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				</td>
 			</tbody>
 		</table>
 		<div th:if="${error}">未找到此筆活動。</div>
@@ -316,7 +385,7 @@
 
 		<h2 style="display: inline-block;">票種列表</h2>		
 		<table class="table table-hover mb-3">
-			<thead>
+			<thead id="tickettype-thead">
 				<tr>
 					<th>票種編號</th>
 					<th>票種名稱</th>
@@ -346,7 +415,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<table class="table table-hover">
+						<table class="table table-hover" id="create-tickettype-table">
 							<tr>
 								<th><span class="mustMark">*</span>票種名稱</th>
 								<td>
@@ -372,15 +441,17 @@
 								</td>
 							</tr>
 							<tr>
-								<th>可購買限量</th>
-								<td>
-									<input type="number" class="form-control" name="quantityAvailable">
+								<th>可購買限量<span class="ms-1 small"  data-bs-toggle="tooltip" data-bs-title="在活動的可購買總數內，進一步限制此票種的可購買數量">(?)</span></th>
+								<td class="d-flex align-items-center">
+									<input type="checkbox" class="form-check-input m-0" id="quantityAvailableCheckBox">
+									<input type="number" class="form-control ms-2" name="quantityAvailable" disabled>
 								</td>
 							</tr>
 						</table>
 					</div>
 					<div class="modal-footer">
-						<button type="button" id="demo" class="btn btn-warning">示範輸入</button>
+						<button type="button" id="demo1" class="btn btn-warning">示範輸入：預售</button>
+						<button type="button" id="demo2" class="btn btn-warning">示範輸入：展期</button>
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
 						<button type="submit" class="btn btn-primary">儲存</button>
 					</div>
@@ -395,10 +466,10 @@
 			<td id="event-id"></td>
 		</tr>
 		<tr>
-			<th>狀態</th>
-			<td class="d-flex">
+			<th style="min-height: 64px;">狀態</th>
+			<td class="d-flex" style="min-height: 64px;">
 				<span id="status" data-status="" class="d-flex align-items-center"></span>
-				<div id="status-button" class="ms-auto gap-3"></div>
+				<div id="status-button" class="ms-auto gap-3 d-flex align-items-center"></div>
 			</td>
 		</tr>
 		<tr>
@@ -464,7 +535,7 @@
 			<td class="quantityAvailable"></td>
 			<td class="action" style="text-align: center;">
 				<button type="button" class="btn btn-primary tickettype-edit">編輯</button>
-				<button type="button" class="btn btn-danger ms-3 tickettype-delete">刪除</button>
+				<button type="button" class="btn btn-danger ms-1 tickettype-delete">刪除</button>
 			</td>
 		</tr>
 	</template>

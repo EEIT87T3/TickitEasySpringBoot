@@ -16,10 +16,6 @@ $(document).ready(function () {
   } else {
     leftProgress = 0;
   }
-  console.log(targetAmount);
-  console.log(currentAmount);
-  console.log(nowProgress);
-  console.log(leftProgress);
 
   const myDoughnutChart = new Chart(ctx, {
     type: "doughnut",

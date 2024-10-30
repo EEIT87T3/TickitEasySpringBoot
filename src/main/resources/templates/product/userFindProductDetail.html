@@ -2,136 +2,251 @@
 <html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
-
     <!-- 在這裡放要引入的 CSS 與 JS library -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script> <!-- jQuery 要放在最前面 -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:src="@{/Token/auth.js}"></script>
+    <script src="/TickitEasy/product/js/userFindProductDetail.js"></script>
     <meta th:replace="~{commons/userHead}">
     <style>
+        /* 縮略圖樣式 */
         .thumbnail-image {
-            width: 60px;
-            height: 60px;
+            width: 120px;
+            height: auto;
             object-fit: cover;
             cursor: pointer;
             margin: 5px;
         }
 
+        /* 主圖樣式 */
         .main-image {
             width: 100%;
-            height: 400px;
             object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.3s;
+
+        }
+
+        /* 主圖容器樣式 */
+        .image-container {
+            width: 100%;
+            max-width: 600px;
+            flex: 1;
+        }
+
+        /* 調整左右空白相等 */
+        .custom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        /* 調整上方空白及容器寬度 */
+        .container {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* 縮略圖容器的水平排列 */
+        .thumbnails-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 調整數量輸入框的樣式 */
+        .input-group .form-control {
+            text-align: center;
+            width: auto;
+            flex-grow: 0;
+        }
+
+        /* 購物車與收藏按鈕樣式 */
+        .btn-group-wrapper {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* 調整按鈕背景色及樣式 */
+        #favoriteButton {
+            background-color: #FFB44D;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 16px;
+            height: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #favoriteButton .fas.fa-heart {
+            color: white;
+        }
+
+        #favoriteButton.favorited {
+            background-color: white;
+            color: #FFB44D;
+            border: 1px solid #FFB44D;
+        }
+
+        #favoriteButton.favorited .fas.fa-heart {
+            color: #FFB44D;
+        }
+
+        /* 文字容器樣式 */
+        .text-container {
+            flex: 1;
+            padding-left: 2rem;
+            padding-right: 1rem;
+        }
+
+        /* 自定義字母間距 */
+        .custom-letter-spacing {
+            letter-spacing: 1.25px;
+        }
+
+        /* 推薦商品卡片樣式 */
+        .recommended-product-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .recommended-product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .recommended-product-card .card-title {
+            color: #322770;
+            font-weight: bold;
+        }
+
+        .recommended-product-card .btn-primary {
+            background-color: #5F46E8;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            transition: background-color 0.3s;
+        }
+
+        .recommended-product-card .btn-primary:hover {
+            background-color: #322770;
         }
     </style>
     <title>周邊商品</title>
     <script>
-        $(document).ready(function () {
-
-            // 這裡是 JavaScript 內容
-
+    $(document).ready(function () {
+        // 點擊主圖放大
+        $(document).on('click', '#mainImage', function() {
+            const imageUrl = $(this).attr('src');
+            const modalHtml = `
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg ">
+                        <div class="modal-content">
+                            <div class="modal-header border-0" >
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img src="${imageUrl}" class="img-fluid" alt="放大圖片">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+            $('#imageModal').modal('show');
+            $('#imageModal').on('hidden.bs.modal', function () {
+                $(this).remove();
+            });
         });
-    </script>
+    });
+</script>
+
 </head>
 
 <body>
     <div th:replace="~{commons/userHeader}"></div>
 
-    <!--  這裡是網頁內容 >-->
-
-
+    <!-- 商品詳情 -->
     <div class="container mt-5">
-        <div class="row" id="productDetail">
+        <div class="row custom-row" id="productDetail">
             <!-- 商品詳情將通過 JavaScript 動態添加 -->
         </div>
     </div>
-    <script th:inline="javascript">
-        const productID = /*[[${productID}]]*/ '';
 
-        function loadProductDetail() {
-            axios.get(`/TickitEasy/user/api/product/${productID}`)
-                .then(response => {
-                    const product = response.data;
-                    displayProductDetail(product);
-                })
-                .catch(error => {
-                    console.error('Error loading product details:', error);
-                    document.getElementById('productDetail').innerHTML = '<p class="text-danger">商品加載失敗，請稍後再試。</p>';
-                });
-        }
+    <h4 class="text-center mb-4">推薦商品</h4>
+    <div class="row justify-content-center" id="recommendedProductsContainer">
+        <!-- 推薦商品將通過 JavaScript 動態添加 -->
+    </div>
 
-        function displayProductDetail(product) {
-            const detailHtml = `
-            <div class="col-md-6">
-                <img id="mainImage" src="/TickitEasy${product.productPic}" alt="${product.productName}" class="main-image">
-                <div class="d-flex flex-wrap mt-2" id="thumbnails">
-                    <img src="/TickitEasy${product.productPic}" alt="${product.productName}" class="thumbnail-image" onclick="changeMainImage(this.src)">
-                    ${product.detailPhotos.map(photo => `
-                        <img src="/TickitEasy${photo}" alt="${product.productName}" class="thumbnail-image" onclick="changeMainImage(this.src)">
-                    `).join('')}
+    <!-- 商品詳情模板 -->
+    <template id="productDetailTemplate">
+        <div class="col-md-6 image-container mt-5">
+            <!-- 主圖 -->
+            <img id="mainImage" class="main-image" src="" alt="主圖">
+            <!-- 副圖縮略圖容器 -->
+            <div class="thumbnails-container" id="thumbnails"></div>
+        </div>
+        <div class="col-md-6 text-container">
+            <h1 class="custom-letter-spacing fs-5 fw-medium py-4 mt-4" id="productName"></h1>
+            <p class="fs-4 fw-bolder">NT$<span class="fs-4 fw-bolder" id="productPrice"></span></p>
+            <p id="productStocknone">庫存: <span id="productStock"></span></p>
+
+            <!-- 補貨通知區 -->
+            <div id="notificationButtonContainer" class="mb-3" style="display: none;">
+                <button id="productStocknone" onclick="setNotification()" class="btn btn-warning ml-2">補貨通知我</button>
+            </div>
+
+            <!-- 數量選擇區域 -->
+            <div id="quantityInputnone" class="input-group mb-2 mt-4">
+                <button class="btn btn-outline-secondary" onclick="decreaseQuantity()">-</button>
+                <input type="number" id="quantityInput" class="form-control" value="1" min="1" onchange="updateQuantity(this.value)">
+                <button class="btn btn-outline-secondary" onclick="increaseQuantity()">+</button>
+            </div>
+
+            <!-- 購物車按鈕區域 -->
+            <div id="cartButtonsContainer" class="btn-group-wrapper">
+                <button onclick="addToCart(false)" class="btn btn-primary" style="background-color: #5F46E8; border: none; border-radius: 25px; padding: 10px 20px;">加入購物車</button>
+                <button onclick="addToCart(true)" class="btn btn-secondary" style="border-radius: 25px; padding: 10px 20px;">直接購買</button>
+                <button id="favoriteButton" onclick="toggleFavorite()" class="btn btn-outline-primary">
+                    <i class="fas fa-heart"></i> 加入收藏
+                </button>
+            </div>
+        </div>
+        <h4 class="mt-4">商品特色描述</h4>
+        <p id="productDesc"></p>
+    </template>
+
+    <!-- 推薦商品模板 -->
+    <template id="recommendedProductTemplate">
+        <div class="col-md-3 mb-4">
+            <div class="card recommended-product-card h-100">
+                <img class="card-img-top recommended-img" src="" alt="">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-truncate recommended-name"></h5>
+                    <p class="card-text mb-2">NT$ <span class="recommended-price"></span></p>
+                    <a href="" class="btn btn-primary mt-auto">查看詳情</a>
                 </div>
             </div>
-            <div class="col-md-6">
-                <h2>${product.productName}</h2>
-                <p>價格: $${product.price}</p>
-                <p>庫存: ${product.stock}</p>
-                <h4 class="mt-4">商品描述</h4>
-                <p>${product.productDesc}</p>
-                <input type="number" id="quantityInput" value="1" min="1">
-                 <button onclick="addToCart(false)" class="btn btn-primary mr-2">加入購物車</button>
-    			 <button onclick="addToCart(true)" class="btn btn-success">直接購買</button>
-            </div>
-        `;
-            document.getElementById('productDetail').innerHTML = detailHtml;
-        }
+        </div>
+    </template>
 
-        function changeMainImage(src) {
-            document.getElementById('mainImage').src = src;
-        }
-
-        document.addEventListener('DOMContentLoaded', loadProductDetail);
-
-
-        //購物車按鈕
-        function addToCart(buyNow) {
-            const quantity = parseInt(document.getElementById('quantityInput').value, 10);
-
-            if (isNaN(quantity) || quantity < 1) {
-                alert('請輸入大於0的數量');
-                return;
-            }
-
-            axios.post('/TickitEasy/user/api/product', null, {
-                params: {
-                    productID: productID, // 假設 productID 是全局變量
-                    quantity: quantity
-                }
-            })
-                .then(response => {
-                    const cartItem = response.data;
-                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                    const existingItemIndex = cart.findIndex(item => item.productID === cartItem.productID);
-
-                    if (existingItemIndex > -1) {
-                        cart[existingItemIndex].quantity += quantity;
-                    } else {
-                        cart.push(cartItem);
-                    }
-
-                    localStorage.setItem('cart', JSON.stringify(cart));
-
-                    if (buyNow) {
-                        window.location.href = '/TickitEasy/user/cart';
-                    } else {
-                        alert('商品已加入購物車');
-                    }
-                })
-                .catch(error => {
-                    console.error('加入購物車失敗:', error);
-                    alert('加入購物車失敗，請稍後再試');
-                });
-        }
+    <script th:inline="javascript">
+        const productID = /*[[${productID}]]*/ 0;
+        console.log('Product ID:', productID);
     </script>
-
-    <div th:replace="~{commons/userFooter}"></div>
 </body>
 
 </html>
