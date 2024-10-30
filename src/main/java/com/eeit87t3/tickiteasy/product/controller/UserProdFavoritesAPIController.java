@@ -33,6 +33,13 @@ public class UserProdFavoritesAPIController {
     
     @Autowired
     private MemberService memberService;
+    
+    // 获取每个商品的收藏次数，用于长条图
+    @GetMapping("/product-favorites")
+    public ResponseEntity<Map<String, Integer>> getProductFavoriteCount() {
+        Map<String, Integer> favoriteCountData = favoritesService.getProductFavoriteCount();
+        return ResponseEntity.ok(favoriteCountData);
+    }
 
     // 收藏/取消收藏商品
     @PostMapping("/favorite/{productID}")
