@@ -42,7 +42,7 @@
         .chart-container {
             position: relative;
             width: 100%;  /* 讓圖表自動適應卡片寬度 */
-            height: 300px; /* 你可以根據需要調整這個高度 */
+            height: 400px; /* 你可以根據需要調整這個高度 */
         }
     </style>
 </head>
@@ -56,7 +56,7 @@
 	<!-- 將兩個圖表合併為同一列 -->
     <div class="stat-row">
         <!-- 圓餅圖：各標籤的商品庫存數 -->
-        <div class="stat-card">
+        <div class="stat-card card-body" >
             <h2>各標籤的商品庫存數</h2>
             <div class="chart-container">
                 <canvas id="tagStockChart"></canvas>
@@ -110,7 +110,16 @@
                             ],
                             borderWidth: 1
                         }]
+                    },
+                    options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right' // 將圖例移到右側
+                        }
                     }
+                }
                 });
             })
             .catch(error => console.error('獲取商品庫存數據時出錯：', error));
