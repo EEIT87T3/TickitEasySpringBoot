@@ -1,3 +1,13 @@
+/* 限制活動介紹的圖片寬度 */
+#event-desc {
+    position: relative;
+    max-width: 100%;
+}
+#event-desc img {
+    max-width: 100%;
+    height: auto !important;
+}
+
 /* 隱藏 input:number 的右方增減箭頭 */
 
 input[type="number"]::-webkit-inner-spin-button,
