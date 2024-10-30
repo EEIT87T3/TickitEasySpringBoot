@@ -41,8 +41,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.eeit87t3.tickiteasy.admin.entity.Admin;
 import com.eeit87t3.tickiteasy.admin.service.AdminService;
+import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.event.service.TicketTypesProcessingService;
+import com.eeit87t3.tickiteasy.event.service.UserEventsService;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.eeit87t3.tickiteasy.order.entity.CheckoutPaymentRequestForm;
@@ -55,6 +57,7 @@ import com.eeit87t3.tickiteasy.order.entity.RedirectUrls;
 import com.eeit87t3.tickiteasy.order.repository.ProdOrdersRepository;
 import com.eeit87t3.tickiteasy.order.service.ProdOrdersService;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
+import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,7 +79,16 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 	
 	@Autowired
 	private ProdOrdersRepository por;
-
+	@Autowired
+	ProductService productService;
+	@Autowired
+	TicketTypesProcessingService ticketTypesProcessingService;
+	@Autowired
+	MemberService memberService;
+	@Autowired
+	UserEventsService userEventsService;
+	
+	
 	@Override
 	public ProdOrders saveOrder(ProdOrders prodOrders) {
 		return por.save(prodOrders);
@@ -168,12 +180,6 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		return por.findOrdersByMemberId(number);
 	}
 	
-	@Autowired
-	ProductService productService;
-	@Autowired
-	TicketTypesProcessingService ticketTypesProcessingService;
-	@Autowired
-	MemberService memberService;
 	//串接綠界ECPay
 	@Override
 	public String ECPay(List<Map<String,Object>> ticketTypesCartToCheckoutJson,List<Map<String,Object>> checkoutItems,String totalAmount,String memberEmail) { 
@@ -199,7 +205,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		obj.setTotalAmount(totalAmount); //交易金額 String類型
 		obj.setTradeDesc("test Description"); //交易描述
 		obj.setItemName(itemname); //商品名稱
-		obj.setReturnURL("https://abf1-114-25-182-128.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
+		obj.setReturnURL("https://540f-114-25-157-66.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
 		obj.setNeedExtraPaidInfo("N"); //額外的付款資訊
 		obj.setClientBackURL("http://localhost:8080/TickitEasy/user/clientSide/orderPaymentCompleted"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
 				
@@ -257,17 +263,16 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 	
 	@Autowired
 	private JavaMailSender javaMailSender;
-	@Autowired
-	private AdminService adminService;
 	//寄gmail信
-	public void emailSend(Integer memberId,String merchantTradeNo,String tradeDate,String tradeAmt,String paymentType) throws MessagingException { //寄信
-		Optional<Admin> adminById = adminService.getAdminById(memberId); //後續透過會員id找到會員信箱並寄出
-
+	public void emailSend(String merchantTradeNo,String tradeDate,String tradeAmt,String paymentType) throws MessagingException { //寄信
+		ProdOrders bypaymentInfo = por.findBypaymentInfo(merchantTradeNo);
+		Member member = bypaymentInfo.getMember();
+		
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 	    MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
 	    helper.setFrom("eeit87t3@gmail.com");
-	    helper.setTo("sososo8819@gmail.com");
+	    helper.setTo(member.getEmail());
 	    helper.setSubject("Tickit訂單號碼: " + merchantTradeNo);
 
 	    String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>" +
@@ -276,7 +281,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
             "<h1 style='color: #333;'>[Tickit] 您的訂單" + merchantTradeNo + "已完成付款！</h1>" +
         "</div>" +
         "<div style='padding: 20px; background-color: white;'>" +
-            "<p>王大明 您好：</p>" +
+            "<p>" +  member.getName()  + " 您好：</p>" +
             "<p>感謝您在 Tickit 訂購商品</p>" +
             "<h2 style='color: #333; border-bottom: 1px solid #ccc; padding-bottom: 10px;'>訂單明細</h2>" +
             "<table style='width: 100%; border-collapse: collapse;'>" +
@@ -384,7 +389,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setAppPackageName(""); //N 在Android環境切換應用時所需的資訊，用於防止網路釣魚攻擊（phishing）
         redirectUrls.setConfirmUrlType("SERVER");
-        redirectUrls.setConfirmUrl("https://abf1-114-25-182-128.ngrok-free.app/TickitEasy/admin/order/LinePayReturn"); //Y 設定支付完成後用戶跳轉的網址。
+        redirectUrls.setConfirmUrl("https://540f-114-25-157-66.ngrok-free.app/TickitEasy/admin/order/LinePayReturn"); //Y 設定支付完成後用戶跳轉的網址。
         redirectUrls.setCancelUrl("http://localhost:8080/TickitEasy"); //Y 設定支付取消後用戶跳轉的網址。
         form.setRedirectUrls(redirectUrls);
         
@@ -492,12 +497,18 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 			int productQuantity = product.getInt("quantity");
 			int productPrice = product.getInt("price");
 			
-			if(productName.contains("示範") || productName.contains("活動") || productName.contains("啟售") || productName.contains("票種")) {
+			if(productName.contains("會") || productName.contains("場") || productName.contains("活動") || 
+					productName.contains("展") || productName.contains("市集") || productName.contains("電競") ||
+					productName.contains("劇場") || productName.contains("親子")|| productName.contains("世界") || 
+					productName.contains("賽")|| productName.contains("旅")|| productName.contains("篇")|| 
+					productName.contains("社交")) {
+				LinePayReduceStock(null, null, Integer.parseInt(productId), productQuantity);
 				prodOrderDetails.setProdOrder(bypaymentInfo);
 				prodOrderDetails.setTicketTypeId(Integer.parseInt(productId));
 				prodOrderDetails.setTicketPrice(productPrice);
 				prodOrderDetails.setTicketQuantity(productQuantity);
 			}else {
+				LinePayReduceStock(Integer.parseInt(productId), productQuantity, null, null);
 				prodOrderDetails.setProdOrder(bypaymentInfo);
 				prodOrderDetails.setProductId(Integer.parseInt(productId));
 				prodOrderDetails.setPrice(productPrice);
@@ -508,10 +519,41 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 	    if("0000".equals(returnCode)) {
 			bypaymentInfo.setStatus("已付款");
 			bypaymentInfo.setProdOrderDetailsBean(listsProdOrderDetails);
+			por.save(bypaymentInfo);//更改資料庫資料
 			
-			por.save(bypaymentInfo);
+			String merchantTradeNo = bypaymentInfo.getPaymentInfo();
+			String tradeDate = bypaymentInfo.getOrderDate().toString();
+			String tradeAmt = String.valueOf(bypaymentInfo.getTotalAmount());
+			String paymentType = bypaymentInfo.getPayments();
+			emailSend(merchantTradeNo, tradeDate, tradeAmt, paymentType); //寄信gmail
+			
 			return "ok";
 		}
 	    return new RuntimeException("添加失敗, Status Code: " + response.statusCode()).toString();
+    }
+    
+    @Autowired
+    ProductRepo productRepo;
+    //綠界完成後減少庫存 待測試
+    public void ECPayReduceStock(Integer productId,Integer quantity,Integer ticketTypeId,Integer ticketQuantity) {
+    	if(productId != null) { //尚未寫入小梁減少庫存方法
+    		ProductEntity productById = productService.findProductById(productId);
+    		productById.setStock(productById.getStock() - quantity);
+    		productRepo.save(productById);
+    	}
+    	if(ticketTypeId != null) {
+    		userEventsService.changeQuantity(ticketTypeId, ticketQuantity);
+    	}
+    }
+    //LinePay完成後減少庫存
+    public void LinePayReduceStock(Integer productId,Integer quantity,Integer ticketTypeId,Integer ticketQuantity) {
+    	if(productId != null) { //尚未寫入小梁減少庫存方法
+    		ProductEntity productById = productService.findProductById(productId);
+    		productById.setStock(productById.getStock() - quantity);
+    		productRepo.save(productById);
+    	}
+    	if(ticketTypeId != null) {
+    		userEventsService.changeQuantity(ticketTypeId, ticketQuantity);
+    	}
     }
 }

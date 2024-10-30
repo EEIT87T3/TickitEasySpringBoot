@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
 import com.eeit87t3.tickiteasy.member.entity.Member;
+import com.eeit87t3.tickiteasy.order.entity.ProdOrderDetails;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 import com.eeit87t3.tickiteasy.order.service.Impl.ProdOrdersServiceImpl;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
@@ -241,7 +242,7 @@ public class ProdOrdersController {
 	        String tradeDate = paymentResult.get("TradeDate"); //（訂單成立時間）
 
 	        if("1".equals(rtnCode)) {//如果綠界回傳1 代表交易成功
-	        	prodOrdersService.emailSend(5,merchantTradeNo,tradeDate,tradeAmt,paymentType); //memberId先填死測試
+	        	prodOrdersService.emailSend(merchantTradeNo,tradeDate,tradeAmt,paymentType); //memberId先填死測試
 	        	ProdOrders prodOrders = prodOrdersService.findBypaymentInfo(merchantTradeNo);
 	        	tradeDate = tradeDate.replace("/", "-");
 	        	prodOrders.setOrderDate(Timestamp.valueOf(tradeDate));
@@ -250,9 +251,18 @@ public class ProdOrdersController {
 	        	prodOrders.setStatus("已付款");
 	        	prodOrders.setTotalAmount(Integer.valueOf(tradeAmt));
 	        	prodOrdersService.saveOrder(prodOrders);
+	        	
+	        	List<ProdOrderDetails> prodOrderDetailsBean = prodOrders.getProdOrderDetailsBean();
+				for (ProdOrderDetails prodOrderDetails : prodOrderDetailsBean) {
+					Integer productId = prodOrderDetails.getProductId();
+					Integer ticketTypeId = prodOrderDetails.getTicketTypeId();
+					Integer quantity = prodOrderDetails.getQuantity();
+					Integer ticketQuantity = prodOrderDetails.getTicketQuantity();
+                    prodOrdersService.ECPayReduceStock(productId,quantity,ticketTypeId,ticketQuantity);
+				}
 	        	return "1|OK";
 	        }else {
-	        	prodOrdersService.emailSend(5,merchantTradeNo,tradeDate,tradeAmt,paymentType); //memberId先填死測試
+	        	prodOrdersService.emailSend(merchantTradeNo,tradeDate,tradeAmt,paymentType); //memberId先填死測試
 	        	ProdOrders prodOrders = new ProdOrders();
 	        	Member member = new Member();
 				member.setMemberID(5);
@@ -306,12 +316,9 @@ public class ProdOrdersController {
 		}
 		
 		
-		
+		//LinePay回傳
 		@GetMapping("LinePayReturn")
 		public String LinePay(@RequestParam String transactionId,@RequestParam String orderId) throws Exception{
-			System.out.println("transactionId:"+transactionId);
-			System.out.println("orderId:"+orderId);
-			
 			String targetUrl = "https://sandbox-api-pay.line.me/v3/payments/" + transactionId + "/confirm";
 
 			String linePayReturn = prodOrdersService.LinePayReturn(targetUrl, orderId, transactionId);
