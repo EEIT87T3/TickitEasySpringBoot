@@ -14,6 +14,13 @@
 
 	<title>新增活動</title>
 	<style>
+		#create-table {
+			table-layout: fixed;
+		}
+		#create-table>tbody>tr>td img {
+			max-width: 100%;
+			height: auto !important;
+		}
 		table>tbody>tr>th {
 			width: 120px;
 			text-align: right;
@@ -37,6 +44,14 @@
 			const currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
 
 
+			// 設定日期時間欄位最小值
+			const now = new Date();
+			const nowFormattedString = now.toISOString().slice(0, 16);
+			document.querySelectorAll("input[type=datetime-local]").forEach(element => {
+            	element.setAttribute('min', nowFormattedString);
+        	});
+
+			
 			// summernote
 			$('#summernote').summernote({
 				placeholder: '活動介紹',
@@ -107,17 +122,17 @@
 
 			// 示範輸入
 			document.getElementById("demo").addEventListener("click", function () {
-				document.getElementsByName("eventName")[0].value = "示範輸入活動名稱 01";
-				document.getElementsByName("eventDesc")[0].value = "示範輸入活動介紹";
-				document.getElementsByName("categoryString")[0].value = "other";
-				document.getElementsByName("tagString")[0].value = "";
-				document.getElementsByName("place")[0].value = "聖德基督學院";
-				document.getElementsByName("address")[0].value = "桃園市中壢區新生路二段421號";
-				document.getElementsByName("eventStartTime")[0].value = "2024-11-20T11:00";
-				document.getElementsByName("eventEndTime")[0].value = "2024-11-20T12:00";
-				document.getElementsByName("startEntryTime")[0].value = "2024-11-20T10:30";
-				document.getElementsByName("endEntryTime")[0].value = "2024-11-20T11:30";
-				document.getElementsByName("quantityTotalAvailable")[0].value = "100";
+				document.getElementsByName("eventName")[0].value = "印象派150週年光影藝術展-高雄場";
+				$('#summernote').summernote('code', `<div>活動資料來源：KKTIX<br><a href='https://firenzecx.kktix.cc/events/impressionismkh'>https://firenzecx.kktix.cc/events/impressionismkh</a></div><hr>\n          <p><b>印象派起源</b></p>\n\n<p>法語Impressionnisme，19世紀末至20世紀初的一個藝術運動，起源於法國，擴及歐美，影響全球。</p>\n\n<p>畫作的特色是筆觸未經修飾而顯見，構圖寬廣無邊，尤其著重於光影的改變、對時間的印象，並以生活中的平凡事物做為描繪對象。</p>\n\n<p>印象派被認為是現代藝術的奠基石之一，改變了藝術的傳統觀念，對後來的藝術風格和運動，如野獸派、立體派和抽象表現主義等產生深遠的影響，也成為世人最喜愛的畫派之一。</p>\n\n<p>&nbsp;</p>\n\n<p><b>印象派經典－日出 Impression Sunrise</b></p>\n\n<p>印象派得名於法國畫家克勞德˙莫內的畫作《印象·日出》（Impression, Sunrise）。這幅畫創作於1872年，莫內以模糊、分散的筆觸呈現太陽升起時的光線和反射在水面上的效果。</p>\n\n<p>當這幅畫於1874年在巴黎舉辦的獨立藝術展覽中展出時，藝術評論家認為畫作僅是一種印象而非傳統的細緻描繪，於是用「印象」一詞來嘲笑這種新的繪畫風格。</p>\n\n<p><img alt=\"\" src=\"https://t.kfs.io/organization_resource_files/41451/65124/Monet_-_Impression__Sunrise.jpg\" style=\"width:2887px;height:2239px;\"></p>\n\n<p>&nbsp;</p>\n\n<p><b>展區Ⅰ　黃金印象 Introduction</b></p>\n\n<p>以圖片、影片、原寸仿真畫作等多元方式，帶領觀眾回顧印象派150年的歷史、事件，認識最具代表性的畫作、畫家，領略印象派對人類藝術史的貢獻和影響。</p>\n\n<p><img alt=\"\" src=\"https://t.kfs.io/organization_resource_files/41451/65126/R0001624.jpg\" style=\"width:2914px;height:1943px;\"></p>\n\n<p><b>展區Ⅱ　花都風情Life &amp; Leisure</b></p>\n\n<p>馬奈、竇加、雷諾瓦、卡耶博特等畫家將工業革命、城市改造、休閒活動等生活百態一一入畫，公園、咖啡館、歌舞廳、大街小巷都成了他們啟發靈感的場景，生動的題材與大膽的風格隨著時代脈絡而延伸，也留下風情萬千的歷史見證。</p>\n\n<p><img alt=\"\" src=\"https://t.kfs.io/organization_resource_files/41451/65127/R0001638.jpg\" style=\"width:3000px;height:2000px;\"></p>\n\n<p><b>展區Ⅲ　光影之舞Light &amp; Shadow</b></p>\n\n<p>在印象派畫作中，光影是至關重要的元素之一。畫家們在不同的時間、季節和天氣條件下觀察自然景物，嘗試捕捉到不同的光影效果，呈現出生動迷人、變幻莫測的氛圍。這種光影之美不僅是靜態的畫面，更是對大自然的謳歌，一花一世界，剎那即永恆！</p>\n\n<p><img alt=\"\" src=\"https://t.kfs.io/organization_resource_files/41451/65184/S__695582729.jpg\" style=\"width:1280px;height:720px;\"></p>\n\n<p><b>展區Ⅳ　四季之歌Four Seasons</b></p>\n\n<p>印象派畫家的作品多與季節、景色相關，他們以獨特的方式捕捉不同季節和自然景色的變化。觀眾將會在巨大投影空間中，獲得前所未有的體驗！</p>\n\n<p><img alt=\"\" src=\"https://t.kfs.io/organization_resource_files/41451/65129/123.61.jpg\" style=\"width:2560px;height:1902px;\"></p>\n\n`);
+				document.getElementsByName("categoryString")[0].value = "exhibition";
+				document.getElementsByName("tagString")[0].value = "classical";
+				document.getElementsByName("place")[0].value = "國立科學工藝博物館 第一、二特展廳";
+				document.getElementsByName("address")[0].value = "高雄市三民區九如一路720號";
+				document.getElementsByName("eventStartTime")[0].value = "2024-12-28T10:00:00";
+				document.getElementsByName("eventEndTime")[0].value = "2025-04-06T18:00:00";
+				document.getElementsByName("startEntryTime")[0].value = "2024-12-28T10:00:00";
+				document.getElementsByName("endEntryTime")[0].value = "2025-04-06T16:00:00";
+				document.getElementsByName("quantityTotalAvailable")[0].value = "100000";
 			})
 		});
 	</script>
@@ -130,7 +145,7 @@
 	<div class="container">
 		<h1>新增活動</h1>
 		<form id="create-form" enctype="multipart/form-data">
-			<table class="table table-hover">
+			<table id="create-table" class="table table-hover">
 				<tbody>
 					<tr>
 						<th><span class="mustMark">*</span>活動名稱</th>
@@ -141,7 +156,7 @@
 					<tr>
 						<th>活動主圖</th>
 						<td>
-							<input type="file" class="form-control" name="eventPicFile">
+							<input type="file" class="form-control" name="eventPicFile" accept=".jpg, .jpeg, .png, .gif">
 						</td>
 					</tr>
 					<tr>
