@@ -69,18 +69,17 @@ public class PostService {
         
         return posts.stream().map(post -> {
         	ShowPostDTO dto = new ShowPostDTO();
-            dto.setPostID(post.getPostID()); // 假設ID是主鍵
+            dto.setPostID(post.getPostID()); 
             dto.setNickname(post.getMember().getNickname());
             dto.setPostTitle(post.getPostTitle());
             dto.setPostContent(post.getPostContent());
             dto.setCategoryName(post.getPostCategory() != null ? post.getPostCategory().getCategoryName() : "N/A");
             dto.setTagName(post.getPostTag() != null ? post.getPostTag().getTagName() : "N/A");
-//            dto.setPostImgUrl(post.getPostImgUrl() != null ? post.getPostImgUrl() : "N/A");
             dto.setLikesCount(post.getLikesCount() );
             dto.setViewCount(post.getViewCount() );
             dto.setStatus(post.getStatus());
-            dto.setPostTime(post.getPostTime() ); // 根據需要格式化時間
-            dto.setEditTime(post.getEditTime() ); // 根據需要格式化時間
+            dto.setPostTime(post.getPostTime() ); 
+            dto.setEditTime(post.getEditTime() ); 
             
             return dto;
         }).collect(Collectors.toList());
@@ -119,7 +118,9 @@ public class PostService {
         dto.setViewCount(post.getViewCount());
         return dto;
     }
-
+    public List<PostEntity> findByMemberID(Integer memberID) {
+        return postRepo.findByMemberID(memberID);
+    }
 //	public Page<PostEntity> getPostsByPage(int page, int size) {
 //	    Pageable pageable = PageRequest.of(page, size); // page 是第幾頁, size 是每頁顯示的數量
 //	    return postRepo.findAll(pageable);

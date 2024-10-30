@@ -126,13 +126,22 @@
     <!-- 顯示已選圖片 -->
     <div id="imagePreview"></div>
     <br>
+    <button type="button" id="fillDataButton">填入資料</button>
     <button class="button" type="submit">新增貼文</button>
   </form>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
+    document.getElementById("fillDataButton").addEventListener("click", function() {
+        // 自動填入資料
+        document.getElementById("fullPostTitle").value = "五月天演唱會的震撼回憶";
+        document.getElementById("fullPostContent").value = 
+            "最近參加了五月天的演唱會，真的是一場視覺和聽覺的盛宴！當「倔強」響起時，全場都跟著一起高唱，氣氛熱烈得讓我感受到滿滿的青春與激情。特別是他們現場的演出，不僅讓我回憶起了許多過去的點滴，也讓我感受到音樂的力量。期待他們下一次的演出！有參加的朋友也來分享一下你們的經歷吧！";
 
-  </script>
+        document.getElementById("fullPostCategory").value = "5"; 
+        document.getElementById("fullPostTag").value = "11"; 
+    });
+</script>
 
   <div th:replace="~{commons/userFooter}"></div>
 </body>

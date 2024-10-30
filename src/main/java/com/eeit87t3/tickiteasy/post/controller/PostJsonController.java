@@ -141,6 +141,16 @@ public class PostJsonController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 	}
+	// 根據MemberID取得單一貼文
+	@GetMapping("GET/member/{MemberID}")
+	public ResponseEntity<List<PostEntity>> getPostsByMemberID(@PathVariable("MemberID") Integer MemberID) {
+		try {
+			List<PostEntity> posts = postService.findByMemberID(MemberID);
+			return ResponseEntity.ok(posts);
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+	}
 
 	// 更新單筆貼文
 	@PutMapping("PUT/{postID}")
@@ -409,6 +419,14 @@ public class PostJsonController {
 	        commentService.deleteAll(comments);
 	        
 	        likesPostService.removeAllLikesByPostId(postID);
+	        
+//	        // 將所有相關檢舉的貼文設置為 null
+//	        List<ReportEntity> reports = reportService.findByPost(post);
+//	        for (ReportEntity report : reports) {
+//	            report.setPost(null); // 移除與貼文的關聯
+//	            reportService.save(report);
+//	        }
+
 	        Boolean isDeleted = postService.delete(postID);
 
 	        if (isDeleted) {

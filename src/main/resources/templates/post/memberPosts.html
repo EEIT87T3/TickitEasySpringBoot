@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <!-- 在這裡放要引入的 CSS 與 JS library -->
+
+  <meta th:replace="~{commons/memberHead}" />
+  <title>TickitEasy｜我的貼文</title>
+  <script th:src="@{/post/js/getMember.js}"></script>
+  <script>
+
+    $(document).ready(function () {
+      currentMember();
+      //currentUserID來自currentMember
+      // const memberID = currentUserID;
+      currentMember()
+        .then(userID => {
+          fetchMemberPosts(userID);
+        })
+
+    });
+    function fetchMemberPosts(memberID) {
+      axios.get(`/TickitEasy/admin/api/post/GET/member/${memberID}`)
+        .then(response => {
+          const posts = response.data;
+
+
+          const formattedPosts = posts.map(post => {
+            const originalDate = post.postTime;
+            console.log(originalDate);
+            const date = new Date(originalDate);
+            console.log(date);
+            // 格式化為 YYYY-MM-DD HH:mm:ss
+            const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+            console.log(formattedDate);
+            return { ...post, formattedDate }; // 將格式化後的日期加入到喜歡項目中
+          });
+          console.log('格式化後的喜歡列表:', formattedPosts); // 調試：查看格式化後的數據
+          displayPosts(formattedPosts); // 呼叫函數來顯示喜歡的內容
+        })
+        .catch(error => {
+          console.error('Error fetching member posts:', error);
+        });
+    }
+    function truncateContent(content, limit) {
+      if (content.length > limit) {
+        return content.slice(0, limit) + '...'; // 超過限制時加上省略號
+      }
+      return content; // 沒有超過限制時直接返回內容
+    }
+    function displayPosts(formattedPosts) {
+      const outputBlock = document.getElementById('outputBlock'); // 獲取表格的 tbody 元素
+      outputBlock.innerHTML = '';
+
+      formattedPosts.forEach(post => {
+        console.log('顯示的貼文:', post); // 調試：查看每個喜歡項目的內容
+        const postRow = document.createElement('tr');
+
+
+        postRow.innerHTML = `
+            <td>${post.postTitle}</td> 
+            <td>${truncateContent(post.postContent, 28)}</td>  
+            <td>${post.formattedDate}</td> 
+            <td>
+                <a href="/TickitEasy/user/post/${post.postID}" class="btn btn-primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </td>
+        `;
+        outputBlock.appendChild(postRow); // 將行添加到表格中
+      });
+    }
+  </script>
+
+</head>
+
+<body>
+  <div th:replace="~{commons/memberHeader}"></div>
+  <!-- 這裡是網頁內容 -->
+  <h2>我的貼文</h2>
+  <div id="posts-container"></div>
+  <table class="table table-striped">
+    <thead>
+      <th>貼文標題</th>
+      <th>貼文內容</th>
+      <th>發表日期</th>
+      <th></th>
+
+    </thead>
+    <tbody id="outputBlock"></tbody>
+  </table>
+  <div id="spinnerBlock"></div>
+  <div class="text-end" id="pageBtnBlock"></div>
+  <div th:replace="~{commons/memberFooter}"></div>
+</body>
+
+</html>

@@ -69,6 +69,9 @@ public class ReportEntity {
     
     @Column(name = "reportStatus")
     private Integer reportStatus;
+    
+    @Column(name = "isDeleted")
+    private boolean isDeleted = false; // 用來標記是否已刪除
 
 	public Integer getReportID() {
 		return reportID;
@@ -164,6 +167,14 @@ public class ReportEntity {
 
 	public void setReportStatus(Integer reportStatus) {
 		this.reportStatus = reportStatus;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 
 

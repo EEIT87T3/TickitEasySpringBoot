@@ -155,7 +155,7 @@ public class CommentController {
 		        // 進行授權檢查
 		        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 		            response.put("success", false);
-		            response.put("message", "您尚未登入或沒有權限刪除貼文");
+		            response.put("message", "您尚未登入或沒有權限刪除留言");
 		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		        }
 
