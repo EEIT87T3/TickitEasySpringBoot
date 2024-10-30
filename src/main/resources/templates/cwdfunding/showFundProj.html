@@ -41,13 +41,13 @@
         }
 
         function htmlMaker(pageData) {
-          let output = document.getElementById("outputBlock");
-          let pageBtnBlock = document.getElementById("pageBtnBlock");
-          let elementBlock = document.getElementById("totalElementsBlock");
+          const output = document.getElementById("outputBlock");
+          const ulPagination = document.querySelector("ul.pagination");
+          const elementBlock = document.getElementById("totalElementsBlock");
 
           output.innerHTML = "";
           spinnerBlock.innerHTML = "";
-          pageBtnBlock.innerHTML = "";
+          ulPagination.innerHTML = "";
           elementBlock.innerHTML = "";
 
           pageData.content.forEach((el) => {
@@ -91,23 +91,68 @@
             output.append(tr);
           });
           // 印頁數 (pageData.totalPages)
+          ulPagination.innerHTML += `
+					<li class="page-item">
+						<button class="page-link" aria-label="Previous" data-page-num="previous">
+							<span aria-hidden="true">&laquo;</span>
+						</button>
+					</li>`;
           for (let i = 1; i <= pageData.totalPages; i++) {
-            pageBtnBlock.innerHTML += ` <button class="btn pageBtn active" data-pagebtn="${i}" >${i}</button>`;
+            ulPagination.innerHTML += ` <li class="page-item"><button class="page-link" data-page-num="${i}" >${i}</button></li>`;
           }
+          ulPagination.innerHTML += `
+					<li class="page-item">
+						<button class="page-link" aria-label="Next" data-page-num="next">
+							<span aria-hidden="true">&raquo;</span>
+						</button>
+					</li>`;
 
-          let pageBtns = document.getElementsByClassName("pageBtn");
+          let pageBtns = document.getElementsByClassName("page-link");
 
           for (let i = 0; i < pageBtns.length; i++) {
             pageBtns[i].addEventListener("click", function (e) {
-              let pageID = this.getAttribute("data-pagebtn");
+              let pageID = this.getAttribute("data-page-num");
               console.log("pageID: " + pageID);
               loadThatPage(pageID);
             });
           }
 
+          // EventListener
+          [...document.querySelectorAll("button.page-link")].forEach(
+            (element, index) => {
+              switch (element.getAttribute("data-page-num")) {
+                case "previous":
+                  if (pageData.pageable.pageNumber == 0) {
+                    element.classList.add("disabled");
+                  } else {
+                    element.setAttribute(
+                      "data-page-num",
+                      pageData.pageable.pageNumber
+                    );
+                  }
+                  break;
+                case "next":
+                  if (pageData.pageable.pageNumber + 1 == pageData.totalPages) {
+                    element.classList.add("disabled");
+                  } else {
+                    element.setAttribute(
+                      "data-page-num",
+                      pageData.pageable.pageNumber + 2
+                    );
+                  }
+                  break;
+              }
+              element.addEventListener("click", function () {
+                const params = getParams();
+                params.pageNumber = this.getAttribute("data-page-num");
+
+                console.log(params);
+                search(params);
+              });
+            }
+          );
           //監聽刪除按鈕
           let deleteBtns = document.getElementsByClassName("btn-delete");
-          // console.log(deleteBtns.length);
           for (let i = 0; i < deleteBtns.length; i++) {
             deleteBtns[i].addEventListener("click", function (e) {
               let projectID = this.getAttribute("data-projectID");
@@ -218,7 +263,11 @@
         <tbody id="outputBlock"></tbody>
       </table>
       <div id="spinnerBlock"></div>
-      <div class="text-end" id="pageBtnBlock"></div>
+      <div class="d-flex flex-row-reverse">
+        <nav>
+          <ul class="pagination"></ul>
+        </nav>
+      </div>
       <br />
       <div id="totalElementsBlock"></div>
     </div>
