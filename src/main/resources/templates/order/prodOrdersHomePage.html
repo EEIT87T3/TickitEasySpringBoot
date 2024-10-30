@@ -110,11 +110,6 @@
 							<th>付款資訊
 							<th>訂單狀態
 							<th>總金額
-							<th>配送狀態
-							<th>配送編號
-							<th>收件人姓名
-							<th>收件地址
-							<th>電話
 							<th>操作
 						</tr>
 
@@ -131,11 +126,6 @@
 								<td th:text="${prodOrders.paymentInfo}" />
 								<td th:text="${prodOrders.status}" />
 								<td th:text="${prodOrders.totalAmount}" />
-								<td th:text="${prodOrders.shippingStatus}" />
-								<td th:text="${prodOrders.shippingID}" />
-								<td th:text="${prodOrders.recipientName}" />
-								<td th:text="${prodOrders.address}" />
-								<td th:text="${prodOrders.phone}" />
 
 								<td>
 									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/delete">
@@ -236,11 +226,6 @@
 						<td>${prodOrders.paymentInfo}</td>
 						<td>${prodOrders.status}</td>
 						<td>${prodOrders.totalAmount}</td>
-						<td>${prodOrders.shippingStatus}</td>
-						<td>${prodOrders.shippingID}</td>
-						<td>${prodOrders.recipientName}</td>
-						<td>${prodOrders.address}</td>
-						<td>${prodOrders.phone}</td>
 						<td>
 							<form method="get" action="http://localhost:8080/TickitEasy/admin/order/delete">
 								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">

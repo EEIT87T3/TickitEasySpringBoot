@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta th:replace="~{commons/adminHead}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>新增貼文</title>
+    <style>
+      /* styles.css */
+body {
+    font-family: Arial, sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+      </style>
+
+</head>
+<body>
+    <div th:replace="~{commons/adminHeader}"></div>
+   <h1>檢舉紀錄</h1>
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th>檢舉 ID</th>
+                <th>檢舉者</th>
+                <th>被檢舉者</th>
+                <th>原因</th>
+                <th>檢舉時間</th>
+                <th>狀態</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 檢舉紀錄將在這裡動態加載 -->
+        </tbody>
+    </table>
+   
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+   // script.js
+document.addEventListener("DOMContentLoaded", function () {
+    fetchReports();
+});
+
+function fetchReports() {
+    const apiUrl = "http://localhost:8080/TickitEasy/admin/api/post/reports"; // 更改為實際的 API 路徑
+    
+    fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+   
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("網絡響應出錯");
+        }
+        return response.json();
+    })
+    .then(data => {
+        const reportTableBody = document.getElementById("reportTable").querySelector("tbody");
+        reportTableBody.innerHTML = ""; // 清空表格內容
+
+        data.forEach(report => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${report.reportID}</td>
+                <td>${report.reportedMember.name}</td>
+                <td>${report.accusedMember.name}</td>
+                <td>${report.reason}</td>
+                <td>${new Date(report.reportTime).toLocaleString()}</td>
+                <td>${report.reportStatus === 1 ? "未處理" : "已處理"}</td>
+                <td>
+                    <button onclick="updateReportStatus(${report.reportID}, 0)">標記為已處理</button>
+                </td>
+            `;
+            reportTableBody.appendChild(row);
+        });
+    })
+    .catch(error => {
+        console.error("獲取檢舉紀錄失敗:", error);
+    });
+}
+
+function updateReportStatus(reportID, newStatus) {
+    const apiUrl = `http://localhost:8080/TickitEasy/admin/api/post/report/${reportID}/status`; 
+    const requestBody = { reportStatus: newStatus };
+
+    axios.put(apiUrl, requestBody, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+      response.data.message); // 成功後顯示訊息
+        fetchReports(); // 重新加載報告以顯示更新
+    })
+    .catch(error => {
+        console.error("更新檢舉狀態失敗:", error);
+        alert("更新檢舉狀態失敗，請稍後再試。"); // 顯示錯誤提示
+    });
+}
+
+   
+        </script>
+        <div th:replace="~{commons/adminFooter}"></div>
+    </body>
+</html>

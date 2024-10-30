@@ -65,6 +65,21 @@
             background-color: #5F46E8;
             border: none;
         }
+
+        .containerList {
+            margin-top: 70px;
+        }
+
+        .active {
+            background-color: #5F46E8 !important;
+        }
+
+        /* .nav-link {
+            color: #5F46E8 !important; 
+        } */
+        .nav-link.active {
+            color: #ffffff !important;
+        }
     </style>
 </head>
 
@@ -72,7 +87,7 @@
     <div th:replace="~{commons/userHeader}"></div>
     <button class="postHomeBtn text-white px-4 py-2 rounded">回首頁</button>
     <div class="containerList">
-        <h4>文章列表</h4>
+        <!-- <h4>討論區</h4> -->
         <nav class="newestpost nav nav-pills flex-column flex-sm-row justify-content-center" id="categoryNav">
             <!-- 動態生成 -->
         </nav>
@@ -81,18 +96,7 @@
                 <span>選擇標籤:</span>
                 <select id="tagId" name="tagId" onchange="fetchPosts()">
                     <option value="" selected>請選擇標籤</option>
-                    <!-- <option value="0">所有主題</option>
-                    <option value="1">音樂</option>
-                    <option value="2">舞蹈</option>
-                    <option value="3">戲劇</option>
-                    <option value="4">音樂劇</option>
-                    <option value="5">親子</option>
-                    <option value="6">講座</option>
-                    <option value="7">展覽</option>
-                    <option value="8">電影</option>
-                    <option value="9">體育</option>
-                    <option value="10">旅遊</option>
-                    <option value="11">其他</option> -->
+
                 </select>
             </form>
 
@@ -350,65 +354,87 @@
 
         // 更新文章列表的函數
         function updateArticleList(posts) {
-            const container = document.getElementById('articleList');
-            container.innerHTML = ''; // 清空容器
+    const container = document.getElementById('articleList');
+    container.innerHTML = '';
 
-            if (posts.length === 0) {
-                container.innerHTML = `<div class="article-item"><h2>查無文章</h2></div>`;
-                return;
-            }
+    if (posts.length === 0) {
+        container.innerHTML = `<div class="article-item"><h2>查無文章</h2></div>`;
+        return;
+    }
 
-            posts.forEach(post => {
-                console.log(post); // 查看每個貼文的數據
-                const articleItem = document.createElement('div');
-                articleItem.classList.add('article-item');
+    posts.forEach(post => {
+        const articleItem = document.createElement('div');
+        articleItem.classList.add('article-item');
+        
+        // <span class="theme">${post.categoryName}</span>
+        //先建立結構再抓圖
+        articleItem.innerHTML = `
+            <img class="postImg" src="http://localhost:8080/TickitEasy/images/event/EventPicDefault.png" alt="文章縮略圖">
+            <div>
+                
+                <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
+                <a href="#" class="post-title">${post.postTitle}</a>
+                <p>${truncateContent(post.postContent, 60)}</p>
+                <div class="article-meta">
+                    <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
+                    <span>${post.editTime ? `<div>編輯日期：${new Date(post.editTime).toLocaleString()}</div>` : ''}</span>
+                </div>
+            </div>
+            <div class="meta-right">
+                <span><i class="fas fa-thumbs-up"></i>${post.likesCount !== null ? post.likesCount : 0}</span>
+                <span><i class="fas fa-eye"></i>${post.viewCount !== null ? post.viewCount : 0}</span>
+            </div>
+        `;
 
-                // const formattedDate = formatDate(post.postTime);
-                // 檢查 editTime 是否為 null
-                let editDateHtml = '';
-                if (post.editTime) {
-                    const formattedEditDate = new Date(post.editTime).toLocaleString();
-                    editDateHtml = `<span>編輯日期：${formattedEditDate}</span>`;
+        // 獲取圖片路徑並更新
+        axios.get(`/TickitEasy/admin/api/post/images/show/${post.postID}`)
+            .then(response => {
+                const data = response.data;
+                if (data.success && data.images.length > 0) {
+                    const firstImagePath = `http://localhost:8080/TickitEasy${data.images[0]}`;
+                    const imgElement = articleItem.querySelector('.postImg');
+                    imgElement.src = `${firstImagePath}`;
                 }
+            })
+            .catch(error => console.error('Error:', error));
 
-                articleItem.innerHTML = `
-                    <img class="postImg" src="${post.postImgUrl}" alt="文章縮略圖">
-                    <div>
-                        <span class="theme">${post.categoryName}</span>
-                        <span class="theme"><i class="fa-solid fa-tag"></i>${post.tagName}</span>
-                        <a href="#" class="post-title">${post.postTitle}</a>
-                        <p>${post.postContent}</p>
-                        <div class="article-meta">
-                            <span>發佈日期：${new Date(post.postTime).toLocaleString()}</span>
-                            <span>編輯日期：${new Date(post.editTime).toLocaleString()}</span>
-                        </div>
-                    </div>
-                    <div class="meta-right">
-                        <span><i class="fas fa-thumbs-up"></i>${post.likesCount !== null ? post.likesCount : 0}</span>
-                    <span><i class="fas fa-eye"></i>${post.viewCount !== null ? post.viewCount : 0}</span>
-                    </div>
-                `;
+        // 添加點擊事件
+        articleItem.addEventListener('click', function () {
+            axios.put(`/TickitEasy/admin/api/post/view/${post.postID}`)
+                .then(response => {
+                    if (response.data.success) {
+                        window.location.href = `/TickitEasy/user/post/${post.postID}`;
+                    } else {
+                        console.error("Failed to update view count");
+                    }
+                })
+                .catch(error => console.error("Error updating view count:", error));
+        });
 
-                // 添加 click 事件監聽器
-                articleItem.addEventListener('click', function () {
-                    window.location.href = `/TickitEasy/user/post/${post.postID}`;
-                });
-
-                container.appendChild(articleItem);
-            });
-        }
+        container.appendChild(articleItem);
+    });
+}
 
         // 頁面加載時獲取 categoryId
         function getCategoryIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('categoryId');
         }
-
+        //預覽字數限制
+        function truncateContent(content, limit) {
+            if (content.length > limit) {
+                return content.slice(0, limit) + '...'; // 超過限制時加上省略號
+            }
+            return content; // 沒有超過限制時直接返回內容
+        }
         // 當頁面加載時獲取所有文章
         document.addEventListener('DOMContentLoaded', () => {
             fetchCategories();
             fetchTag();
         });
+
+
+
     </script>
 
 </body>
