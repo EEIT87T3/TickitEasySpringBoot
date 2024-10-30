@@ -86,8 +86,8 @@ public class PostController {
 	    }
 	 //檢舉頁面
 	 @GetMapping("/report")
-	 public String showReportPage(@PathVariable Integer postID,Model model) {
-		 model.addAttribute("postID", postID);
+	 public String showReportPage() {
+		 
 		 return "post/adminReportPostList"; // 返回你的 Thymeleaf 模板，確保模板的路徑正確
 	 }
 	

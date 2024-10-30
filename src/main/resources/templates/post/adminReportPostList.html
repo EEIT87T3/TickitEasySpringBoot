@@ -8,72 +8,34 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>新增貼文</title>
     <style>
-        body {
-          font-family: Arial, sans-serif;
-          background-color: #f4f4f4;
-          margin: 0;
-          margin-top: 100px;
-          padding: 20px;
-          color: #333;
-        }
-    
-        h1 {
-          text-align: center;
-          color: #4CAF50;
-        }
-    
-        form {
-          background: white;
-          padding: 20px;
-          border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          max-width: 600px;
-          margin: 0 auto;
-        }
-    
-        label {
-          display: block;
-          margin-bottom: 10px;
-          font-weight: bold;
-        }
-    
-        input[type="text"], textarea {
-          width: 100%;
-          padding: 10px;
-          margin-bottom: 20px;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          font-size: 16px;
-        }
-    
-        .button {
-          background-color: #4CAF50;
-          color: white;
-          padding: 10px 15px;
-          border: none;
-          border-radius: 5px;
-          font-size: 16px;
-          cursor: pointer;
-          transition: background-color 0.3s;
-          width: 100%;
-        }
-        .listbtn{
-        width: 5%;
-        }
-        button:hover {
-          background-color: #45a049;
-        }
-    
-        #updateResult {
-          margin-top: 20px;
-          text-align: center;
-          font-weight: bold;
-          color: #d9534f; /* Red color for errors */
-        }
-    
-        .success {
-          color: #5cb85c; /* Green color for success */
-        }
+      /* styles.css */
+body {
+    font-family: Arial, sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
       </style>
 
 </head>
@@ -105,12 +67,12 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function fetchReports() {
-    const apiUrl = "http://localhost:8080/TickitEasy/admin/api/reports"; // 更改為實際的 API 路徑
+    const apiUrl = "http://localhost:8080/TickitEasy/admin/api/post/reports"; // 更改為實際的 API 路徑
     
     fetch(apiUrl, {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${Auth.getToken()}`, // 使用實際的身份驗證令牌
+   
             'Content-Type': 'application/json'
         }
     })
@@ -134,7 +96,7 @@ function fetchReports() {
                 <td>${new Date(report.reportTime).toLocaleString()}</td>
                 <td>${report.reportStatus === 1 ? "未處理" : "已處理"}</td>
                 <td>
-                    <button onclick="updateReportStatus(${report.reportID}, 2)">標記為已處理</button>
+                    <button onclick="updateReportStatus(${report.reportID}, 0)">標記為已處理</button>
                 </td>
             `;
             reportTableBody.appendChild(row);
@@ -146,31 +108,24 @@ function fetchReports() {
 }
 
 function updateReportStatus(reportID, newStatus) {
-    const apiUrl = `http://localhost:8080/TickitEasy/admin/api/report/${reportID}`; // 更新狀態的 API 路徑
+    const apiUrl = `http://localhost:8080/TickitEasy/admin/api/post/report/${reportID}/status`; 
     const requestBody = { reportStatus: newStatus };
 
-    fetch(apiUrl, {
-        method: 'PUT',
+    axios.put(apiUrl, requestBody, {
         headers: {
-            'Authorization': `Bearer ${Auth.getToken()}`, // 使用實際的身份驗證令牌
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
+        }
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error("網絡響應出錯");
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message);
+      response.data.message); // 成功後顯示訊息
         fetchReports(); // 重新加載報告以顯示更新
     })
     .catch(error => {
         console.error("更新檢舉狀態失敗:", error);
+        alert("更新檢舉狀態失敗，請稍後再試。"); // 顯示錯誤提示
     });
 }
+
    
         </script>
         <div th:replace="~{commons/adminFooter}"></div>
