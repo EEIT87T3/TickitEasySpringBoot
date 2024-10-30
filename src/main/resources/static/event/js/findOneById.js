@@ -54,6 +54,26 @@ $(document).ready(function () {
         eventContent.getElementById("embed-map").src += event.address;
 
 
+        // EventListener
+        eventContent.getElementById("scroll-to-map").addEventListener("click", () => {
+            // 滾動至地圖
+            const targetElement = document.getElementById("embed-map");
+            const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;  // 目標元素上緣相對於 window 頂部的距離 + 目前滾輪離頂部的距離
+            window.scrollTo({
+                top: targetPosition - 90,
+                behavior: 'smooth'
+            });
+        })
+        eventContent.getElementById("scroll-to-tickettypes").addEventListener("click", () => {
+            // 滾動至票種列表
+            const targetElement = document.getElementById("tickettype-list-title");
+            const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY;  // 目標元素上緣相對於 window 頂部的距離 + 目前滾輪離頂部的距離
+            window.scrollTo({
+                top: targetPosition - 90,
+                behavior: 'smooth'
+            });
+        })
+
         // ========== 票種 ==========
         const ticketTypes = data.ticketTypes;
 

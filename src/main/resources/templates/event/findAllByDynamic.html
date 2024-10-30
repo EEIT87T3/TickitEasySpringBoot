@@ -6,6 +6,12 @@
 	<script src="https://cdn.jsdelivr.net/npm/axios@1.7.7/dist/axios.js"></script>
 	<script src="/TickitEasy/event/js/utils.js"></script>
 	<title>活動列表</title>
+	<style>
+		th, td {
+			text-align: center;
+			vertical-align: middle;
+		}
+	</style>
 	<script>
 		$(document).ready(function () {
 
@@ -52,45 +58,49 @@
 				const tbody = document.getElementById("tbody");
 				tbody.innerHTML = "";
 
-				for (const event of data) {
-					let tbodyHtml = `<tr>
-							<td>${event.eventID}</td>
-							<td>${event.eventName}</td>`;
-					
-					if (event.eventPic != null) {
-						tbodyHtml += `<td><img src="${contextPath}${event.eventPic}" alt="活動主圖" width=240px></td>`;
-					} else {
-						tbodyHtml += `<td>（無圖片）</td>`;
+				if (data.length === 0) {
+					tbody.innerHTML = "<td colspan='9'>目前沒有符合條件的活動。</td>";
+				} else {
+					for (const event of data) {
+						let tbodyHtml = `<tr>
+								<td>${event.eventID}</td>
+								<td>${event.eventName}</td>`;
+						
+						if (event.eventPic != null) {
+							tbodyHtml += `<td><div class="ratio ratio-16x9" style="width:240px"><img src="${contextPath}${event.eventPic}" alt="活動主圖" class="object-fit-cover"></div></td>`;
+						} else {
+							tbodyHtml += `<td>（無圖片）</td>`;
+						}
+								
+						tbodyHtml += `<td>${event.eventCategory.categoryName}</td>`;
+
+						if (event.eventTag != null) {
+							tbodyHtml += `<td>${event.eventTag.tagName}</td>`;
+						} else {
+							tbodyHtml += `<td>（無標籤）</td>`;
+						}
+
+						tbodyHtml += `<td>${event.address.substring(0, 2)}</td>`;
+						tbodyHtml += `<td>${dateFormat(event.eventStartTime)}</td>`;
+
+						switch (event.status) {
+							case 0:
+								tbodyHtml += `<td class="text-danger">未上架</td>`;
+								break;
+							case 1:
+								tbodyHtml += `<td class="text-success">已上架</td>`;
+								break;
+							case 2:
+								tbodyHtml += `<td class="text-primary">已啟售</td>`;
+								break;
+						}
+
+						tbodyHtml += `
+							<td><button class="event-detail btn btn-primary" data-event-id="${event.eventID}">查看</button></td>
+							</tr>`;
+
+						tbody.innerHTML += tbodyHtml;
 					}
-							
-					tbodyHtml += `<td>${event.eventCategory.categoryName}</td>`;
-
-					if (event.eventTag != null) {
-						tbodyHtml += `<td>${event.eventTag.tagName}</td>`;
-					} else {
-						tbodyHtml += `<td>（無標籤）</td>`;
-					}
-
-					tbodyHtml += `<td>${event.address.substring(0, 2)}</td>`;
-					tbodyHtml += `<td>${dateFormat(event.eventStartTime)}</td>`;
-
-					switch (event.status) {
-						case 0:
-							tbodyHtml += `<td class="text-danger">未上架</td>`;
-							break;
-						case 1:
-							tbodyHtml += `<td class="text-success">已上架</td>`;
-							break;
-						case 2:
-							tbodyHtml += `<td class="text-primary">已啟售</td>`;
-							break;
-					}
-
-					tbodyHtml += `
-						<td><button class="event-detail btn btn-primary" data-event-id="${event.eventID}">查看</button></td>
-						</tr>`;
-
-					tbody.innerHTML += tbodyHtml;
 				}
 			}
 
@@ -171,6 +181,16 @@
 					directionString: document.getElementById("direction").value
 				}
 			}
+			// 清空按鈕
+			document.getElementById("clear").addEventListener("click", () => {
+				document.getElementById("event-name").value = "";
+				document.getElementById("city-name").value = "";
+				document.getElementById("category").value = "";
+				document.getElementById("tag").value = "";
+				document.getElementById("searching-date").value = "";
+				document.getElementById("order-by").value = "eventStartTime";
+				document.getElementById("direction").value = "ASC";
+			})
 
 			// tbody 的「查看」按鈕
 			$("#tbody").on("click", ".event-detail", function () {
@@ -180,7 +200,8 @@
 
 
 			// 初始執行
-			search();
+			const initParams = getParams();
+			search(initParams);
 		});
 	</script>
 </head>
@@ -244,12 +265,13 @@
 					<div class="d-flex align-items-center">
 						<label class="text-end me-3" style="width: 140px;">排序方向</label>
 						<select class="form-select" id="direction">
-							<option value="ASC" selected>升冪</option>
-							<option value="DESC">降冪</option>
+							<option value="ASC">升冪</option>
+							<option value="DESC" selected>降冪</option>
 						</select>
 					</div>
 				</div>
-				<div class="d-flex justify-content-center align-items-center">
+				<div class="d-flex justify-content-evenly align-items-center">
+					<button class="btn btn-secondary" id="clear">清空</button>
 					<button class="btn btn-primary" id="search">查詢</button>
 				</div>
 			</div>
@@ -258,15 +280,15 @@
 		<table class="table table-hover">
 			<thead>
 				<tr>
-					<th>活動編號</th>
+					<th style="min-width: 48px;">活動<br>編號</th>
 					<th>活動名稱</th>
-					<th>活動主圖</th>
-					<th>類別</th>
-					<th>標籤</th>
-					<th>地區</th>
+					<th style="min-width: 96px;">活動主圖</th>
+					<th style="min-width: 64px;">類別</th>
+					<th style="min-width: 96px;">標籤</th>
+					<th style="min-width: 48px;">地區</th>
 					<th>活動開始時間</th>
-					<th>狀態</th>
-					<th>詳情</th>
+					<th style="min-width: 64px">狀態</th>
+					<th style="min-width: 80px;">詳情</th>
 				</tr>
 			</thead>
 			<tbody id="tbody">
