@@ -9,6 +9,8 @@
 
     <title>貼文</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:src="@{/Token/auth.js}"></script>
+    <script th:src="@{/post/js/getMember.js}"></script>
     <style>
         /* 功能列按鈕 */
         .post-actions {
@@ -43,6 +45,40 @@
             background-color: #5F46E8;
             border: none;
         }
+         /* 彈窗樣式 */
+         .modal {
+            display: none; /* 初始為隱藏 */
+            position: fixed; /* 固定在螢幕上 */
+            z-index: 1000; /* 確保在最上層 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 全寬 */
+            height: 100%; /* 全高 */
+            background-color: rgba(0, 0, 0, 0.5); /* 背景顏色 */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 在頁面中間 */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px; /* 寬度 */
+            border-radius: 5px; /* 邊角圓滑 */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -56,10 +92,10 @@
                 <!-- 貼文內容會在這裡動態填充 -->
             </div>
             <div class="post-actions">
-                <button id="like-btn"><i class="far fa-thumbs-up"></i> 按讚</button>
-                <button id="save-btn"><i class="far fa-star"></i> 收藏</button>
-                <button id="report-btn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>
-                <button id="subscribe-btn"><i class="far fa-bell"></i> 訂閱作者</button>
+                <button id="like-btn"><i class="far fa-thumbs-up"></i><span id="likes-count"></span></button>
+                <!-- <button id="save-btn"><i class="far fa-star"></i> 收藏</button> -->
+                <button id="reportBtn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>
+                <!-- <button id="subscribe-btn"><i class="far fa-bell"></i> 訂閱作者</button> -->
                 <button id="edit-btn" style="display: none;"><i class="fas fa-pen"></i> 編輯</button>
                 <button id="delete-btn" style="display: none;"><i class="fas fa-trash"></i> 刪除</button>
 
@@ -82,13 +118,31 @@
 
 
     </div>
+    <!-- 彈窗 -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>檢舉文章</h2>
+            <h6>*目前可以檢舉但相關功能未完成 檢舉後會不能刪除貼文*</h6>
+            <form id="report-form">
+                <input type="hidden" id="postID" value=postID> <!-- 此處為示範，請根據實際文章 ID 動態設置 -->
+                <div>
+                    <label for="reason">檢舉理由：</label>
+                    <textarea id="reason" required></textarea>
+                </div>
+                <button type="submit">提交檢舉</button>
+            </form>
+            <div id="response-message"></div>
+        </div>
+    </div>
+
     <div th:replace="~{commons/userFooter}"></div>
     <script>
+        let currentUserID;
 
         //從url讀取postID
         const postID = window.location.pathname.split("/")[4];
-        // 假設這裡是當前登入會員的 ID
-        const currentUserID = 1;
+
         //////////////////////////////////////////////////
         // 根據ID取得單一貼文
         function fetchPost() {
@@ -113,6 +167,8 @@
                             <ul>
                                 <li><div>${post.member.nickname}</div></li>
                                 <li><div>${new Date(post.postTime).toLocaleString()}</div></li>
+                                <li>${post.editTime ? `<div>上次編輯${new Date(post.editTime).toLocaleString()}</div>` : ''}</li>
+                                
                             </ul>
                         </div>
                         <hr>
@@ -123,8 +179,9 @@
                     if (post.member.memberID === currentUserID) {
                         document.getElementById('delete-btn').style.display = 'inline-flex';
                         document.getElementById('edit-btn').style.display = 'inline-flex';
-                        document.getElementById('subscribe-btn').style.display = 'none';
-                        document.getElementById('report-btn').style.display = 'none';
+
+                        // document.getElementById('subscribe-btn').style.display = 'none';
+                        document.getElementById('reportBtn').style.display = 'none';
                     }
                 })
                 .catch(error => {
@@ -135,15 +192,18 @@
 
         // 刪除貼文
         document.getElementById('delete-btn').addEventListener('click', function () {
-            
+
             if (confirm("確定要刪除此貼文嗎？")) {
 
-                axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
-                .then(response => {
-                        const categoryId = response.data.categoryId;
-                        alert('貼文已刪除');
-                        window.location.href =  `/TickitEasy/user/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
-                    })
+                axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`, {
+                    headers: {
+                        'Authorization': `Bearer ${Auth.getToken()}`
+                    }
+                }).then(response => {
+                    const categoryId = response.data.categoryId;
+                    alert('貼文已刪除');
+                    window.location.href = `/TickitEasy/user/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
+                })
                     .catch(error => {
                         console.error('Error deleting post:', error);
                         alert('刪除失敗，請稍後再試。');
@@ -153,16 +213,19 @@
 
         // 編輯貼文
         document.getElementById('edit-btn').addEventListener('click', function () {
-            axios.get(`/TickitEasy/admin/api/post/GET/${postID}`)
-                .then(response => {
-                    // 確保獲取成功後再進行跳轉
-                    if (response.status === 200) {
-                        // 可以在這裡進行其他操作，像是儲存狀態等等
-                        window.location.href = `/TickitEasy/user/post/${postID}/useredit`;
-                    } else {
-                        console.error('Failed to load post data:', response.status);
-                    }
-                })
+            axios.get(`/TickitEasy/admin/api/post/GET/${postID}`, {
+                headers: {
+                    'Authorization': `Bearer ${Auth.getToken()}`
+                }
+            }).then(response => {
+                // 確保獲取成功後再進行跳轉
+                if (response.status === 200) {
+                    // 可以在這裡進行其他操作，像是儲存狀態等等
+                    window.location.href = `/TickitEasy/user/post/${postID}/useredit`;
+                } else {
+                    console.error('Failed to load post data:', response.status);
+                }
+            })
                 .catch(error => {
                     console.error('Error fetching post data:', error);
                 });
@@ -175,102 +238,389 @@
                     document.getElementById('comments-container').innerHTML = '';
                     const comments = response.data;
                     const commentsContainer = document.getElementById('comments-container');
+
                     commentsContainer.innerHTML += comments.length ?
-                        comments.map(comment => `
-                            <div class="comment">
-                                <div class="author">
-                                    <img class="avatar" src="" alt="頭像">
-                                    <div class="name">${comment.nickname}</div>
-                                </div>
-                                <p>${comment.content}</p>
-                                <p>${new Date(comment.commentDate).toLocaleString()}</p>
+                        comments.map(comment => {
+                            const isOwner = comment.memberID === currentUserID;
+                            return `
+                        <div class="comment" data-comment-id="${comment.postCommentID}">
+                            <div class="author">
+                                <img class="avatar" src="" alt="頭像">
+                                <div class="name">${comment.nickname}</div>
+                                <button class="comment-edit-btn" style="display: ${isOwner ? 'inline-flex' : 'none'};">
+                                    <i class="fas fa-pen"></i> 編輯
+                                </button>
+                                <button class="comment-delete-btn" style="display: ${isOwner ? 'inline-flex' : 'none'};">
+                                    <i class="fas fa-trash"></i> 刪除
+                                </button>
                             </div>
-                        `).join('') : '目前沒有回應';
+                            <p class="comment-content">${comment.content}</p>
+                            <input type="text" class="comment-input" style="display: none;" value="${comment.content}" />
+                            <p>${new Date(comment.commentDate).toLocaleString()}</p>
+                             <p>${comment.editTime ? `<div>上次編輯${new Date(comment.editTime).toLocaleString()}</div>` : ''}</p>
+                        </div>
+                    `;
+                        }).join('') : '目前沒有回應';
+
+                    // 編輯留言
+                    document.querySelectorAll('.comment-edit-btn').forEach(button => {
+                        button.addEventListener('click', function () {
+                            if (!Auth.isLoggedIn()) {
+                                // 如果未登入，重定向到登入頁面
+                                Auth.logout();
+                            } else {
+                                const commentDiv = this.closest('.comment');
+                                const commentID = commentDiv.dataset.commentId; // 獲取留言的ID
+                                const contentParagraph = commentDiv.querySelector('.comment-content');
+                                const inputField = commentDiv.querySelector('.comment-input');
+
+                                // 切換顯示
+                                if (this.innerText === '編輯') {
+                                    contentParagraph.style.display = 'none'; // 隱藏留言內容
+                                    inputField.style.display = 'inline-block'; // 顯示可編輯輸入框
+                                    this.innerHTML = '<i class="fas fa-check" style="color: green;"></i> 完成'; // 更新按鈕為編輯完成
+                                } else {
+                                    // 獲取輸入框中的內容
+                                    const updatedContent = inputField.value;
+                                    if (!Auth.isLoggedIn()) {
+                                        // 如果未登入，重定向到登入頁面
+                                        Auth.logout();
+                                    } else {
+
+                                        // 發送更新請求
+                                        axios.put(`/TickitEasy/admin/api/post/comment/PUT/${commentID}`,
+                                            { content: updatedContent }, // 將更新的內容放在這裡
+                                            {
+                                                headers: {
+                                                    'Authorization': `Bearer ${Auth.getToken()}`
+                                                }
+                                            }
+                                        )
+                                            .then(response => {
+                                                if (response.data.success) {
+                                                    contentParagraph.innerText = updatedContent; // 更新留言內容
+                                                    contentParagraph.style.display = 'block'; // 顯示留言內容
+                                                    inputField.style.display = 'none'; // 隱藏輸入框
+                                                    this.innerHTML = `<i class="fas fa-pen"></i> 編輯`; // 恢復按鈕為編輯
+                                                    console.log(response.data.message);
+                                                    fetchComments();
+                                                } else {
+                                                    console.error(response.data.message);
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error('更新留言時發生錯誤:', error.response.data);
+                                            });
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    //刪除留言
+                    document.querySelectorAll('.comment-delete-btn').forEach(button => {
+                        button.addEventListener('click', function () {
+                            if (!Auth.isLoggedIn()) {
+                                // 如果未登入，重定向到登入頁面
+                                Auth.logout();
+                            } else {
+                                const commentID = this.closest('.comment').dataset.commentId; // 獲取該留言的ID
+                                // 確認刪除
+                                if (confirm('確定要刪除這條留言嗎？')) {
+                                    // 刪除留言的請求
+                                    axios.delete(`/TickitEasy/admin/api/post/comment/DELETE/${commentID}`, {
+                                        headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                                    })
+                                        .then(response => {
+                                            // 刪除成功後，重新加載留言
+                                            fetchComments();
+                                            console.log(`留言 ID: ${commentID} 已刪除`);
+                                        })
+                                        .catch(error => {
+                                            console.error('刪除留言時發生錯誤:', error);
+                                        });
+                                }
+                            }
+                        });
+
+                    });
                 })
                 .catch(error => {
                     console.error('Error fetching comments:', error);
                 });
         }
 
-        // 提交新回應
+        // 新增留言
         document.getElementById('comment-form').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const content = document.getElementById('content').value;
+            if (!Auth.isLoggedIn()) {
+                // 如果未登入，重定向到登入頁面
+                Auth.logout();
+                event.preventDefault();  // 這裡也需要防止表單提交
+            } else {
+                event.preventDefault();
+                const content = document.getElementById('content').value.trim(); // 獲取並去除前後空白
 
-            axios.post('/TickitEasy/admin/api/post/comment/POST/', {
-                postID: postID,
-                memberID: 1, // 這裡可以根據實際情況更改
-                content: content
-            })
-                .then(response => {
-                    // 清空回應內容並重新加載留言
-                    document.getElementById('content').value = '';
-
-                    fetchComments();
+                if (content === '') {
+                    // 如果內容為空，顯示提示訊息
+                    alert('請輸入留言內容'); // 提示用戶輸入內容
+                    return; // 退出函數，避免繼續執行
+                }
+                console.log("留言currentUserID:", currentUserID);
+                const memberID = currentUserID;
+                console.log("留言memberID:", memberID);
+                axios.post('/TickitEasy/admin/api/post/comment/POST/', {
+                    postID: postID,
+                    memberID: memberID, // 根據實際情況更改
+                    content: content
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${Auth.getToken()}`
+                    }
                 })
-                .catch(error => {
-                    console.error('Error posting comment:', error);
-                });
+
+                    .then(response => {
+                        // 清空回應內容並重新加載留言
+                        document.getElementById('content').value = '';
+                        console.log(response.data.message);
+                        fetchComments();
+                    })
+                    .catch(error => {
+                        console.error(response.data.message);
+                        console.error('Error posting comment:', error);
+                    });
+            }
         });
+
         //////////////////////功能按鈕列///////////////////////
-        let isLiked = false;
+        let isLiked;
         let isSaved = false;
         let isSubscribed = false;
-
+        let currentLikesCount = 0; // 暫存目前的喜歡數
+        //喜歡功能
         document.getElementById('like-btn').addEventListener('click', function () {
-            isLiked = !isLiked;
-            const icon = this.querySelector('i');
-            if (isLiked) {
-                icon.classList.remove('far'); // 空心
-                icon.classList.add('fas');    // 實心
-                alert('已按讚！');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                alert('已取消按讚！');
-            }
-            // 發送請求
-            axios.post(`/TickitEasy/admin/api/post/like`, { postID: postID, isLiked: isLiked })
-                .catch(error => console.error('Error liking post:', error));
+            fetchLikesStatus(currentUserID, postID)
+                .then(isLiked => {
+                    if (!Auth.isLoggedIn()) {
+                        // 如果未登入，重定向到登入頁面
+                        Auth.logout();
+                        event.preventDefault();  // 這裡也需要防止表單提交
+                    } else {
+
+                        if (isLiked == null) {
+                            isLiked = false;
+                        }
+
+                        isLiked = !isLiked;
+
+                        const icon = this.querySelector('i');
+                        if (isLiked) {
+                            icon.classList.remove('far'); // 空心
+                            icon.classList.add('fas');    // 實心
+                            currentLikesCount += 1;
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            currentLikesCount -= 1;
+                        }
+                        // 先更新暫存的喜歡數
+                        const likeButton = document.getElementById('likes-count');
+                        likeButton.innerHTML = `${currentLikesCount}`;
+                        // 發送請求
+                        axios.post(`/TickitEasy/admin/api/post/likes/toggle`, {
+                            postID: postID,
+                            isLiked: isLiked
+                        }, {
+                            headers: {
+                                'Authorization': `Bearer ${Auth.getToken()}`,
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(response => {
+                            //發送請求查詢真正的喜歡數
+                            initializeLikesCount();
+                            console.log('成功:', response.data);
+                        })
+                            .catch(error => {
+                                console.error('錯誤:', error.response.data);
+                                // 若出錯，恢復顯示的喜歡數
+                                if (isLiked) {
+                                    currentLikesCount -= 1; // 若原先是增加的，出錯後恢復減少
+                                } else {
+                                    currentLikesCount += 1; // 若原先是減少的，出錯後恢復增加
+                                }
+                                likeButton.innerHTML = `${currentLikesCount}`;
+                            });
+                    }
+                })
         });
 
-        document.getElementById('save-btn').addEventListener('click', function () {
-            isSaved = !isSaved;
-            const icon = this.querySelector('i');
-            if (isSaved) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                alert('已收藏！');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                alert('已取消收藏！');
+        // 查詢該貼文的是否按過喜歡
+        function fetchLikesStatus(currentUserID, postID) {
+            return new Promise((resolve, reject) => {
+                currentMember()
+                    .then(userID => {
+                        currentUserID = userID;
+                        console.log('currentUserID' + currentUserID);
+                        console.log('postID' + postID);
+                        const likeButton = document.getElementById('like-btn'); // 取得按讚按鈕
+                        const icon = likeButton.querySelector('i'); // 找到按鈕內的圖標 <i> 元素
+
+                        axios.get(`/TickitEasy/admin/api/post/likes/checkLike`, {
+                            params: { memberID: currentUserID, postID: postID }
+                        })
+                            .then(response => {
+                                const isLiked = response.data; // 取得按讚狀態的布林值
+                                resolve(isLiked);  // 成功取得 userID 後 resolve
+                                // 根據按讚狀態切換圖標樣式
+                                if (isLiked) {
+                                    icon.classList.remove('far'); // 切換為實心圖標
+                                    icon.classList.add('fas');
+                                } else {
+                                    icon.classList.remove('fas'); // 切換為空心圖標
+                                    icon.classList.add('far');
+                                }
+                            })
+                            .catch(error => console.error('Error fetching likes status:', error));
+                    });
+            });
+        }
+
+        function initializeLikesCount() {
+            const postID = window.location.pathname.split("/")[4]; // 獲取postID
+
+            // 查詢按讚數
+            axios.get(`/TickitEasy/admin/api/post/likes/count/${postID}`)
+                .then(response => {
+                    const likesCount = response.data.likesCount;
+
+                    currentLikesCount = likesCount;  // 更新暫存變數
+                    const likeButton = document.getElementById('likes-count');
+                    likeButton.innerHTML = `${likesCount}`;
+
+                    // 更新 post 的 likesCount
+                    return axios.put(`/TickitEasy/admin/api/post/likes/updateLikesCount/${postID}`, null, {
+                        params: { likesCount: likesCount }
+                    });
+                })
+                .then(response => {
+                    console.log(response.data); // 更新成功的響應
+                    // 更新UI，例如顯示按讚數
+                })
+                .catch(error => {
+                    console.error('Error updating likes count:', error);
+                });
+        }
+        // 開啟彈窗
+        const reportBtn = document.getElementById('reportBtn');
+        const reportModal = document.getElementById('reportModal');
+        const closeModal = document.getElementsByClassName('close')[0];
+
+        reportBtn.onclick = function () {
+            reportModal.style.display = "block";
+        }
+
+        // 關閉彈窗
+        closeModal.onclick = function () {
+            reportModal.style.display = "none";
+        }
+
+        // 點擊彈窗外部關閉
+        window.onclick = function (event) {
+            if (event.target === reportModal) {
+                reportModal.style.display = "none";
             }
-            // 發送請求
-            axios.post(`/TickitEasy/admin/api/post/save`, { postID: postID, isSaved: isSaved })
-                .catch(error => console.error('Error saving post:', error));
+        }
+
+        // 表單提交處理
+        document.getElementById('report-form').addEventListener('submit', async function (event) {
+            event.preventDefault(); // 防止表單的默認提交行為
+            if (!Auth.isLoggedIn()) {
+                // 如果未登入，重定向到登入頁面
+                Auth.logout();
+            } else {
+                // const memberID = currentUserID;
+                const reason = document.getElementById('reason').value;
+
+
+                const reportRequest = {
+                    reportedMemberID: currentUserID,
+                    reason: reason
+                };
+
+                axios.post(`/TickitEasy/admin/api/post/report/${postID}`, reportRequest, {
+                    headers: {
+                        'Authorization': `Bearer ${Auth.getToken()}`,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                      alert('檢舉成功');
+                }).catch(error => {
+                      alert('檢舉失敗');
+                });
+            }
         });
 
-        document.getElementById('subscribe-btn').addEventListener('click', function () {
-            isSubscribed = !isSubscribed;
-            const icon = this.querySelector('i');
-            if (isSubscribed) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                alert('已訂閱作者！');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                alert('已取消訂閱！');
-            }
-            // 發送請求
-            axios.post(`/TickitEasy/admin/api/author/subscribe`, { authorID: post.member.memberID, isSubscribed: isSubscribed })
-                .catch(error => console.error('Error subscribing to author:', error));
-        });
+        // //收藏功能(未完成)
+        // document.getElementById('save-btn').addEventListener('click', function () {
+        //     isSaved = !isSaved;
+        //     const icon = this.querySelector('i');
+        //     if (isSaved) {
+        //         icon.classList.remove('far');
+        //         icon.classList.add('fas');
+        //         alert('已收藏！');
+        //     } else {
+        //         icon.classList.remove('fas');
+        //         icon.classList.add('far');
+        //         alert('已取消收藏！');
+        //     }
+        //     // 發送請求
+        //     axios.post(`/TickitEasy/admin/api/post/save`, { postID: postID, isSaved: isSaved }, {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`
+        //         }
+        //     })
+        //         .catch(error => {
+        //             console.error('Error fetching likes status:', error);
+        //             if (error.response) {
+        //                 console.error('Response data:', error.response.data);
+        //                 console.error('Response status:', error.response.status);
+        //                 console.error('Response headers:', error.response.headers);
+        //             } else if (error.request) {
+        //                 console.error('Request was made but no response was received:', error.request);
+        //             } else {
+        //                 console.error('Error setting up the request:', error.message);
+        //             }
+        //         });
 
+        // });
+        // //訂閱功能(未完成)
+        // document.getElementById('subscribe-btn').addEventListener('click', function () {
+        //     isSubscribed = !isSubscribed;
+        //     const icon = this.querySelector('i');
+        //     if (isSubscribed) {
+        //         icon.classList.remove('far');
+        //         icon.classList.add('fas');
+        //         alert('已訂閱作者！');
+        //     } else {
+        //         icon.classList.remove('fas');
+        //         icon.classList.add('far');
+        //         alert('已取消訂閱！');
+        //     }
+        //     // 發送請求
+        //     axios.post(`/TickitEasy/admin/api/author/subscribe`, { authorID: post.member.memberID, isSubscribed: isSubscribed }, {
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`
+        //         }
+        //     })
+        //         .catch(error => console.error('Error subscribing to author:', error));
+        // });
+
+        document.addEventListener('DOMContentLoaded', initializeLikesCount);
         // 初始化函數
         fetchPost();
         fetchComments();
+        currentMember();
+        // fetchLikesCount();
+        fetchLikesStatus(currentUserID, postID);
+
     </script>
 </body>
 

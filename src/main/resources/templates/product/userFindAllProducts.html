@@ -75,6 +75,30 @@ input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none; 
     margin: 0; 
 }
+.product-img {
+    object-fit: contain;
+    width: 100%;
+    height: auto;
+}
+#searchButton {
+    background-color: #5F46E8;
+    border-color: #5F46E8;
+}
+
+#searchButton:hover {
+    background-color: #322770;
+}
+
+#priceFilterBtn {
+    background-color: #FFB44D;
+    border-color: #FFB44D;
+}
+
+#priceFilterBtn:hover {
+    background-color: #F5BE74;
+}
+
+
 	
 	</style>
 </head>
@@ -103,13 +127,13 @@ input[type=number]::-webkit-outer-spin-button {
         </select>
     </div>
     <div class="col-md-auto">
-        <input type="number" id="minPrice" class="form-control" placeholder="最低價" style="width: 100px;">
+        <input type="number" id="minPrice" class="form-control" placeholder="最低價格" style="width: 100px;">
     </div>
     <div class="col-md-auto">
         <span>~</span>
     </div>
     <div class="col-md-auto">
-        <input type="number" id="maxPrice" class="form-control" placeholder="最高價" style="width: 100px;">
+        <input type="number" id="maxPrice" class="form-control" placeholder="最高價格" style="width: 100px;">
     </div>
     <div class="col-md-auto">
         <button id="priceFilterBtn" class="btn btn-primary">確認價格</button>
@@ -180,7 +204,7 @@ input[type=number]::-webkit-outer-spin-button {
         const productElement = `
             <div class="col">
                 <div class="card h-100" style="cursor: pointer;" onclick="window.location.href='/TickitEasy/product/${product.productID}'">
-                    <img src="/TickitEasy${product.productPic}" class="card-img-top" alt="${product.productName}">
+                    <img src="/TickitEasy${product.productPic}" class="card-img-top product-img" alt="${product.productName}">
                     <div class="card-body">
                         <h5 class="card-title fw-semibold custom-title-text">${product.productName}</h5>
                         <h5 class="card-title fw-semibold custom-title-text">NT$ ${product.price}</h5>

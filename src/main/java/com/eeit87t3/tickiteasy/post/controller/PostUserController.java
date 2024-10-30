@@ -37,4 +37,16 @@ public class PostUserController {
 		public String userEditPost() {
 			return "post/userEditPost";  
 		}
+		//會員頁面
+		@GetMapping("/like")
+		public String showMemberPage() {
+			
+			return "post/memberPostLikes"; 
+		}
+		@GetMapping("/memberPosts")
+		public String showMemberPostPage() {
+			
+			return "post/memberPosts"; 
+		}
+				
 }

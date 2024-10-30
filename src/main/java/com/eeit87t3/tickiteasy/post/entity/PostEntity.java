@@ -62,14 +62,14 @@ public class PostEntity {
 //	private LocalDateTime createdAt;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
-	@Column(name = "editTime")
+	@Column(name = "editTime",nullable = true)
 	private Timestamp editTime;
 	
-	@Column(name = "likesCount")
+	@Column(name = "likesCount",nullable = true)
 	private Integer likesCount;
 	
-	@Column(name = "viewCount")
-	private Integer viewCount;
+	@Column(nullable = false) 
+	private Integer viewCount = 0; // 設定預設值為 0
 	
 	@Column(name = "status")
 	private Integer status;

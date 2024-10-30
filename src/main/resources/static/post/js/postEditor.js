@@ -117,6 +117,7 @@
 
     // 更新貼文
     async function updatePost() {
+        console.log("updatePost called")
         const title = document.getElementById("postTitle").value;
         const content = document.getElementById("postContent").value;
         const category = document.getElementById("fullPostCategory").value;
@@ -134,6 +135,7 @@
         try {
             const response = await axios.put(`/TickitEasy/admin/api/post/PUT/${postID}`, formData, {
                 headers: {
+                    'Authorization': `Bearer ${Auth.getToken()}`,
                     'Content-Type': 'multipart/form-data' // 設置內容類型
                 }
             });
@@ -175,6 +177,10 @@
             document.getElementById("updateResult").innerText = `Error: ${error.message}`;
         }
     }
-
+    if (!Auth.isLoggedIn()) {
+        // 如果未登入，重定向到登入頁面
+        Auth.logout(); 
+      } else {
     // 初始化載入
     fetchPost();
+  }
