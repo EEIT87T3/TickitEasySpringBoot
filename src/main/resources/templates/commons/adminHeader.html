@@ -58,9 +58,6 @@
                         <li>
                             <a th:href="@{/admin/event/create}" class="sidebar-link"><i class="fas fa-calendar-plus"></i> 新增活動</a>
                         </li>
-                        <li>
-                            <a href="#" class="sidebar-link"><i class="fas fa-ticket-alt"></i> 票券訂單列表</a>
-                        </li>
                     </ul>
                 </li>
                 <li>
@@ -77,10 +74,10 @@
                         <li>
                             <a th:href="@{/admin/product/analytics}" class="sidebar-link"><i class="fas fa-chart-line"></i> 商品統計分析</a>
                         </li>
-                        <li>
-                            <a th:href="@{/admin/order}" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 商品訂單列表</a>
-                        </li>
                     </ul>
+                </li>
+                <li>
+                    <a th:href="@{/admin/order}" class="sidebar-link"><i class="fas fa-shopping-cart"></i> 訂單管理</a>
                 </li>
                 <li>
                     <a href="#cwdfundingSubmenu" data-bs-toggle="collapse" aria-expanded="false"
