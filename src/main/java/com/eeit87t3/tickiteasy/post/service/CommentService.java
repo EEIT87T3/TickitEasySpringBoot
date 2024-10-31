@@ -38,10 +38,11 @@ public class CommentService {
 	    // 直接從 commentRepo 取得結果，若沒有資料則返回空的 List
 	    return commentRepo.findByPostPostID(postID);
 	}
-//	public List<ShowCommentDTO> getCommentsByPostId(Integer postID) {
-//	  
-//	    return commentRepo.getCommentsByPostId(postID);
-//	}
+	
+	@Transactional(readOnly = true)
+	public List<ShowCommentDTO> findByPostIdwithMember(Integer postID) {
+	    return commentRepo.findCommentsWithMemberInfoByPostID(postID);
+	}
 
 
 	//根據貼文ID新增留言
