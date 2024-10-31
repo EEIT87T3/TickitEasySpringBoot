@@ -2,6 +2,7 @@ package com.eeit87t3.tickiteasy.product.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.product.dto.ProductDTO;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
+
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -50,6 +53,19 @@ public class ProductService {
     public List<TagEntity> getProductTags() {
         return tagService.findProductTagList();
     }
+    
+ // 1. 获取各标签的商品库存数
+    public Map<String, Integer> getProductTagStock() {
+        List<ProductEntity> products = productRepo.findAll();
+        // 将商品按照标签分组，计算每个标签的总库存
+        return products.stream()
+                .collect(Collectors.groupingBy(
+                        product -> product.getProductTag().getTagName(),  // 假设 TagEntity 有 getTagName() 方法
+                        Collectors.summingInt(ProductEntity::getStock)
+                ));
+    }
+    
+    
     
     // 取得所有商品列表
     public List<ProductEntity> getAllProducts() {

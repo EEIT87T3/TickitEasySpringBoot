@@ -25,6 +25,13 @@ public class AdminProductPageController {
 	@Autowired
 	private ProductPhotoService productPhotoService;
 	
+	 // 商品圖表分析頁面
+    @GetMapping("/analytics")
+    public String memberAnalytics() {
+        return "product/productAnalytics"; // 返回商品分析頁面
+    }
+	
+	
 	// 查詢所有商品頁面
     @GetMapping
     public String findAllProducts() {

@@ -3,6 +3,7 @@ package com.eeit87t3.tickiteasy.product.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,13 @@ public class AdminProductAPIController {
 	
 	@Autowired
 	ProductService productService;
+	
+	// 获取各标签的商品库存数，用于圆饼图
+    @GetMapping("/tag-stock")
+    public ResponseEntity<Map<String, Integer>> getProductTagStock() {
+        Map<String, Integer> tagStockData = productService.getProductTagStock();
+        return ResponseEntity.ok(tagStockData);
+    }
     
 	
 	// 按照商品名稱進行模糊查詢的分頁
