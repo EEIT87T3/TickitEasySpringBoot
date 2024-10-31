@@ -15,6 +15,8 @@ import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.repository.ProdFavoritesRepo;
 import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
 
+import java.util.stream.Collectors;
+
 @Service
 public class UserProdFavoritesService {
 
@@ -23,6 +25,18 @@ public class UserProdFavoritesService {
 	
 	@Autowired
 	private ProdFavoritesRepo prodFavoritesRepo;
+	
+	public Map<String, Integer> getProductFavoriteCount() {
+	    List<ProdFavoritesEntity> favorites = prodFavoritesRepo.findAll();
+	    // 将商品按照名称分组，统计每个商品的收藏次数
+	    return favorites.stream()
+	            .collect(Collectors.groupingBy(
+	                    favorite -> favorite.getProduct().getProductName(),  // 确保是字符串类型
+	                    Collectors.summingInt(ProdFavoritesEntity::getFavoriteCount)
+	            ));
+	}
+
+	
 	
 	// 處理收藏/取消收藏
     @Transactional

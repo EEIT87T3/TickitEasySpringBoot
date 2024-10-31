@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	
+	<!-- 在這裡放要引入的 CSS 與 JS library -->
+
+    <meta th:replace="~{commons/adminHead}">
+	<title>商品圖表分析</title>
+	<script>
+		$(document).ready(function () {
+			
+			// 這裡是 JavaScript 內容
+			
+		});
+	</script>
+	<!-- 引入 Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+       .stat-row {
+            display: flex; /* 使用 flexbox 佈局來併排顯示 */
+            justify-content: space-around; /* 圖表之間保持適當距離 */
+            flex-wrap: wrap; /* 如果視窗太小，允許換行 */
+        }
+
+        .stat-card {
+            transition: transform 0.2s;
+            margin: 20px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            flex: 1; /* 讓每個卡片佔據相同的空間 */
+            max-width: 45%; /* 控制每個圖表的最大寬度 */
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;  /* 讓圖表自動適應卡片寬度 */
+            height: 400px; /* 你可以根據需要調整這個高度 */
+        }
+    </style>
+</head>
+
+<body>
+	<div th:replace="~{commons/adminHeader}"></div>
+    
+	<!--  這裡是網頁內容 >-->
+	<h1>商品圖表分析</h1>
+	
+	<!-- 將兩個圖表合併為同一列 -->
+    <div class="stat-row">
+        <!-- 圓餅圖：各標籤的商品庫存數 -->
+        <div class="stat-card card-body" >
+            <h2>各標籤的商品庫存數</h2>
+            <div class="chart-container">
+                <canvas id="tagStockChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 長條圖：每個商品的收藏次數 -->
+        <div class="stat-card">
+            <h2>各商品的收藏次數</h2>
+            <div class="chart-container">
+                <canvas id="productFavoriteChart"></canvas>
+            </div>
+        </div>
+    </div>
+	
+
+   <div th:replace="~{commons/adminFooter}"></div>
+   
+
+    <script>
+         // 獲取各標籤的商品庫存數並生成圓餅圖
+        fetch('/TickitEasy/admin/api/product/tag-stock')
+            .then(response => response.json())
+            .then(data => {
+                const labels = Object.keys(data); // 標籤名稱
+                const values = Object.values(data); // 庫存數
+
+                const ctx = document.getElementById('tagStockChart').getContext('2d');
+                const tagStockChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '庫存數',
+                            data: values,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right' // 將圖例移到右側
+                        }
+                    }
+                }
+                });
+            })
+            .catch(error => console.error('獲取商品庫存數據時出錯：', error));
+
+        // 獲取每個商品的收藏次數並生成長條圖
+        fetch('/TickitEasy/user/api/product/product-favorites')
+            .then(response => response.json())
+            .then(data => {
+                const labels = Object.keys(data); // 商品名稱
+                const values = Object.values(data); // 收藏次數
+
+                const ctx = document.getElementById('productFavoriteChart').getContext('2d');
+                const productFavoriteChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels, // 顯示商品名稱
+                        datasets: [{
+                            label: '收藏次數',
+                            data: values,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true, // y 軸從 0 開始
+                                ticks: {
+                                    stepSize: 5 // 設置以 5 為單位遞增
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('獲取商品收藏次數資料時出錯：', error));
+    </script>
+</body>
+
+</html>
