@@ -11,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script th:src="@{/Token/auth.js}"></script>
     <script th:src="@{/post/js/getMember.js}"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <style>
         /* 功能列按鈕 */
         .post-actions {
@@ -45,25 +46,35 @@
             background-color: #5F46E8;
             border: none;
         }
-         /* 彈窗樣式 */
-         .modal {
-            display: none; /* 初始為隱藏 */
-            position: fixed; /* 固定在螢幕上 */
-            z-index: 1000; /* 確保在最上層 */
+
+        /* 彈窗樣式 */
+        .modal {
+            display: none;
+            /* 初始為隱藏 */
+            position: fixed;
+            /* 固定在螢幕上 */
+            z-index: 1000;
+            /* 確保在最上層 */
             left: 0;
             top: 0;
-            width: 100%; /* 全寬 */
-            height: 100%; /* 全高 */
-            background-color: rgba(0, 0, 0, 0.5); /* 背景顏色 */
+            width: 100%;
+            /* 全寬 */
+            height: 100%;
+            /* 全高 */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 背景顏色 */
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; /* 在頁面中間 */
+            margin: 15% auto;
+            /* 在頁面中間 */
             padding: 20px;
             border: 1px solid #888;
-            width: 300px; /* 寬度 */
-            border-radius: 5px; /* 邊角圓滑 */
+            width: 300px;
+            /* 寬度 */
+            border-radius: 5px;
+            /* 邊角圓滑 */
         }
 
         .close {
@@ -94,7 +105,7 @@
             <div class="post-actions">
                 <button id="like-btn"><i class="far fa-thumbs-up"></i><span id="likes-count"></span></button>
                 <!-- <button id="save-btn"><i class="far fa-star"></i> 收藏</button> -->
-                <button id="reportBtn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>
+               <!-- <button id="reportBtn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>-->
                 <!-- <button id="subscribe-btn"><i class="far fa-bell"></i> 訂閱作者</button> -->
                 <button id="edit-btn" style="display: none;"><i class="fas fa-pen"></i> 編輯</button>
                 <button id="delete-btn" style="display: none;"><i class="fas fa-trash"></i> 刪除</button>
@@ -181,7 +192,7 @@
                         document.getElementById('edit-btn').style.display = 'inline-flex';
 
                         // document.getElementById('subscribe-btn').style.display = 'none';
-                        document.getElementById('reportBtn').style.display = 'none';
+                        // document.getElementById('reportBtn').style.display = 'none';
                     }
                 })
                 .catch(error => {
@@ -192,23 +203,40 @@
 
         // 刪除貼文
         document.getElementById('delete-btn').addEventListener('click', function () {
+            swal({
+                title: "確定要刪除這個貼文嗎？",
+                text: "這個動作無法復原！",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    // 用戶確認刪除，進行刪除操作
+                    axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`, {
+                        headers: {
+                            'Authorization': `Bearer ${Auth.getToken()}`
+                        }
+                    }).then(response => {
+                        const categoryId = response.data.categoryId;
 
-            if (confirm("確定要刪除此貼文嗎？")) {
+                        // 顯示成功提示框
+                        // 顯示成功提示框
+                        swal("貼文刪除成功！", "", "success");
 
-                axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`, {
-                    headers: {
-                        'Authorization': `Bearer ${Auth.getToken()}`
-                    }
-                }).then(response => {
-                    const categoryId = response.data.categoryId;
-                    alert('貼文已刪除');
-                    window.location.href = `/TickitEasy/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
-                })
-                    .catch(error => {
-                        console.error('Error deleting post:', error);
-                        alert('刪除失敗，請稍後再試。');
-                    });
-            }
+                        // 使用 setTimeout 延遲跳轉
+                        setTimeout(() => {
+                            window.location.href = `/TickitEasy/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
+                        }, 2000); 
+                    })
+                        .catch(error => {
+                            console.error('Error deleting post:', error);
+
+                            swal("貼文刪除失敗", "請稍後再試", "error");
+                        });
+                } else {
+                    swal("貼文未被刪除。");
+                }
+            });
         });
 
         // 編輯貼文
@@ -242,10 +270,11 @@
                     commentsContainer.innerHTML += comments.length ?
                         comments.map(comment => {
                             const isOwner = comment.memberID === currentUserID;
+
                             return `
                         <div class="comment" data-comment-id="${comment.postCommentID}">
                             <div class="author">
-                                <img class="avatar" src="" alt="頭像">
+                                <img class="avatar" src="/TickitEasy${comment.profilePic || '/TickitEasy/images/member/default-avatar.png'}" alt="頭像">
                                 <div class="name">${comment.nickname}</div>
                                 <button class="comment-edit-btn" style="display: ${isOwner ? 'inline-flex' : 'none'};">
                                     <i class="fas fa-pen"></i> 編輯
@@ -508,55 +537,56 @@
                     console.error('Error updating likes count:', error);
                 });
         }
-        // 開啟彈窗
-        const reportBtn = document.getElementById('reportBtn');
-        const reportModal = document.getElementById('reportModal');
-        const closeModal = document.getElementsByClassName('close')[0];
+        // // 開啟彈窗
+        // const reportBtn = document.getElementById('reportBtn');
+        // const reportModal = document.getElementById('reportModal');
+        // const closeModal = document.getElementsByClassName('close')[0];
 
-        reportBtn.onclick = function () {
-            reportModal.style.display = "block";
-        }
+        // reportBtn.onclick = function () {
+        //     reportModal.style.display = "block";
+        // }
 
-        // 關閉彈窗
-        closeModal.onclick = function () {
-            reportModal.style.display = "none";
-        }
+        // // 關閉彈窗
+        // closeModal.onclick = function () {
+        //     reportModal.style.display = "none";
+        // }
 
-        // 點擊彈窗外部關閉
-        window.onclick = function (event) {
-            if (event.target === reportModal) {
-                reportModal.style.display = "none";
-            }
-        }
+        // // 點擊彈窗外部關閉
+        // window.onclick = function (event) {
+        //     if (event.target === reportModal) {
+        //         reportModal.style.display = "none";
+        //     }
+        // }
 
-        // 表單提交處理
-        document.getElementById('report-form').addEventListener('submit', async function (event) {
-            event.preventDefault(); // 防止表單的默認提交行為
-            if (!Auth.isLoggedIn()) {
-                // 如果未登入，重定向到登入頁面
-                Auth.logout();
-            } else {
-                // const memberID = currentUserID;
-                const reason = document.getElementById('reason').value;
+        // // 表單提交處理
+        // document.getElementById('report-form').addEventListener('submit', async function (event) {
+        //     event.preventDefault(); // 防止表單的默認提交行為
+        //     if (!Auth.isLoggedIn()) {
+        //         // 如果未登入，重定向到登入頁面
+        //         Auth.logout();
+        //     } else {
+        //         // const memberID = currentUserID;
+        //         const reason = document.getElementById('reason').value;
 
 
-                const reportRequest = {
-                    reportedMemberID: currentUserID,
-                    reason: reason
-                };
+        //         const reportRequest = {
+        //             reportedMemberID: currentUserID,
+        //             reason: reason
+        //         };
 
-                axios.post(`/TickitEasy/admin/api/post/report/${postID}`, reportRequest, {
-                    headers: {
-                        'Authorization': `Bearer ${Auth.getToken()}`,
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => {
-                      alert('檢舉成功');
-                }).catch(error => {
-                      alert('檢舉失敗');
-                });
-            }
-        });
+        //         axios.post(`/TickitEasy/admin/api/post/report/${postID}`, reportRequest, {
+        //             headers: {
+        //                 'Authorization': `Bearer ${Auth.getToken()}`,
+        //                 'Content-Type': 'application/json'
+        //             }
+        //         }).then(response => {
+        //             swal("貼文檢舉成功！", "", "success");
+        //         }).catch(error => {
+
+        //             swal("貼文檢舉失敗！", "您可能未登入或發生錯誤", "error");
+        //         });
+        //     }
+        // });
 
         // //收藏功能(未完成)
         // document.getElementById('save-btn').addEventListener('click', function () {

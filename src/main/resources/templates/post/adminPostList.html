@@ -10,9 +10,96 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
     <title>貼文列表</title>
+
+
+
+</head>
+
+<body>
+    <div th:replace="~{commons/adminHeader}"></div>
+
+    <!-- 類別篩選選單 -->
+    <!-- <button id="openModalBtn" class=" add-post bg-blue-500 text-white px-4 py-2 rounded">新增貼文</button> -->
+    <!-- <label for="categoryFilter">選擇類別: </label>
+    <select id="categoryFilter">
+        <option value="">所有類別</option>
+     
+    </select>
+
+    <label for="tagFilter">選擇標籤: :</label>
+    <select id="tagFilter">
+        <option value="">所有標籤</option>
+    
+    </select> -->
+
+
+    <table id="postsTable" class="display">
+        <thead>
+            <tr>
+                <th>貼文ID</th>
+                <th>會員暱稱</th>
+                <th>標題</th>
+                <th>內容</th>
+                <th>活動類別</th>
+                <th>標籤</th>
+                <th>圖片</th>
+                <th>按讚數</th>
+                <th>觀看數</th>
+                <th>狀態</th>
+                <th>發布時間</th>
+                <th>編輯時間</th>
+                <th>動作</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 這裡的資料會動態填充 -->
+        </tbody>
+    </table>
+
+    <!-- 彈窗 -->
+    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded shadow-lg">
+            <h2 class="text-xl font-bold mb-4">新增貼文</h2>
+            <form id="createPostForm">
+                <div class="mb-4">
+                    <label for="postTitle" class="block mb-2">標題：</label>
+                    <input type="text" id="postTitle" name="postTitle" required class="w-full px-3 py-2 border rounded">
+                </div>
+                <div class="mb-4">
+                    <label for="postContent" class="block mb-2">內容：</label>
+                    <textarea id="postContent" name="postContent" required
+                        class="w-full px-3 py-2 border rounded"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="categoryId" class="block mb-2">分類：</label>
+                    <select id="categoryId" name="categoryId" class="w-full px-3 py-2 border rounded">
+                        <option value="">選擇分類</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="tagId" class="block mb-2">標籤：</label>
+                    <select id="tagId" name="tagId" class="w-full px-3 py-2 border rounded">
+                        <option value="">選擇標籤</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="postImgUrl" class="block mb-2">圖片 URL：</label>
+                    <input type="text" id="postImgUrl" name="postImgUrl" class="w-full px-3 py-2 border rounded">
+                </div>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">提交</button>
+                <button type="button" id="closeModalBtn"
+                    class="bg-red-500 text-white px-4 py-2 rounded ml-2">關閉</button>
+            </form>
+        </div>
+    </div>
+    <div th:replace="~{commons/adminFooter}"></div>
     <script>
+
         let dataTable;//全局變數
 
 
@@ -23,7 +110,9 @@
             axios.get(url)
                 .then(response => {
                     const posts = response.data; // 獲取 JSON 數據
+
                     updateTable(posts); // 將資料填充到表格
+
                 })
                 .catch(error => {
                     console.error("Error fetching posts:", error);
@@ -36,7 +125,6 @@
                 dataTable.clear().rows.add(posts).draw();
             } else {
                 const startTime = new Date();
-
                 dataTable = $('#postsTable').DataTable({
                     data: posts,
                     columns: [
@@ -46,7 +134,10 @@
                         {
                             data: 'postContent',
                             render: function (data, type, row) {
-                                return truncateContent(data, 30); // 使用截取後的內容
+                                return truncateContent(DOMPurify.sanitize(data, {
+                                    ALLOWED_TAGS: [], // 空陣列表示不允許任何標籤，保留純文本
+                                    ALLOWED_ATTR: []  // 空陣列表示不允許任何屬性
+                                }), 30); // 使用截取後的內容
                             }
                         },
                         { data: 'categoryName', defaultContent: 'N/A' },
@@ -109,11 +200,11 @@
                             data: null,
                             render: function (data, type, row) {
                                 return `
-                                    <button class="view-post bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">查看貼文</button>
-                                    <button class="view-comments bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">查看留言</button>
-                                    
-                                    <button class="delete-post bg-red-500 text-white px-2 py-2 rounded" data-id="${row.postID}">刪除</button>
-                                `;
+                            <button class="view-post bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">查看貼文</button>
+                            <button class="view-comments bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">查看留言</button>
+                            
+                            <button class="delete-post bg-red-500 text-white px-2 py-2 rounded" data-id="${row.postID}">刪除</button>
+                        `;
                                 // <button class="edit-post bg-blue-500 text-white px-2 py-2 rounded" data-id="${row.postID}">編輯</button>
                             }
                         }
@@ -159,7 +250,8 @@
 
                 axios.post('/TickitEasy/admin/api/post/POST/', formData)
                     .then(function (response) {
-                        alert("貼文創建成功");
+                        // alert("貼文創建成功");
+                        swal("貼文創建成功！","", "success");
                         $("#modal").removeClass("flex").addClass("hidden");
                         fetchAllPosts(); // 重新加載貼文列表
                     })
@@ -194,12 +286,13 @@
                 if (confirm('確定要刪除此貼文嗎？')) {
                     axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
                         .then(response => {
-                            alert("刪除成功！");
+                            swal("刪除成功！",  "","success");
                             fetchAllPosts(); // 刪除後重新加載貼文列表
                         })
                         .catch(error => {
                             console.error("Error fetching posts:", error);
-                            alert("刪除失敗！您可能未登入或發生錯誤");
+                            // alert("刪除失敗！您可能未登入或發生錯誤");
+                            swal("刪除失敗！", "您可能未登入或發生錯誤", "error");
                         });
                 }
             });
@@ -288,81 +381,87 @@
         }
 
 
+        function loadCategories() {
+            axios.get('/TickitEasy/admin/api/post/categories')
+                .then(function (response) {
+                    const categories = response.data;
+                    let html = '<option value="">選擇分類</option>';
+                    categories.forEach(category => {
+                        html += `<option value="${category.categoryId}">${category.categoryName}</option>`;
+                    });
+                    $("#categoryId").html(html); // 修改選擇器
+                    $("#categoryFilter").html(html); // 同時更新篩選器
+                })
+                .catch(error => {
+                    console.error('Error loading categories:', error);
+                });
+        }
+
+        function loadTags() {
+            axios.get('/TickitEasy/admin/api/post/tags')
+                .then(function (response) {
+                    const tags = response.data;
+                    let html = '<option value="">選擇標籤</option>';
+                    tags.forEach(tag => {
+                        html += `<option value="${tag.tagId}">${tag.tagName}</option>`;
+                    });
+                    $("#tagId").html(html); // 修改選擇器
+                    $("#tagFilter").html(html); // 同時更新篩選器
+                })
+                .catch(error => {
+                    console.error('Error loading tags:', error);
+                });
+        }
+        $(document).ready(function () {
+            // 加載類別和標籤
+            loadCategories();
+            loadTags();
+
+            // 初始化數據表格
+            fetchAllPosts();
+
+            // 綁定篩選事件
+            $('#categoryFilter, #tagFilter').on('change', function () {
+                const categoryFilter = $('#categoryFilter').val();
+                const tagFilter = $('#tagFilter').val();
+
+                // 直接使用 DataTables 的 API 進行篩選
+                dataTable
+                    .columns(4).search(categoryFilter)  // 類別欄位
+                    .columns(5).search(tagFilter)       // 標籤欄位
+                    .draw();
+            });
+        });
+
+        dataTable = $('#postsTable').DataTable({
+            data: posts,
+            searching: true,
+            columns: [
+                // ... 其他列配置保持不變 ...
+            ],
+            // 新增搜索配置
+            searchable: true,
+            columnDefs: [
+                {
+                    targets: [4, 5], // 類別和標籤欄位
+                    searchable: true
+                }
+            ]
+        });
+        $('#categoryFilter, #tagFilter').on('change', function () {
+            const categoryFilter = $('#categoryFilter').val();
+            const tagFilter = $('#tagFilter').val();
+
+            console.log('Category Filter:', categoryFilter);
+            console.log('Tag Filter:', tagFilter);
+
+            dataTable
+                .columns(4).search(categoryFilter)
+                .columns(5).search(tagFilter)
+                .draw();
+        });
 
     </script>
-</head>
-
-<body>
-    <div th:replace="~{commons/adminHeader}"></div>
-    <h1>All Posts</h1>
-    <!-- 類別篩選選單 -->
-    <!-- <button id="openModalBtn" class=" add-post bg-blue-500 text-white px-4 py-2 rounded">新增貼文</button> -->
-    <label for="categoryFilter">Filter by Category: </label>
-    <select id="categoryFilter">
-        <option value="">All Categories</option>
-    </select>
-
-    <table id="postsTable" class="display">
-        <thead>
-            <tr>
-                <th>貼文ID</th>
-                <th>會員暱稱</th>
-                <th>標題</th>
-                <th>內容</th>
-                <th>活動類別</th>
-                <th>標籤</th>
-                <th>圖片</th>
-                <th>按讚數</th>
-                <th>觀看數</th>
-                <th>狀態</th>
-                <th>發布時間</th>
-                <th>編輯時間</th>
-                <th>動作</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 這裡的資料會動態填充 -->
-        </tbody>
-    </table>
-
-    <!-- 彈窗 -->
-    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white p-8 rounded shadow-lg">
-            <h2 class="text-xl font-bold mb-4">新增貼文</h2>
-            <form id="createPostForm">
-                <div class="mb-4">
-                    <label for="postTitle" class="block mb-2">標題：</label>
-                    <input type="text" id="postTitle" name="postTitle" required class="w-full px-3 py-2 border rounded">
-                </div>
-                <div class="mb-4">
-                    <label for="postContent" class="block mb-2">內容：</label>
-                    <textarea id="postContent" name="postContent" required
-                        class="w-full px-3 py-2 border rounded"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="categoryID" class="block mb-2">分類：</label>
-                    <select id="categoryID" name="categoryID" required class="w-full px-3 py-2 border rounded">
-                        <!-- 這裡會動態填充分類選項 -->
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="tagID" class="block mb-2">標籤：</label>
-                    <select id="tagID" name="tagID" required class="w-full px-3 py-2 border rounded">
-                        <!-- 這裡會動態填充標籤選項 -->
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="postImgUrl" class="block mb-2">圖片 URL：</label>
-                    <input type="text" id="postImgUrl" name="postImgUrl" class="w-full px-3 py-2 border rounded">
-                </div>
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">提交</button>
-                <button type="button" id="closeModalBtn"
-                    class="bg-red-500 text-white px-4 py-2 rounded ml-2">關閉</button>
-            </form>
-        </div>
-    </div>
-    <div th:replace="~{commons/adminFooter}"></div>
 </body>
 
 </html>

@@ -11,6 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <link rel="stylesheet" href="/TickitEasy/post/css/list.css">
 
     <style>
@@ -372,7 +373,7 @@
                     ALLOWED_TAGS: [], // 空陣列表示不允許任何標籤，保留純文本
                     ALLOWED_ATTR: []  // 空陣列表示不允許任何屬性
                 });
-                console.log(' sanitizeContent' + sanitizeContent)
+              
                 // <span class="theme">${post.categoryName}</span>
                 //先建立結構再抓圖
                 articleItem.innerHTML = `

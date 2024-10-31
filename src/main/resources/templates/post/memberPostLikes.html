@@ -7,6 +7,7 @@
   <meta th:replace="~{commons/memberHead}" />
   <title>TickitEasy｜我的喜歡</title>
   <script th:src="@{/post/js/getMember.js}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
   <script>
 
     $(document).ready(function () {
@@ -56,10 +57,15 @@
         console.log('顯示的喜歡項目:', like); // 調試：查看每個喜歡項目的內容
         const likeRow = document.createElement('tr');
 
+        //DOMPurify過濾html標籤
+        const sanitizeContent = DOMPurify.sanitize(like.content, {
+          ALLOWED_TAGS: [], // 空陣列表示不允許任何標籤，保留純文本
+          ALLOWED_ATTR: []  // 空陣列表示不允許任何屬性
+        });
 
         likeRow.innerHTML = `
             <td>${like.title}</td> <!-- 貼文標題 -->
-            <td>${truncateContent(like.content, 28)}</td>  <!-- 貼文內容 -->
+            <td>${truncateContent(sanitizeContent, 28)}</td>  <!-- 貼文內容 -->
             <td>${like.formattedDate}</td> <!-- 喜歡日期 -->
             <td>
                 <a href="/TickitEasy/post/${like.postID}" class="btn btn-primary">

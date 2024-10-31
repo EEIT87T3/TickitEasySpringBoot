@@ -275,24 +275,33 @@ public class PostJsonController {
 	}
 
 	// 根據貼文id取得多筆留言
+//	@GetMapping("/comments")
+//	public ResponseEntity<List<CommentEntity>> findCommentByPostId(@RequestParam("postID") Integer postID) {
+//
+//		Optional<PostEntity> optionalPost = postRepo.findById(postID);
+//
+//		if (optionalPost.isPresent()) {
+//			// 如果貼文存在，則查詢貼文的留言
+//			List<CommentEntity> comments = commentService.findByPostId(postID);
+//			return ResponseEntity.ok(comments); // 回傳 200 OK 和結果
+//		}
+//
+//		// 如果類別不存在，回傳 404 Not Found
+//		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//	}
 	@GetMapping("/comments")
-	// public List<ShowCommentDTO> getCommentsByPostId(@RequestParam("postID")
-	// Integer postID) {
-	// return commentService.getCommentsByPostId(postID);
-	// }
-	public ResponseEntity<List<CommentEntity>> findCommentByPostId(@RequestParam("postID") Integer postID) {
+	public ResponseEntity<List<ShowCommentDTO>> findCommentByPostId(@RequestParam("postID") Integer postID) {
+	    Optional<PostEntity> optionalPost = postRepo.findById(postID);
 
-		Optional<PostEntity> optionalPost = postRepo.findById(postID);
+	    if (optionalPost.isPresent()) {
+	        List<ShowCommentDTO> comments = commentService.findByPostIdwithMember(postID);
+	        return ResponseEntity.ok(comments); // 回傳 200 OK 和結果
+	    }
 
-		if (optionalPost.isPresent()) {
-			// 如果貼文存在，則查詢貼文的留言
-			List<CommentEntity> comments = commentService.findByPostId(postID);
-			return ResponseEntity.ok(comments); // 回傳 200 OK 和結果
-		}
-
-		// 如果類別不存在，回傳 404 Not Found
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	    // 如果類別不存在，回傳 404 Not Found
+	    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	}
+
 
 	// 新增單筆貼文(附圖)//這不是json
 	@PostMapping("POST/")
