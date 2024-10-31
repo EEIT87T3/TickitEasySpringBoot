@@ -11,13 +11,19 @@
     <title>查看貼文</title>
     <style>
         body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             margin-top: 100px;
             padding: 20px;
             color: #333;
+            gap: 10px;
         }
+
 
         h1 {
             text-align: center;
@@ -31,6 +37,8 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             margin: 0 auto;
+            flex: 1;
+            margin-bottom: 100px;
         }
 
         .post-row {
@@ -43,6 +51,11 @@
         .post-label {
             font-weight: bold;
             width: 30%;
+            /* flex-shrink: 0; */
+            /* flex-grow: 1; 占滿剩餘空間 */
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .post-value {
@@ -56,15 +69,23 @@
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
+
         }
 
         .info-item {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+
+
+            width: calc(100% - 10px);
+            /* 每個項目佔半寬度，適應畫面大小 */
+            box-sizing: border-box;
         }
 
         .info-item i {
+
+            flex-shrink: 0;
             margin-right: 8px;
             font-size: 20px;
             color: #5F46E8;
@@ -142,6 +163,52 @@
             visibility: visible;
             opacity: 1;
         }
+
+        .footer {
+            width: 100%;
+
+
+            padding: 10px;
+
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #5F46E8;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        #imageList img {
+            width: 100px;
+            height: auto;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -152,77 +219,74 @@
 
     <div class="post-container">
         <!-- 圖像化呈現區域 -->
-        <div class="info-container">
-            <!-- Likes Count -->
-            <div class="info-item">
-                <i class="fas fa-thumbs-up"></i>
-                <span id="likesCount"></span>
-            </div>
 
-            <!-- View Count -->
-            <div class="info-item">
-                <i class="fas fa-eye"></i>
-                <span id="viewCount"></span>
-            </div>
-
-            <!-- Status -->
-            <div class="info-item">
-                <i class="fas fa-flag"></i>
-                <span id="status"></span>
-            </div>
-
-            <!-- Category Name -->
-            <div class="info-item">
-                <i class="fas fa-list"></i>
-                <span id="categoryName"></span>
-            </div>
-
-            <!-- Tag Name -->
-            <div class="info-item">
-                <i class="fas fa-tag"></i>
-                <span id="tagName"></span>
-            </div>
-
-            <!-- Post Time -->
-            <div class="info-item">
-                <i class="fas fa-calendar-alt"></i>
-                <span id="postTime"></span>
-            </div>
-        </div>
-
-        <!-- 發布者圖像和名稱 -->
-
-        <div class="post-row">
-            <div class="tooltip">
-                <img id="profilePic" class="profile-pic" alt="發布者頭像">
-
-            </div>
-        </div>
-        <div class="post-row">
-
+        <div class="info-item">
+            <i class="fas fa-user"></i>
             <div class="post-label">發布者:</div>
             <div id="tooltipName" class="post-value"></div>
         </div>
 
-        <div class="post-row">
+        <div class="info-item">
+            <i class="fas fa-list"></i>
             <div class="post-label">標題:</div>
             <div id="postTitle" class="post-value"></div>
         </div>
 
-        <div class="post-row">
+        <div class="info-item">
+            <i class="fas fa-file-alt"></i>
             <div class="post-label">文章內容:</div>
             <div id="postContent" class="post-value"></div>
         </div>
 
-        <div class="post-row">
-            <div class="post-label">圖片網址:</div>
-            <!-- <div id="postImgUrl" class="post-value"></div> -->
-            <div id="imageList" class="post-value"></div>
+        <div class="info-item long">
+            <i class="fas fa-calendar-alt"></i>
+            <div class="post-label">發布時間:</div>
+            <div id="postTime" class="post-value"></div>
+        </div>
+
+        <div class="info-item">
+            <i class="fas fa-thumbs-up"></i>
+            <div class="post-label">按讚數:</div>
+            <div id="likesCount" class="post-value"></div>
+        </div>
+
+        <div class="info-item">
+            <i class="fas fa-eye"></i>
+            <div class="post-label">瀏覽數:</div>
+            <div id="viewCount" class="post-value"></div>
+        </div>
+
+        <div class="info-item">
+            <i class="fas fa-flag"></i>
+            <div class="post-label">狀態:</div>
+            <div id="status" class="post-value"></div>
+        </div>
+
+        <div class="info-item">
+            <i class="fas fa-list"></i>
+            <div class="post-label">分類名稱:</div>
+            <div id="categoryName" class="post-value"></div>
+        </div>
+
+        <div class="info-item">
+            <i class="fas fa-tag"></i>
+            <div class="post-label">標籤名稱:</div>
+            <div id="tagName" class="post-value"></div>
+        </div>
+        
+        <div id="imageList"></div>
+        <div class="link">
+            <a href="" class="btn btn-primary">
+                前往貼文頁面
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
         </div>
     </div>
 
-    <div id="updateResult"></div>
 
+
+    <div id="updateResult"></div>
+    <div th:replace="~{commons/adminFooter}"></div>
     <script>
         async function loadPostData() {
             try {
@@ -240,11 +304,12 @@
                     document.getElementById('status').innerText = post.status;
                     document.getElementById('categoryName').innerText = post.postCategory.categoryName;
                     document.getElementById('tagName').innerText = post.postTag.tagName;
+                    document.querySelector('.link a').href = `/TickitEasy/post/${post.postID}`;
 
                     // 設置發布者名稱和頭像
                     document.getElementById('tooltipName').innerText = post.member.nickname;
                     // post.member.profilePicPath || 
-                    document.getElementById('profilePic').src = '/TickitEasy/images/member/default-avatar.png';
+                    // document.getElementById('profilePic').src = '/TickitEasy/images/member/default-avatar.png';
 
                     const imageListContainer = document.getElementById('imageList');
                     imageListContainer.innerHTML = ''; // 清空容器中的內容
@@ -291,8 +356,8 @@
                     } else {
                         // 創建文件路徑元素
                         const nullmsg = document.createElement('span');
-                        nullmsg.textContent = '本則貼文無圖片'; 
-                        imageListContainer.appendChild( nullmsg);
+                        nullmsg.textContent = '本則貼文無圖片';
+                        imageListContainer.appendChild(nullmsg);
                         console.error("post.images is not an array or is undefined.");
                     }
                 } else {
@@ -310,7 +375,7 @@
         });
     </script>
 
-    <div th:replace="~{commons/adminFooter}"></div>
+
 </body>
 
 </html>

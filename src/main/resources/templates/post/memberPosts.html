@@ -7,6 +7,7 @@
   <meta th:replace="~{commons/memberHead}" />
   <title>TickitEasy｜我的貼文</title>
   <script th:src="@{/post/js/getMember.js}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
   <script>
 
     $(document).ready(function () {
@@ -56,13 +57,17 @@
         console.log('顯示的貼文:', post); // 調試：查看每個喜歡項目的內容
         const postRow = document.createElement('tr');
 
-
+        //DOMPurify過濾html標籤
+        const sanitizeContent = DOMPurify.sanitize(post.postContent, {
+          ALLOWED_TAGS: [], // 空陣列表示不允許任何標籤，保留純文本
+          ALLOWED_ATTR: []  // 空陣列表示不允許任何屬性
+        });
         postRow.innerHTML = `
             <td>${post.postTitle}</td> 
-            <td>${truncateContent(post.postContent, 28)}</td>  
+            <td>${truncateContent(sanitizeContent, 28)}</td>  
             <td>${post.formattedDate}</td> 
             <td>
-                <a href="/TickitEasy/user/post/${post.postID}" class="btn btn-primary">
+                <a href="/TickitEasy/post/${post.postID}" class="btn btn-primary">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
             </td>

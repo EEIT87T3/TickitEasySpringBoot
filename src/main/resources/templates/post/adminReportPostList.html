@@ -117,7 +117,7 @@ function updateReportStatus(reportID, newStatus) {
         }
     })
     .then(response => {
-      response.data.message); // 成功後顯示訊息
+      (response.data.message); // 成功後顯示訊息
         fetchReports(); // 重新加載報告以顯示更新
     })
     .catch(error => {

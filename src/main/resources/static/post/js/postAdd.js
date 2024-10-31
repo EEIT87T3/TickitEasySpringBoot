@@ -26,7 +26,7 @@ $('.postList').on('click', function () {
   if (currentUrl.includes("/admin/")) {
     window.location.href = `/TickitEasy/admin/post`;
   } else {
-    window.location.href = `/TickitEasy/user/post/PostList`;
+    window.location.href = `/TickitEasy/post/PostList`;
   }
 });
 
@@ -100,7 +100,11 @@ $('#fullCreatePostForm').on('submit', function (event) {
   event.preventDefault();
   const memberID =currentUserID;
   const formData = new FormData();
-
+  const button = event.target;
+    button.disabled = true;
+    console.log('按鈕禁用')
+    
+   
   console.log($('#fullPostCategory').val());
 
   // 使用formData取代json傳遞資料
@@ -125,21 +129,31 @@ $('#fullCreatePostForm').on('submit', function (event) {
     .then(response => {
       if (response.data && response.data.postID) {  // 確認回應包含 postID
         const postID = response.data.postID;  // 抓取生成的 postID
-        alert("貼文新增成功！");
+        swal("貼文新增成功！", "", "success");
+        setTimeout(() => {
+          // 上傳完成後再重新啟用按鈕
+          button.disabled = false; console.log('按鈕啟用')
+        }, 100);
         const currentUrl = window.location.href;
         if (currentUrl.includes("/admin/")) {
+          setTimeout(() => {
           window.location.href = `/TickitEasy/admin/post/${postID}`;
+        }, 2000);
         } else {
-          window.location.href = `/TickitEasy/user/post/${postID}`;
+          setTimeout(() => {
+          window.location.href = `/TickitEasy/post/${postID}`;
+        }, 2000);
         }
 
       } else {
-        alert("新增成功，但無法取得貼文 ID。");
+        // alert("新增成功，但無法取得貼文 ID。");
+        swal("無法取得貼文ID", "請稍後再試", "error");
       }
     })
     .catch(error => {
       console.error("新增貼文失敗:", error);
-      alert("新增失敗，請稍後再試。");
+      // alert("新增失敗，請稍後再試。");
+      swal("新增失敗！", "請稍後再試", "error");
       if (error.response && error.response.status === 401) {
         Auth.logout(); // 如果錯誤會移除token並自動定向到登入頁面
       }
