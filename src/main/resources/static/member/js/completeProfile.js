@@ -1,6 +1,18 @@
 // completeProfile.js
 
 document.addEventListener('DOMContentLoaded', function() {
+	
+	// 在 document.addEventListener('DOMContentLoaded', function() { ... }) 內添加：
+	const autoFillBtn = document.getElementById('autoFillBtn');
+	    
+	autoFillBtn.addEventListener('click', function() {
+	    // 自動填入測試資料
+	    document.getElementById('nickname').value = '小帥';
+	    document.getElementById('name').value = '李到晛';
+	    document.getElementById('birthDate').value = '1988-05-13';
+	    document.getElementById('phone').value = '0914445678';
+	});
+	
     if (!Auth.isLoggedIn()) {
         window.location.href = '/TickitEasy/login';
         return;
