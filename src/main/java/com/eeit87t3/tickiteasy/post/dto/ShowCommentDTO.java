@@ -8,13 +8,22 @@ public class ShowCommentDTO {
     private Integer memberID;
     private String content;
     private Timestamp commentDate;
+    private Timestamp editTime;
+    private String nickname;
+    private String profilePic; // 新增此欄位
     // 構造函數
-    public ShowCommentDTO(Integer postID, Integer postCommentID, Integer memberID, String content, Timestamp CommentDate) {
+    public ShowCommentDTO(
+    		Integer postID, Integer postCommentID, Integer memberID,
+    		String content, Timestamp commentDate,Timestamp  editTime, String nickname, String profilePic) {
         this.postID = postID;
         this.postCommentID = postCommentID;
         this.memberID = memberID;
         this.content = content;
         this.commentDate = commentDate;
+        this.editTime = editTime;
+        this.nickname = nickname;
+        this.profilePic = profilePic;
+        
     }
     // getters 和 setters
     public Integer getPostID() { return postID; }
@@ -31,4 +40,25 @@ public class ShowCommentDTO {
 
     public Timestamp getCommentDate() { return commentDate; }
     public void setCommentDate(Timestamp commentDate) { this.commentDate = commentDate; }
+    
+	public String getProfilePic() {
+		return profilePic;
+	}
+	public void setProfilePic(String profilePic) {
+		this.profilePic = profilePic;
+	}
+	public Timestamp getEditTime() {
+		return editTime;
+	}
+	public void setEditTime(Timestamp editTime) {
+		this.editTime = editTime;
+	}
+	public String getNickname() {
+		return nickname;
+	}
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+	
+    
 }

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/user/post")
+@RequestMapping("/post")
 public class PostUserController {
 		//測試頁面 
 		@GetMapping("/test")
