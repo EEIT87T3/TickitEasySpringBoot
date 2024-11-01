@@ -251,12 +251,13 @@
                 axios.post('/TickitEasy/admin/api/post/POST/', formData)
                     .then(function (response) {
                         // alert("貼文創建成功");
-                        swal("貼文創建成功！","", "success");
+                        swal("貼文創建成功！", "", "success");
                         $("#modal").removeClass("flex").addClass("hidden");
                         fetchAllPosts(); // 重新加載貼文列表
                     })
                     .catch(function (error) {
-                        alert("錯誤：" + (error.response ? error.response.data : error.message));
+                        // alert("錯誤：" + (error.response ? error.response.data : error.message));
+                        swal("貼文創建失敗！", "您可能尚未登入", "error");
                     });
             });
 
@@ -283,18 +284,28 @@
             // 刪除貼文==================================
             $('#postsTable').on('click', '.delete-post', function () {
                 const postID = $(this).data('id'); // 獲取 postID
-                if (confirm('確定要刪除此貼文嗎？')) {
-                    axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
-                        .then(response => {
-                            swal("刪除成功！",  "","success");
-                            fetchAllPosts(); // 刪除後重新加載貼文列表
-                        })
-                        .catch(error => {
-                            console.error("Error fetching posts:", error);
-                            // alert("刪除失敗！您可能未登入或發生錯誤");
-                            swal("刪除失敗！", "您可能未登入或發生錯誤", "error");
-                        });
-                }
+                swal({
+                    title: "確定要刪除這條留言嗎？",
+                    text: "這個動作無法復原！",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willDelete) => {
+
+                    if (willDelete) {
+                        axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`)
+                            .then(response => {
+                                swal("刪除成功！", "", "success");
+                                fetchAllPosts(); // 刪除後重新加載貼文列表
+                            })
+                            .catch(error => {
+                                console.error("Error fetching posts:", error);
+                                // alert("刪除失敗！您可能未登入或發生錯誤");
+                                swal("刪除失敗！", "您可能未登入或發生錯誤", "error");
+                            });
+                    }
+
+                })
             });
             // 編輯貼文==================================
             $('#postsTable').on('click', '.edit-post', function () {

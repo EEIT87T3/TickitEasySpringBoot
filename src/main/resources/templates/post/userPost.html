@@ -105,7 +105,7 @@
             <div class="post-actions">
                 <button id="like-btn"><i class="far fa-thumbs-up"></i><span id="likes-count"></span></button>
                 <!-- <button id="save-btn"><i class="far fa-star"></i> 收藏</button> -->
-               <!-- <button id="reportBtn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>-->
+                <!-- <button id="reportBtn"><i class="fas fa-exclamation-triangle"></i> 檢舉</button>-->
                 <!-- <button id="subscribe-btn"><i class="far fa-bell"></i> 訂閱作者</button> -->
                 <button id="edit-btn" style="display: none;"><i class="fas fa-pen"></i> 編輯</button>
                 <button id="delete-btn" style="display: none;"><i class="fas fa-trash"></i> 刪除</button>
@@ -117,7 +117,7 @@
             <h3>新增回應</h3>
             <form id="comment-form">
                 <input type="hidden" name="postID" id="postID" value="" />
-                <textarea name="content" id="content" style="resize:none;height:100px;" placeholder="輸入您的回應"></textarea>
+                <textarea name="content" id="content" style="resize:none;height:100px;" placeholder="輸入您的回應"  required></textarea>
                 <input type="submit" value="發表">
             </form>
         </div>
@@ -218,15 +218,11 @@
                         }
                     }).then(response => {
                         const categoryId = response.data.categoryId;
-
-                        // 顯示成功提示框
-                        // 顯示成功提示框
                         swal("貼文刪除成功！", "", "success");
-
                         // 使用 setTimeout 延遲跳轉
                         setTimeout(() => {
                             window.location.href = `/TickitEasy/post/PostList?categoryId=${categoryId}`; // 刪除後返回列表頁
-                        }, 2000); 
+                        }, 2000);
                     })
                         .catch(error => {
                             console.error('Error deleting post:', error);
@@ -354,20 +350,30 @@
                             } else {
                                 const commentID = this.closest('.comment').dataset.commentId; // 獲取該留言的ID
                                 // 確認刪除
-                                if (confirm('確定要刪除這條留言嗎？')) {
-                                    // 刪除留言的請求
-                                    axios.delete(`/TickitEasy/admin/api/post/comment/DELETE/${commentID}`, {
-                                        headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
-                                    })
-                                        .then(response => {
-                                            // 刪除成功後，重新加載留言
-                                            fetchComments();
-                                            console.log(`留言 ID: ${commentID} 已刪除`);
+                                swal({
+                                    title: "確定要刪除這條留言嗎？",
+                                    text: "這個動作無法復原！",
+                                    icon: "warning",
+                                    buttons: true,
+                                    dangerMode: true,
+                                }).then((willDelete) => {
+                                    if (willDelete) {
+                                        // 刪除留言的請求
+                                        axios.delete(`/TickitEasy/admin/api/post/comment/DELETE/${commentID}`, {
+                                            headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
                                         })
-                                        .catch(error => {
-                                            console.error('刪除留言時發生錯誤:', error);
-                                        });
+                                            .then(response => {
+                                                swal("貼文刪除成功！", "", "success");
+                                                // 刪除成功後，重新加載留言
+                                                fetchComments();
+                                                console.log(`留言 ID: ${commentID} 已刪除`);
+                                            })
+                                            .catch(error => {
+                                                console.error('刪除留言時發生錯誤:', error);
+                                            });
+                                    }
                                 }
+                                )
                             }
                         });
 
@@ -390,7 +396,7 @@
 
                 if (content === '') {
                     // 如果內容為空，顯示提示訊息
-                    alert('請輸入留言內容'); // 提示用戶輸入內容
+                    // swal("請輸入留言內容", "", "warning");
                     return; // 退出函數，避免繼續執行
                 }
                 console.log("留言currentUserID:", currentUserID);
