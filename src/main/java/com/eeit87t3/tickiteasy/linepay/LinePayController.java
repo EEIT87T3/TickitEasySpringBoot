@@ -63,9 +63,13 @@ public class LinePayController {
         		boolean isReached = fundOrderService.isReached(projectID); // 達目標金額
 	        	if (isReached) {
 					List<String> donatedMembersEmail = testEmailService.findDonatedMembersEmail(projectID);
+					//System.out.println("寄信list:"+donatedMembersEmail);
+					int count = 0;
 					for (String email : donatedMembersEmail) {
+						count = count + 1 ;
 						testEmailService.sendDonateSuccessEmail(email);
 					}
+					//System.out.println("迴圈次數應和寄信名單人數相同："+count);
 				}
         	}
         	return ResponseEntity.ok(root);
@@ -75,9 +79,5 @@ public class LinePayController {
     }
 	
 
-	// line pay畫面，付款失敗會導向至這裡
-	@GetMapping("/test/linepay/requestNO")
-	public String linepayReqReject() {
-		return "cwdfunding/linepayNO";
-	}
+
 }
