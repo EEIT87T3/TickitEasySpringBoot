@@ -92,4 +92,18 @@ public class UserFundProjViewController {
 	public String fundProjFollow() {
 		return "cwdfunding/cust_fundProjFollow";
 	}
+	
+	// line pay畫面，使用者同意付款會導向至這裡
+	@GetMapping("/fundproject/linepay/OK")
+	public String linepayReqAcc() {
+		return "cwdfunding/linepayOK";
+	}
+	
+	// line pay畫面，使用者取消付款會導向至這裡
+	@GetMapping("/fundproject/linepay/NO")
+	public String linepayReqReject() {
+		return "cwdfunding/linepayNO";
+	}
+	
+	
 }
