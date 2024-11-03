@@ -2,9 +2,7 @@ package com.eeit87t3.tickiteasy.linepay;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -65,60 +63,10 @@ public class LinePayService {
 			signature = encrypt(CHANNEL_SECRET, CHANNEL_SECRET + requestUri + formString + nonce);
 	        String httpsUrl = API_URL;
 	        JsonNode json = null;
-
-				json = PostApiUtil.sendPost(CHANNEL_ID, nonce, signature, httpsUrl, formString);
-	        
+			json = PostApiUtil.sendPost(CHANNEL_ID, nonce, signature, httpsUrl, formString);	        
 	        return json;
-	           
-	        
+
 	 }
-	 
-	 public Map<String, Object> formMakerTest() {
-		 Map<String, Object> form = new HashMap<>();
-		 form.put("amount", 100);
-		 form.put("currency", "TWD");
-		 form.put("orderId", "EXAMPLE_ORDER_20230422_1000001");
-
-		  // Create the packages list
-		    List<Map<String, Object>> packages = new ArrayList<>();
-
-		    // Create the first package
-		    Map<String, Object> package1 = new HashMap<>();
-		    package1.put("id", "1");
-		    package1.put("amount", 100);
-
-		    // Create the products list inside the package
-		    List<Map<String, Object>> products = new ArrayList<>();
-
-		    // Create the first product
-		    Map<String, Object> product1 = new HashMap<>();
-		    product1.put("id", "PEN-B-001");
-		    product1.put("name", "Pen Brown");
-		    product1.put("quantity", 2);
-		    product1.put("price", 50);
-
-		    // Add the product to the products list
-		    products.add(product1);
-
-		    // Add the products list to the package
-		    package1.put("products", products);
-
-		    // Add the package to the packages list
-		    packages.add(package1);
-
-		    // Add the packages list to the form
-		    form.put("packages", packages);
-
-		    // Add the redirect URLs
-		    Map<String, String> redirectUrls = new HashMap<>();
-		    redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/fundprojects");
-		    redirectUrls.put("cancelUrl", "http://localhost:8080/TickitEasy/test/linepay/requestNO");
-		    form.put("redirectUrls", redirectUrls);
-
-		    return form;	
-		 
-	 }
-	 
 
 	 public Map<String, Object> lineformMaker(Map<String, Object> form){
 		 
@@ -130,11 +78,7 @@ public class LinePayService {
 			 * 		redirectUrls:
 			 * 		orderId:
 			 * }
-			 * 
-			 * 
-			 * */
-		   
-			 
+			 * */	 
 			 String[] keysToExtract = {"amount", "currency","packages"}; //指定form裡要提取出來的key
 		 
 			 Map<String, Object> linefullForm = form.entrySet().stream().filter(entry ->{
@@ -145,8 +89,6 @@ public class LinePayService {
 					  }
 					return false;
 			 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-			 
-			 
 		 
 			 /* 添加key=tickitID給linefullForm */
 			 LocalDateTime now = LocalDateTime.now();
@@ -156,10 +98,13 @@ public class LinePayService {
 			 String tickitID = "tickit" + formattedDateTime;		 	
 			 linefullForm.put("orderId", tickitID);
 		 
-			 /* 添加key=redirectUrls給linefullForm */
+			 /* 添加key=redirectUrls給linefullForm 
+			  * confirmUrl: 使用者授權付款後，跳轉到商家的URL
+			  * cancelUrl: 使用者在付款頁面取消付款，跳轉的URL
+			  */
 			 Map<String, String> redirectUrls = new HashMap<>();
-			 redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/fundprojects");
-			 redirectUrls.put("cancelUrl", "http://localhost:8080/TickitEasy/test/linepay/requestNO");
+			 redirectUrls.put("confirmUrl", "http://localhost:8080/TickitEasy/fundproject/linepay/OK");
+			 redirectUrls.put("cancelUrl", "http://localhost:8080/TickitEasy/fundproject/linepay/NO");
 			 linefullForm.put("redirectUrls", redirectUrls);
 			 
 			 return linefullForm;

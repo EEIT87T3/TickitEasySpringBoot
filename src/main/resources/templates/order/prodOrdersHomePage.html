@@ -32,7 +32,7 @@
 		}
 
 		table {
-			width: 1550px;
+			width: 100%;
 			border-collapse: collapse;
 		}
 
@@ -46,10 +46,6 @@
 		th {
 			background-color: #333;
 			color: #fff;
-		}
-
-		.width {
-			padding-left: 80px;
 		}
 
 		.pagination-container {
@@ -133,11 +129,11 @@
 										<button type="submit" class="btn btn-danger" name="button" value="delete">
 										<i class="fas fa-trash-alt mr-1"></i>刪除</button>
 									</form>
-									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/update">
+									<!-- <form method="post" action="http://localhost:8080/TickitEasy/admin/order/update">
 										<input type="hidden" name="prodOrderID" th:value="${prodOrders.prodOrderID}">
 										<button type="submit" class="btn btn-success" name="button" value="update">
 										<i class="fas fa-edit mr-1"></i>修改</button>
-									</form>
+									</form> -->
 									<form method="post" action="http://localhost:8080/TickitEasy/admin/order/prodOrderDetails">
 										<input type="hidden" name="prodOrderID" th:value="${prodOrders.prodOrderID}">
 										<button type="submit" class="btn btn-secondary" name="button">
@@ -151,10 +147,10 @@
 				</table>
 			</div>
 			<div class="actions">
-				<form method="post" th:action="@{/admin/order/insert}">
+				<!-- <form method="post" th:action="@{/admin/order/insert}">
 					<button type="submit" class="btn btn-primary" name="button" value="insert">
 						<i class="fas fa-plus mr-1"></i>新增訂單</button>
-				</form>
+				</form> -->
 			</div>
 			<!-- 放頁數 -->
 			<div class="pagination-container">
@@ -231,11 +227,6 @@
 								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
 								<button type="submit" class="btn btn-danger" name="button" value="delete">
 								<i class="fas fa-trash-alt mr-1"></i>刪除</button>
-							</form>
-							<form method="post" action="http://localhost:8080/TickitEasy/admin/order/update">
-								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
-								<button type="submit" class="btn btn-success" name="button" value="update">
-								<i class="fas fa-edit mr-1"></i>修改</button>
 							</form>
 							<form method="post" action="http://localhost:8080/TickitEasy/admin/order/prodOrderDetails">
 								<input type="hidden" name="prodOrderID" value="${prodOrders.prodOrderID}">
