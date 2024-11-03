@@ -14,6 +14,9 @@ import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjFollow;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjFollow.FundProjFollowPK;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjFollowRepository;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Service
 public class FundProjFollowService {
 

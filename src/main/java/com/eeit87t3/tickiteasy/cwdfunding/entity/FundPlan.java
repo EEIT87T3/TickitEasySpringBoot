@@ -16,6 +16,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Entity @Table(name = "fundingPlan")
 public class FundPlan {
 	

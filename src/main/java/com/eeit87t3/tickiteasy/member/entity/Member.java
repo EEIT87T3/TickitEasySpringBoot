@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Entity
 @Table(name = "members")
 public class Member {

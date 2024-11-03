@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 與檔案系統中的圖片互動。
  * 
- * @author Chuan
+ * @author Chuan (chuan13)
  */
 /*
  * 設計時，可選擇設計為——

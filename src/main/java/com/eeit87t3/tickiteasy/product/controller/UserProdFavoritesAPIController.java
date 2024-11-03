@@ -20,7 +20,9 @@ import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.UserProdFavoritesService;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
 
-
+/**
+ * @author Liang123456123
+ */
 @RestController
 @RequestMapping("/user/api/product")
 public class UserProdFavoritesAPIController {

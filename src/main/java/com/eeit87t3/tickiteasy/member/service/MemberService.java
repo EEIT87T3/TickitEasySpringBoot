@@ -18,15 +18,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
-import com.eeit87t3.tickiteasy.member.controller.MemberController;
 import com.eeit87t3.tickiteasy.member.entity.Member;
-import com.eeit87t3.tickiteasy.member.entity.Member.MemberStatus;
 import com.eeit87t3.tickiteasy.member.repository.MemberRepository;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
 import com.eeit87t3.tickiteasy.util.OAuthLoginRequest;
 
 import jakarta.transaction.Transactional;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Service
 public class MemberService {
 	

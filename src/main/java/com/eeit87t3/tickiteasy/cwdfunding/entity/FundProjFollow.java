@@ -15,6 +15,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Entity @Table(name = "fundingProjFollow")
 public class FundProjFollow {
 

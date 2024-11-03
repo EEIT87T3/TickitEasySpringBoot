@@ -10,6 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 
+/**
+ * @author Liang123456123
+ */
 public interface ProductRepo extends JpaRepository<ProductEntity, Integer> {
 	
 		// 按照商品名稱進行模糊查詢的後台分頁

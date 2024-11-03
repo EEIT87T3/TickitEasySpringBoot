@@ -1,5 +1,8 @@
 package com.eeit87t3.tickiteasy.order.entity;
 
+/**
+ * @author tony475767
+ */
 public class RedirectUrls {
 	private String appPackageName;
 	private String confirmUrl;

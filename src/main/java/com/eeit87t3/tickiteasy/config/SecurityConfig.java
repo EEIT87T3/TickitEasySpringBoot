@@ -7,7 +7,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 //import com.eeit87t3.tickiteasy.admin.filter.AdminFilter;
 
-
+/**
+ * @author Lilian (Curriane)
+ */
 @Configuration
 public class SecurityConfig {
 

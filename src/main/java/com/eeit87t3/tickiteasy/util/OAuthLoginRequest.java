@@ -1,5 +1,8 @@
 package com.eeit87t3.tickiteasy.util;
 
+/**
+ * @author Lilian (Curriane)
+ */
 public class OAuthLoginRequest {
     private String token;  // OAuth token
     private String provider;  

@@ -22,8 +22,10 @@ import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundOrderRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
-import com.eeit87t3.tickiteasy.cwdfunding.testemail.TestEmailService;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Service
 public class FundOrderService {
 

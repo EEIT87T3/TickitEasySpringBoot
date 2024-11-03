@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eeit87t3.tickiteasy.product.entity.ProductCartItemEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
-import com.eeit87t3.tickiteasy.product.service.ProductService;
 import com.eeit87t3.tickiteasy.product.service.UserProductService;
 
 import java.util.Collections;
@@ -18,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.eeit87t3.tickiteasy.product.dto.ProductDTO;
 
+/**
+ * @author Liang123456123
+ */
 @RestController
 @RequestMapping("/user/api/product")
 public class UserProductAPIController {

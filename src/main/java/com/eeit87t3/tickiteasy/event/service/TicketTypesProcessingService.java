@@ -12,7 +12,7 @@ import com.eeit87t3.tickiteasy.event.repository.TicketTypesRepo;
 import jakarta.transaction.Transactional;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @Service
 public class TicketTypesProcessingService {

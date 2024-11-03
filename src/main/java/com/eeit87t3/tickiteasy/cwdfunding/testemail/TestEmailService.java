@@ -10,10 +10,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
-import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
-import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 import com.eeit87t3.tickiteasy.member.entity.Member;
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 
@@ -21,18 +18,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import jakarta.mail.internet.MimeMessage;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Service
 public class TestEmailService {
 	
 	
 	   @Autowired
 	   private JavaMailSender mailSender;
-	   
-	   @Autowired
-	   private FundProjRepository fundProjRepository;
-	   
-	   @Autowired
-	   private FundProjService fundProjService;
 	   
 	   @Autowired
 	   private FundOrderService fundOrderService;

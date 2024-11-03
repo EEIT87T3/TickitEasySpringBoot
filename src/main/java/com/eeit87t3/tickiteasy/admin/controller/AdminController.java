@@ -17,6 +17,9 @@ import com.eeit87t3.tickiteasy.admin.service.AdminService;
 
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminController {

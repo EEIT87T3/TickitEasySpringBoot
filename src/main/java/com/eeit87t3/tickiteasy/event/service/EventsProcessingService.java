@@ -22,7 +22,7 @@ import com.eeit87t3.tickiteasy.image.ImageUtil;
 import jakarta.transaction.Transactional;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @Service
 public class EventsProcessingService {

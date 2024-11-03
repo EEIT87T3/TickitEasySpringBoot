@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.eclipse.angus.mail.handlers.message_rfc822;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -33,8 +32,10 @@ import com.eeit87t3.tickiteasy.cwdfunding.service.FundPlanService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
-import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminFundProjAPIController {
