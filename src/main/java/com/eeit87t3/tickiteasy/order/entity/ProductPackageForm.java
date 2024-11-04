@@ -3,6 +3,9 @@ package com.eeit87t3.tickiteasy.order.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * @author tony475767
+ */
 public class ProductPackageForm {
 	private String id;
 	private String name;

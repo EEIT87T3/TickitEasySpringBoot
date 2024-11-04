@@ -4,13 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 
+/**
+ * @author tony475767
+ */
 public interface ProdOrdersService {
 	public ProdOrders saveOrder(ProdOrders prodOrders); //INSERT 新增 依照ProdOrders
 	public void deleteOrderById(Integer prodOrderID); //DELETE 刪除  依照prodOrderID

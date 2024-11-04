@@ -5,6 +5,9 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Entity
 @Table(name = "administrator")
 @Component

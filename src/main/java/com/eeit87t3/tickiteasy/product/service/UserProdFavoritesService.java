@@ -17,6 +17,9 @@ import com.eeit87t3.tickiteasy.product.repository.ProductRepo;
 
 import java.util.stream.Collectors;
 
+/**
+ * @author Liang123456123
+ */
 @Service
 public class UserProdFavoritesService {
 

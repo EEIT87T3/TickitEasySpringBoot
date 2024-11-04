@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 /**
  * 「新增活動」或「編輯活動」時使用的 DTO。
  * 
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 public class EventsDTO {
 

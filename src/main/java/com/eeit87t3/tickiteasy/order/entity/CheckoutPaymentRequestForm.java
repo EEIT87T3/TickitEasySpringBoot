@@ -3,6 +3,9 @@ package com.eeit87t3.tickiteasy.order.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * @author tony475767
+ */
 public class CheckoutPaymentRequestForm {
 	private BigDecimal amount;
 	private String currency;

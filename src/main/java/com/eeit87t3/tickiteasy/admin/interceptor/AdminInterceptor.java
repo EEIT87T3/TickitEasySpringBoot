@@ -6,6 +6,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
 

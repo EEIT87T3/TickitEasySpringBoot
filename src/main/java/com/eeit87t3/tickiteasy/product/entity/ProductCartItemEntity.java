@@ -1,5 +1,8 @@
 package com.eeit87t3.tickiteasy.product.entity;
 
+/**
+ * @author Liang123456123
+ */
 public class ProductCartItemEntity {
 	
 	private Integer productID;

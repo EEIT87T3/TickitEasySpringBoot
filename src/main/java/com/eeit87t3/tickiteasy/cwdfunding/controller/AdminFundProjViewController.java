@@ -17,22 +17,21 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.service.CategoryService;
 import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProjDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Controller
 @RequestMapping("/admin/fundproject")
 public class AdminFundProjViewController {
 
 	@Autowired
 	private FundProjService projService;
-
-	@Autowired
-	private FundOrderService orderService;
 	
 	@Autowired
 	private CategoryService categoryService;

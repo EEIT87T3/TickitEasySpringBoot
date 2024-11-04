@@ -10,7 +10,7 @@ import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import jakarta.transaction.Transactional;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @Service
 public class AdminTicketTypesService {
@@ -90,7 +90,7 @@ public class AdminTicketTypesService {
 	/**
 	 * 新增票種。
 	 * 
-	 * @param ticketTypesDTO：新增內容。
+	 * @param editTicketTypesDTO：新增內容。
 	 * @return 新增後的 TicketTypesEntity。
 	 */
 	public TicketTypesEntity create(TicketTypesDTO editTicketTypesDTO) {
@@ -242,4 +242,7 @@ public class AdminTicketTypesService {
 	
 	
 	// 刪除
+	public Boolean delete(Integer ticketTypeID) {
+		return ticketTypesProcessingService.deleteById(ticketTypeID);
+	}
 }

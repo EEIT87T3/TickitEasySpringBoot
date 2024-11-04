@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Component
 public class JWTUtil {
 

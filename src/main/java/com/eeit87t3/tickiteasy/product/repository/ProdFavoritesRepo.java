@@ -15,6 +15,9 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Liang123456123
+ */
 public interface ProdFavoritesRepo extends JpaRepository<ProdFavoritesEntity, ProdFavoriteID> {
 	
 	 // 查詢需要發送補貨通知的記錄

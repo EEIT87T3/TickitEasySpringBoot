@@ -2,6 +2,9 @@ package com.eeit87t3.tickiteasy.order.entity;
 
 import java.math.BigDecimal;
 
+/**
+ * @author tony475767
+ */
 public class ProductForm {
 	
 	private String id;

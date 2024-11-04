@@ -1,5 +1,8 @@
 package com.eeit87t3.tickiteasy.product.entity;
 
+/**
+ * @author Liang123456123
+ */
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;

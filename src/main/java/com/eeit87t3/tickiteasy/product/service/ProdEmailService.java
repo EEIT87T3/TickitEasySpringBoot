@@ -15,7 +15,9 @@ import com.eeit87t3.tickiteasy.product.entity.ProdFavoritesEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.repository.ProdFavoritesRepo;
 
-
+/**
+ * @author Liang123456123
+ */
 @Service
 public class ProdEmailService {
 

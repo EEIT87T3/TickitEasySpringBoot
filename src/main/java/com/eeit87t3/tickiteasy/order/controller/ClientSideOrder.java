@@ -1,9 +1,7 @@
 package com.eeit87t3.tickiteasy.order.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +23,14 @@ import com.eeit87t3.tickiteasy.order.entity.ProdOrderDetails;
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 import com.eeit87t3.tickiteasy.order.service.ProdOrderDetailsService;
 import com.eeit87t3.tickiteasy.order.service.ProdOrdersService;
-import com.eeit87t3.tickiteasy.order.service.Impl.ProdOrderDetailsServiceImpl;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 import com.eeit87t3.tickiteasy.util.JWTUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * @author tony475767
+ */
 @Controller
 @RequestMapping("user/clientSide")
 public class ClientSideOrder {
