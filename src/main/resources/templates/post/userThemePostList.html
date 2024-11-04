@@ -112,7 +112,7 @@
                         <option value="postTitle">標題</option>
                         <option value="likesCount">讚數</option>
                         <option value="viewCount">點閱率</option>
-                        <option value="commentCount">留言數</option>
+                        <!-- <option value="commentCount">留言數</option> -->
                     </select>
 
                     <!-- Select for choosing page size -->
@@ -361,7 +361,7 @@
             container.innerHTML = '';
 
             if (posts.length === 0) {
-                container.innerHTML = `<div class="article-item"><h2>查無文章</h2></div>`;
+                container.innerHTML = `<div class="article-item"><h2>查無貼文</h2></div>`;
                 return;
             }
 

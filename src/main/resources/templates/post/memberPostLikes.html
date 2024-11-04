@@ -52,7 +52,10 @@
     function displayLikes(formattedLikes) {
       const outputBlock = document.getElementById('outputBlock'); // 獲取表格的 tbody 元素
       outputBlock.innerHTML = '';
-
+      if (formattedLikes.length === 0) {
+        outputBlock.innerHTML = '<div class="empty-message">目前沒有收藏的貼文</div>';
+        return;
+      }
       formattedLikes.forEach(like => {
         console.log('顯示的喜歡項目:', like); // 調試：查看每個喜歡項目的內容
         const likeRow = document.createElement('tr');
