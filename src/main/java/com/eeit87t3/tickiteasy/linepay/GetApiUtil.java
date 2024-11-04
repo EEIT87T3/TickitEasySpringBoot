@@ -10,6 +10,9 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 public class GetApiUtil {
 	
 	public static JsonNode sendGet(String channelId, String nonce, String signature, String url) {

@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @Entity @Table(name = "testImages")
 public class TestImagesEntity {

@@ -1,5 +1,8 @@
 package com.eeit87t3.tickiteasy.product.entity;
 
+/**
+ * @author Liang123456123
+ */
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

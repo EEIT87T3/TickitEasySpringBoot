@@ -25,7 +25,9 @@ import com.eeit87t3.tickiteasy.product.dto.ProductDTO;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 
-
+/**
+ * @author Liang123456123
+ */
 @RestController
 @RequestMapping("/admin/api/product")
 public class AdminProductAPIController {

@@ -15,14 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit87t3.tickiteasy.categoryandtag.entity.CategoryEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.CategoryRepo;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlan;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundPlanDTO;
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
@@ -32,9 +29,11 @@ import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.eeit87t3.tickiteasy.cwdfunding.repository.FundProjRepository;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.EntityNotFoundException;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Service
 public class FundProjService {
 

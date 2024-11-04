@@ -2,13 +2,13 @@ package com.eeit87t3.tickiteasy.order.entity;
 
 import java.sql.Date;
 
-import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
-import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
+/**
+ * @author tony475767
+ */
 @Entity
 @Table(name = "prodOrderDetails")
 public class ProdOrderDetails {

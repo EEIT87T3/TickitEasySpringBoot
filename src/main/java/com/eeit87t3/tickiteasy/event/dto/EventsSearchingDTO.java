@@ -13,7 +13,7 @@ import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.event.repository.EventsSpecification;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 public class EventsSearchingDTO {
 

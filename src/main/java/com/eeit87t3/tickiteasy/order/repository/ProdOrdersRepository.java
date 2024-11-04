@@ -10,6 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 import com.eeit87t3.tickiteasy.order.entity.ProdOrders;
 
+/**
+ * @author tony475767
+ */
 public interface ProdOrdersRepository extends JpaRepository<ProdOrders, Integer> {
 	
 	

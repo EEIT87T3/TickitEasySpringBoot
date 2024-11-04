@@ -15,7 +15,7 @@ import jakarta.persistence.criteria.Root;
 /**
  * 封裝 Events 的條件邏輯。
  * 
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 // 封裝查詢邏輯，不需 Spring 管理
 public class EventsSpecification {

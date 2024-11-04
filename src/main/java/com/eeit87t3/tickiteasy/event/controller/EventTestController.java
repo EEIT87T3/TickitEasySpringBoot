@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +18,9 @@ import com.eeit87t3.tickiteasy.event.repository.TicketTypesRepo;
 import com.eeit87t3.tickiteasy.event.service.EventsProcessingService;
 import com.eeit87t3.tickiteasy.event.service.AdminEventsService;
 
+/**
+ * @author Chuan (chuan13)
+ */
 @RestController
 public class EventTestController {
 	

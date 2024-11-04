@@ -12,6 +12,9 @@ import com.eeit87t3.tickiteasy.categoryandtag.service.TagService;
 import com.eeit87t3.tickiteasy.event.dto.EventWithTicketTypesDTO;
 import com.eeit87t3.tickiteasy.event.service.UserEventsService;
 
+/**
+ * @author Chuan (chuan13)
+ */
 @Controller
 public class UserEventsPageController {
 	

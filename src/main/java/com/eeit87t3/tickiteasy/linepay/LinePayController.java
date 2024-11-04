@@ -1,6 +1,5 @@
 package com.eeit87t3.tickiteasy.linepay;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -8,20 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 import com.eeit87t3.tickiteasy.cwdfunding.service.FundOrderService;
-import com.eeit87t3.tickiteasy.cwdfunding.service.FundProjService;
 import com.eeit87t3.tickiteasy.cwdfunding.testemail.TestEmailService;
-import com.eeit87t3.tickiteasy.member.entity.Member;
-import com.eeit87t3.tickiteasy.member.service.MemberService;
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 @Controller
 public class LinePayController {
 
@@ -30,12 +26,6 @@ public class LinePayController {
 	
 	@Autowired
 	private FundOrderService fundOrderService;
-	
-	@Autowired
-	private FundProjService fundProjService;
-	
-	@Autowired
-	private MemberService memberService;
 	
 	@Autowired
 	private TestEmailService testEmailService;

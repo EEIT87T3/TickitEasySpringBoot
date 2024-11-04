@@ -21,7 +21,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @Entity @Table(name = "events")
 public class EventsEntity {

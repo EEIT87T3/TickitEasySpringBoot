@@ -1,5 +1,8 @@
 package com.eeit87t3.tickiteasy.util;
 
+/**
+ * @author Lilian (Curriane)
+ */
 import com.eeit87t3.tickiteasy.member.entity.Member;
 
 public class ProfileValidator {

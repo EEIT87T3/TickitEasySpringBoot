@@ -15,6 +15,9 @@ import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductPhotoEntity;
 import com.eeit87t3.tickiteasy.product.repository.ProductPhotoRepo;
 
+/**
+ * @author Liang123456123
+ */
 @Service
 public class ProductPhotoService {
 

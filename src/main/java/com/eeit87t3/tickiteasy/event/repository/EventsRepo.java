@@ -13,7 +13,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 public interface EventsRepo extends JpaRepository<EventsEntity, Integer>, JpaSpecificationExecutor<EventsEntity> {
 

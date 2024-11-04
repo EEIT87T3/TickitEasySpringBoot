@@ -33,51 +33,18 @@
 <body>
     <div th:replace="~{commons/userHeader}"></div>
 
-    <!--  這裡是網頁內容 >-->
+    <!--  這裡是網頁內容 -->
     <div class="container mt-5">
         <h1>購物車</h1>
         <div class="bg-secondary-subtle rounded p-3 mt-3">
             <h3>活動票券</h3>
-            <div id="tickettypes-cart" class="p-3 d-flex flex-column gap-2">
-                <div class="d-flex justify-content-center align-item-center border border-secondary rounded p-3">
-                    <span>（目前購物車內沒有活動票券）</span>
-                </div>
-                <div class="row border border-secondary bg-light rounded p-3">
-                    <div class="col-2 p-0">
-                        <div class="ratio ratio-16x9">
-                            <img class="rounded object-fit-cover" src="/TickitEasy/images/event/EventPicDefault.png" alt="（活動名稱）">
-                        </div>
-                    </div>
-                    <div class="col-4 d-flex flex-column gap-1 align-items-center justify-content-center">
-                        <div class="w-100">
-                            <span class="fs-5 event-name">（活動名稱）</span>
-                        </div>
-                        <div class="w-100">
-                            <span class="fs-6 tickettype-name">（票種名稱）</span>
-                        </div>
-                    </div>
-                    <div class="col-2 d-flex justify-content-center align-items-center">
-                        <span>價格：<span class="price">500</span>&nbsp;元</span>
-                    </div>
-                    <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
-                        <div>剩餘數量：<span class="quantityLeft">100</span></div>
-                        <!-- TODO 剩餘數量計算 -->
-                        <div class="input-group">
-                            <button class="minus btn btn-outline-secondary">-</button>
-                            <input type="number" class="tickettype-quantity form-control text-center" min="0" value="0">
-                            <button class="plus btn btn-outline-secondary">+</button>
-                        </div>
-                    </div>
-                    <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
-                        <div>總計：<span class="totalPrice">100</span>&nbsp;元</div>
-                        <button class="add-to-cart btn btn-danger">刪除</button>
-                    </div>
-                </div>
-            </div>
+            <div id="tickettypes-cart" class="p-3 d-flex flex-column gap-2"></div>
         </div>
         <div class="bg-secondary-subtle rounded p-3 mt-3">
             <h3>周邊商品</h3>
-            <div id="cartItems"></div>
+            <!-- 原樣式 -->
+            <!-- <div id="cartItems"></div> -->
+            <div id="cartItems" class="p-3 d-flex flex-column gap-2"></div>
         </div>
         <div class="card mt-3">
             <div class="card-body">
@@ -221,35 +188,72 @@
             const cartItemsElement = document.getElementById('cartItems');
             cartItemsElement.innerHTML = ''; // 清空目前的購物車內容
 
+            // 如果購物車為空
+            if (cartItems.length === 0) {  
+                cartItemsElement.innerHTML = `
+                        <div class="d-flex justify-content-center align-item-center border border-secondary rounded p-3 bg-light">
+                            <span>（目前購物車內沒有周邊商品）</span>
+                        </div>`;
+            }
+
             cartItems.forEach(item => {
                 const itemElement = document.createElement('div'); // 建立每個商品的元素
-                itemElement.className = 'card mb-3';
+                // itemElement.className = 'card mb-3';  // 原樣式
+                itemElement.className = 'row border border-secondary bg-light rounded p-3';
+                
+                // 原樣式
+//                 itemElement.innerHTML = `
+//                    <div class="card-body">
+//     <div class="row">
+//         <div class="col-md-2 d-flex justify-content-center align-items-center">
+//             <img src="/TickitEasy${item.productPic}" alt="${item.productName}" class="img-fluid">
+//         </div>
+//         <div class="col-md-4 d-flex justify-content-center align-items-center">
+//             <h5 class="card-title">${item.productName}</h5>
+//         </div>
+//         <div class="col-md-2 d-flex justify-content-center align-items-center">
+//             <p>價格：${item.price} 元</p>
+//         </div>
+//         <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+//             <div class="input-group justify-content-center">
+//                 <button class="btn btn-outline-secondary" onclick="decreaseQuantity(${item.productID})">-</button>
+//                 <input type="number" class="form-control text-center" value="${item.quantity}" onchange="updateQuantity(${item.productID}, this.value)">
+//                 <button class="btn btn-outline-secondary" onclick="increaseQuantity(${item.productID})">+</button>
+//             </div>
+//         </div>
+//         <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+//             <p>總計: ${item.price * item.quantity} 元</p>
+//             <button class="btn btn-danger btn-sm" onclick="removeItem(${item.productID})">刪除</button>
+//         </div>
+//     </div>
+// </div>
+//                 `;
                 itemElement.innerHTML = `
-                   <div class="card-body">
-    <div class="row">
-        <div class="col-md-2 d-flex justify-content-center align-items-center">
-            <img src="/TickitEasy${item.productPic}" alt="${item.productName}" class="img-fluid">
-        </div>
-        <div class="col-md-4 d-flex justify-content-center align-items-center">
-            <h5 class="card-title">${item.productName}</h5>
-        </div>
-        <div class="col-md-2 d-flex justify-content-center align-items-center">
-            <p>價格：${item.price} 元</p>
-        </div>
-        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-            <div class="input-group justify-content-center">
-                <button class="btn btn-outline-secondary" onclick="decreaseQuantity(${item.productID})">-</button>
-                <input type="number" class="form-control text-center" value="${item.quantity}" onchange="updateQuantity(${item.productID}, this.value)">
-                <button class="btn btn-outline-secondary" onclick="increaseQuantity(${item.productID})">+</button>
-            </div>
-        </div>
-        <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-            <p>總計: ${item.price * item.quantity} 元</p>
-            <button class="btn btn-danger btn-sm" onclick="removeItem(${item.productID})">刪除</button>
-        </div>
-    </div>
-</div>
-                `;
+                    <div class="col-2 p-0">
+                        <div class="ratio ratio-16x9">
+                            <img class="event-pic rounded object-fit-cover" src="/TickitEasy${item.productPic}" alt="${item.productName}">
+                        </div>
+                    </div>
+                    <div class="col-4 d-flex flex-column gap-1 align-items-center justify-content-center">
+                        <div class="w-100">
+                            <span class="fs-5 event-name">${item.productName}</span>
+                        </div>
+                    </div>
+                    <div class="col-2 d-flex justify-content-center align-items-center">
+                        <span>價格：<span class="tickettype-price">${item.price}</span>&nbsp;元</span>
+                    </div>
+                    <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
+                        <div class="input-group">
+                            <button class="tickettype-minus btn btn-outline-secondary" onclick="decreaseQuantity(${item.productID})">-</button>
+                            <input type="number" class="form-control text-center" value="${item.quantity}" onchange="updateQuantity(${item.productID}, this.value)">
+                            <button class="tickettype-plus btn btn-outline-secondary" onclick="increaseQuantity(${item.productID})">+</button>
+                        </div>
+                    </div>
+                    <div class="col-2 d-flex flex-column gap-2 align-items-center justify-content-center">
+                        <div>總計：<span class="tickettype-total-price">${item.price * item.quantity}</span>&nbsp;元</div>
+                        <button class="tickettype-remove btn btn-danger" onclick="removeItem(${item.productID})">刪除</button>
+                    </div>`;
+
                 cartItemsElement.appendChild(itemElement); // 將商品元素添加到購物車
             });
         }

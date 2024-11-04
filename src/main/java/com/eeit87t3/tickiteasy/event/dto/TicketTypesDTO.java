@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * 「新增票種」或「編輯票種」時使用的 DTO。
  * 
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 public class TicketTypesDTO {
 

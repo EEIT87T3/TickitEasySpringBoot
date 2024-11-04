@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.eeit87t3.tickiteasy.member.service.MemberService;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Controller
 @RequestMapping
 public class MemberPageController {
