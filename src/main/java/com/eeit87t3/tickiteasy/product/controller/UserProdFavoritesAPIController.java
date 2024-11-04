@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,8 +34,8 @@ public class UserProdFavoritesAPIController {
     
     @Autowired
     private MemberService memberService;
-    
-    // 获取每个商品的收藏次数，用于长条图
+      
+    // 獲取每個商品的收藏次數，用於長條圖
     @GetMapping("/product-favorites")
     public ResponseEntity<Map<String, Integer>> getProductFavoriteCount() {
         Map<String, Integer> favoriteCountData = favoritesService.getProductFavoriteCount();

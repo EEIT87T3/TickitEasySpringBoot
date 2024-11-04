@@ -40,22 +40,6 @@ public class UserProductPageController {
 	        return "product/userProdFavorites";
 	    }
 	 
-//	 @GetMapping("/user/product/favorite")
-//	    public String getMemberFavorites(Model model, @RequestHeader("Authorization") String authHeader) {
-//	        // 獲取會員身份信息
-//	        String token = authHeader.replace("Bearer ", "");
-//	        String email = jwtUtil.getEmailFromToken(token);
-//	        Member member = memberService.findByEmail(email);
-//	        
-//	        // 如果會員存在，查詢收藏商品
-//	        if (member != null) {
-//	            List<ProductEntity> favorites = favoritesService.getMemberFavorites(member);
-//	            model.addAttribute("favorites", favorites); // 傳遞收藏的商品列表給模板
-//	        }
-//
-//	        return "product/userProdFavorites";  // 返回 Thymeleaf 模板頁面
-//	    }
-	
 	// 前台查詢所有商品頁面
     @GetMapping("/product")
     public String findAllProducts(Model model) {
