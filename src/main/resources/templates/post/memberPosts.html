@@ -52,6 +52,10 @@
     function displayPosts(formattedPosts) {
       const outputBlock = document.getElementById('outputBlock'); // 獲取表格的 tbody 元素
       outputBlock.innerHTML = '';
+      if (formattedPosts.length === 0) {
+        outputBlock.innerHTML = '<div class="empty-message">目前沒有發表的貼文</div>';
+        return;
+      }
 
       formattedPosts.forEach(post => {
         console.log('顯示的貼文:', post); // 調試：查看每個喜歡項目的內容
