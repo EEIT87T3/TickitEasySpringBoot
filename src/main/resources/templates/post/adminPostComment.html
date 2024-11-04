@@ -48,6 +48,7 @@
                 <td>${comment.postID}</td>
                 <td>${comment.postCommentID}</td>
                 <td>${comment.memberID}</td>
+                <td>${comment.nickname}</td>
                 <td>${comment.content || 'N/A'}</td> 
                 <td>${comment.commentDate || 'N/A'}</td> 
                 <td>${comment.editTime || 'N/A'}</td> 
@@ -59,7 +60,7 @@
             `;
             // <button class="openUpdateModal bg-blue-500 text-white px-2 py-2 rounded" data-comment-id="${comment.postCommentID}">編輯</button>
         }
-        // 獲取所有貼文的函數，postID 是從模板中注入的變量
+        // 獲取所有留言
         function fetchAllComments(postID) {
 
             const url = `/TickitEasy/admin/api/post/comments?postID=${postID}`; // 使用相對路徑，確保 API 路徑正確
@@ -74,30 +75,46 @@
                 });
         }
 
-        // 將貼文資料填充到表格中的函數
+        // 將留言資料填充到表格中
+        // function populateTable(comments) {
+        //     // 清空現有資料
+        //     $('#commentsTable tbody').empty();
+
+        //     // 將獲取到的貼文資料加入表格
+        //     comments.forEach(comment => {
+        //         $('#commentsTable tbody').append(createCommentRow(comment));
+        //     });
+
+        //     // 如果 DataTable 已經初始化過，直接更新表格資料
+        //     if (dataTable) {
+        //         dataTable.clear().draw();  // 清空 DataTable
+        //         comments.forEach(comment => {
+        //             const rowNode = $(createCommentRow(comment));
+        //             dataTable.row.add(rowNode).draw(); // 新增資料並重繪表格
+        //         });
+        //     } else {
+        //         // 初始化 DataTable
+        //         dataTable = $('#commentsTable').DataTable();
+        //     }
+        // }
         function populateTable(comments) {
-            // 清空現有資料
-            $('#commentsTable tbody').empty();
+            const table = $('#commentsTable').DataTable();
+            table.clear();
 
-            // 將獲取到的貼文資料加入表格
             comments.forEach(comment => {
-                $('#commentsTable tbody').append(createCommentRow(comment));
+                table.row.add([
+                    comment.postID,
+                    comment.postCommentID,
+                    comment.memberID,
+                    comment.nickname,
+                    comment.content || 'N/A',
+                    comment.commentDate || 'N/A',
+                    comment.editTime || 'N/A',
+                    `<button class="delete-post bg-red-500 text-white px-2 py-2 rounded" data-comment-id="${comment.postCommentID}">刪除</button>`
+                ]).draw(false);
             });
-
-            // 如果 DataTable 已經初始化過，直接更新表格資料
-            if (dataTable) {
-                dataTable.clear().draw();  // 清空 DataTable
-                comments.forEach(comment => {
-                    const rowNode = $(createCommentRow(comment));
-                    dataTable.row.add(rowNode).draw(); // 新增資料並重繪表格
-                });
-            } else {
-                // 初始化 DataTable
-                dataTable = $('#commentsTable').DataTable();
-            }
         }
-
-        // 當頁面加載時抓取所有貼文
+        // 當頁面加載時抓取所有留言
         $(document).ready(function () {
             $('#commentsTable').DataTable({
                 "language": {
@@ -283,6 +300,7 @@
                 <th>貼文ID</th>
                 <th>留言ID</th>
                 <th>會員ID</th>
+                <th>會員暱稱</th>
                 <th>留言內容</th>
                 <th>留言時間</th>
                 <th>編輯時間</th>
@@ -294,6 +312,7 @@
                 <td th:text="${comment.postID}"></td>
                 <td th:text="${comment.postCommentID}"></td>
                 <td th:text="${comment.memberID}"></td>
+                <td th:text="${comment.nickname}"></td>
                 <td th:text="${comment.content} ?: 'N/A'"></td>
                 <td th:text="${comment.commentDate} != null ? ${comment.commentDate} : 'N/A'"></td>
                 <td th:text="${comment.editTime} != null ? ${comment.editTime} : 'N/A'"></td>

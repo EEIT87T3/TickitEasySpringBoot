@@ -117,7 +117,8 @@
             <h3>新增回應</h3>
             <form id="comment-form">
                 <input type="hidden" name="postID" id="postID" value="" />
-                <textarea name="content" id="content" style="resize:none;height:100px;" placeholder="輸入您的回應"  required></textarea>
+                <textarea name="content" id="content" style="resize:none;height:100px;" placeholder="輸入您的回應"
+                    required></textarea>
                 <input type="submit" value="發表">
             </form>
         </div>
@@ -211,6 +212,7 @@
                 dangerMode: true,
             }).then((willDelete) => {
                 if (willDelete) {
+
                     // 用戶確認刪除，進行刪除操作
                     axios.delete(`/TickitEasy/admin/api/post/DELETE/${postID}`, {
                         headers: {
@@ -218,6 +220,16 @@
                         }
                     }).then(response => {
                         const categoryId = response.data.categoryId;
+
+                        //將內文預覽清空:
+                        document.getElementById('post').innerHTML = `
+                       <div class="author">
+                           <h4>此貼文已刪除</h4>
+                       </div>
+                        `;
+                        document.getElementById('comments-container').innerHTML = '';
+                        document.getElementById('likes-count').innerHTML = '0';
+
                         swal("貼文刪除成功！", "", "success");
                         // 使用 setTimeout 延遲跳轉
                         setTimeout(() => {
