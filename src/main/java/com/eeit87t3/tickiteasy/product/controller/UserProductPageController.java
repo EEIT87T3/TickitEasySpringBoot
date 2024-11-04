@@ -1,38 +1,24 @@
 package com.eeit87t3.tickiteasy.product.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.eeit87t3.tickiteasy.member.entity.Member;
-import com.eeit87t3.tickiteasy.member.service.MemberService;
-import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
-import com.eeit87t3.tickiteasy.product.service.UserProdFavoritesService;
-import com.eeit87t3.tickiteasy.util.JWTUtil;
 
+/**
+ * @author Liang123456123
+ */
 @Controller
 @RequestMapping
 public class UserProductPageController {
 	
-    
-    @Autowired
-    private JWTUtil jwtUtil;
-    
-    @Autowired
-    private MemberService memberService;
-
 	 @Autowired
 	    private ProductService productService;
 	 
-	 @Autowired
-	    private UserProdFavoritesService favoritesService;
 	 
 //	  前台查詢會員商品收藏頁面
 	    @GetMapping("/user/product/favorite")
@@ -76,8 +62,4 @@ public class UserProductPageController {
     public String findAllProductsCart(Model model) {
         return "product/userCart";
     }
-    
-
-    
-    
 }

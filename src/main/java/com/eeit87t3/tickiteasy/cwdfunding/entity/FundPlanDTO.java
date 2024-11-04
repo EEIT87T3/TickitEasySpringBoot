@@ -1,9 +1,10 @@
 package com.eeit87t3.tickiteasy.cwdfunding.entity;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 public class FundPlanDTO {
 
 	private Integer planID;

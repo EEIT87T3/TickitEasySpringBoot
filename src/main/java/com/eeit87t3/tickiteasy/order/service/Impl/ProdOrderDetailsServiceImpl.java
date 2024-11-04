@@ -9,6 +9,9 @@ import com.eeit87t3.tickiteasy.order.entity.ProdOrderDetails;
 import com.eeit87t3.tickiteasy.order.repository.ProdOrderDetailsRepository;
 import com.eeit87t3.tickiteasy.order.service.ProdOrderDetailsService;
 
+/**
+ * @author tony475767
+ */
 @Service
 public class ProdOrderDetailsServiceImpl implements ProdOrderDetailsService{
 

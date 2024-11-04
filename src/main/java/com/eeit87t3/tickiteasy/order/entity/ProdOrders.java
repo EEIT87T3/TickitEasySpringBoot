@@ -1,6 +1,5 @@
 package com.eeit87t3.tickiteasy.order.entity;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -12,6 +11,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
+/**
+ * @author tony475767
+ */
 @Entity 
 @Table(name = "prodOrders")
 public class ProdOrders {

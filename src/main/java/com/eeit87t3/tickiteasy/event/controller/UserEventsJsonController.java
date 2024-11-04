@@ -12,6 +12,9 @@ import com.eeit87t3.tickiteasy.event.dto.EventsSearchingDTO;
 import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.event.service.UserEventsService;
 
+/**
+ * @author Chuan (chuan13)
+ */
 @RestController
 @RequestMapping("/api/event")
 public class UserEventsJsonController {

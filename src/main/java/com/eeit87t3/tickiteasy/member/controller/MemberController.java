@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
+/**
+ * @author Lilian (Curriane)
+ */
 @RestController
 @RequestMapping("/api/member")
 public class MemberController {

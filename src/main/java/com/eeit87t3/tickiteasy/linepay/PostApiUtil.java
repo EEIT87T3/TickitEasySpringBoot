@@ -8,6 +8,9 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 public final class PostApiUtil {
 
     public static JsonNode sendPost(String channelId,String nonce, String signature,String httpsUrl,String mapperData) {

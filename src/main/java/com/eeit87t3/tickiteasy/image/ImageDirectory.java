@@ -3,7 +3,7 @@ package com.eeit87t3.tickiteasy.image;
 import java.io.File;
 
 /**
- * @author Chuan
+ * @author Chuan (chuan13)
  */
 public enum ImageDirectory {
 	TEST("test"),

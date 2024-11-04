@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.eeit87t3.tickiteasy.event.service.UserEventsService;
 
+/**
+ * @author Lilian (Curriane), Chuan (chuan13)
+ */
 @Controller
 @RequestMapping
 public class HomeController {

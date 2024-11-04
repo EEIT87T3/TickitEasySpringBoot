@@ -14,6 +14,9 @@ import com.eeit87t3.tickiteasy.product.service.ProductService;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author Liang123456123
+ */
 @RestController
 @RequestMapping("/admin/api/productPhoto")
 public class AdminProductPhotoAPIController {

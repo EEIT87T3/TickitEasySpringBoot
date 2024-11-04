@@ -2,15 +2,15 @@ package com.eeit87t3.tickiteasy.cwdfunding.repository;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eeit87t3.tickiteasy.cwdfunding.entity.FundOrder;
-import com.eeit87t3.tickiteasy.cwdfunding.entity.FundProj;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 public interface FundOrderRepository extends JpaRepository<FundOrder, Integer>{
 
 	@Query(value = "select * from fundingOrder where memberID= :m", nativeQuery = true)

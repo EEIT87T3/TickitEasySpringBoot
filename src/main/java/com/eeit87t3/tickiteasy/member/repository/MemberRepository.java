@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import com.eeit87t3.tickiteasy.member.entity.Member;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Integer> {
     

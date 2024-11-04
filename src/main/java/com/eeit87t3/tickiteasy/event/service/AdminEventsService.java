@@ -25,7 +25,7 @@ import jakarta.transaction.Transactional;
 /**
  * 活動功能的 Service。
  * 
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @Service
 public class AdminEventsService {
