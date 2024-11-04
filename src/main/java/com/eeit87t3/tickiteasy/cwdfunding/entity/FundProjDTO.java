@@ -5,9 +5,11 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eeit87t3.tickiteasy.cwdfunding.repository.FundPlanRepository;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+/**
+ * @author TingXD (chen19990627)
+ */
 public class FundProjDTO {
 
 	private Integer projectID;

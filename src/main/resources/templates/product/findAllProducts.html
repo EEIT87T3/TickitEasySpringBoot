@@ -188,10 +188,10 @@
             paginationDiv.innerHTML = '';
 
             // 首頁按鈕
-            paginationDiv.innerHTML += `<button class="btn btn-light" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>首頁</button>`;
+            paginationDiv.innerHTML += `<button class="btn btn-light" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>第一頁</button>`;
 
             // 前一頁按鈕
-            paginationDiv.innerHTML += `<button class="btn btn-light" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>前一頁</button>`;
+            paginationDiv.innerHTML += `<button class="btn btn-light" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一頁</button>`;
 
             // 直接生成所有頁碼按鈕
             for (let i = 1; i <= totalPages; i++) {

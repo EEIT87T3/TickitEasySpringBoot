@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 public interface TagRepo extends JpaRepository<TagEntity, Integer> {
 

@@ -32,6 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * @author Lilian (Curriane)
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminMemberController {

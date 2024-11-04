@@ -14,7 +14,9 @@ import com.eeit87t3.tickiteasy.product.entity.ProductPhotoEntity;
 import com.eeit87t3.tickiteasy.product.service.ProductPhotoService;
 import com.eeit87t3.tickiteasy.product.service.ProductService;
 
-
+/**
+ * @author Liang123456123
+ */
 @Controller
 @RequestMapping("/admin/product")
 public class AdminProductPageController {

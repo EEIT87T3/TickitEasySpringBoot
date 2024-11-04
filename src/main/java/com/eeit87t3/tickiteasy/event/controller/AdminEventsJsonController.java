@@ -24,7 +24,7 @@ import com.eeit87t3.tickiteasy.event.entity.EventsEntity;
 import com.eeit87t3.tickiteasy.event.service.AdminEventsService;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @RestController
 @RequestMapping("/admin/api/event")

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13)
  */
 @Controller
 public class ImageController {

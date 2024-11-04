@@ -10,7 +10,7 @@ import com.eeit87t3.tickiteasy.categoryandtag.entity.TagEntity;
 import com.eeit87t3.tickiteasy.categoryandtag.repository.TagRepo;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13), Liang123456123
  */
 @Service
 public class TagService {

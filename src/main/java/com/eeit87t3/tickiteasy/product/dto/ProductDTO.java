@@ -2,6 +2,9 @@ package com.eeit87t3.tickiteasy.product.dto;
 
 import java.util.List;
 
+/**
+ * @author Liang123456123
+ */
 public class ProductDTO {
 
 	    private Integer productID;  // 用於編輯，新建時為null

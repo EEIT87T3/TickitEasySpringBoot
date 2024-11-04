@@ -17,7 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 /**
- * @author Chuan(chuan13)
+ * @author Chuan (chuan13), weifang1030, TingXD (chen19990627)
  */
 @Entity @Table(name = "category")
 public class CategoryEntity {

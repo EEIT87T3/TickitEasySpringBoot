@@ -8,7 +8,7 @@ import com.eeit87t3.tickiteasy.admin.entity.Admin;
 
 
 /**
- * @author Lilian(Curriane)
+ * @author Lilian (Curriane)
  */
 public interface AdminRepo extends JpaRepository<Admin, Integer> {
 	 Optional<Admin> findByEmail(String email);

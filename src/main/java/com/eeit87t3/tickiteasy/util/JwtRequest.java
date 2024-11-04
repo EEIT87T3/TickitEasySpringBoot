@@ -1,5 +1,8 @@
 package com.eeit87t3.tickiteasy.util;
 
+/**
+ * @author Lilian (Curriane)
+ */
 //用來接收登入請求
 public class JwtRequest {
 

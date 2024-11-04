@@ -3,6 +3,9 @@ package com.eeit87t3.tickiteasy.order.entity;
 import com.eeit87t3.tickiteasy.event.entity.TicketTypesEntity;
 import com.eeit87t3.tickiteasy.product.entity.ProductEntity;
 
+/**
+ * @author tony475767
+ */
 public class ClientSideOrderDetails {
 	private Integer price;
 	private Integer quantity;

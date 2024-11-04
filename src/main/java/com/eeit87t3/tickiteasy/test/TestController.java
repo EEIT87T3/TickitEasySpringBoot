@@ -28,7 +28,7 @@ import com.eeit87t3.tickiteasy.image.ImageDirectory;
 import com.eeit87t3.tickiteasy.image.ImageUtil;
 
 /**
- * @author Lilian(Curriane), Chuan(chuan13)
+ * @author Lilian (Curriane), Chuan (chuan13)
  */
 @Controller
 public class TestController {
