@@ -20,7 +20,7 @@ public class UserProductPageController {
 	    private ProductService productService;
 	 
 	 
-//	  前台查詢會員商品收藏頁面
+	 //	前台查詢會員商品收藏頁面
 	    @GetMapping("/user/product/favorite")
 	    public String getMemberFavorites(Model model) {
 	        return "product/userProdFavorites";

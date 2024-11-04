@@ -180,7 +180,7 @@
                     .then(response => {
                         const productID = response.data.productID;
 
-                        // 上傳商品詳情圖片
+                        // 上傳商品副圖
                         const files = pond.getFiles();
                         const uploadPromises = files.map(fileItem => {
                             const picFormData = new FormData();

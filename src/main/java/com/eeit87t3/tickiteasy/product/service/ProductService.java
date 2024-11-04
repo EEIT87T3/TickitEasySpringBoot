@@ -113,7 +113,7 @@ public class ProductService {
     @Transactional
     public ProductEntity createProduct(ProductDTO productDTO, MultipartFile imageFile) throws IOException {
         ProductEntity product = new ProductEntity();
-        // 設置基本属性
+        // 設置基本屬性
         product.setProductName(productDTO.getProductName());
         product.setProductDesc(productDTO.getProductDesc());
         product.setPrice(productDTO.getPrice());
@@ -143,7 +143,7 @@ public class ProductService {
         if (optional.isPresent()) {
             ProductEntity product = optional.get();
 
-            // 更新基本属性
+            // 更新基本屬性
             product.setProductName(productDTO.getProductName());
             product.setProductDesc(productDTO.getProductDesc());
             product.setPrice(productDTO.getPrice());

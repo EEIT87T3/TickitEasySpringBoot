@@ -27,7 +27,7 @@ public class AdminProductPhotoAPIController {
 	 @Autowired
 	    private ProductService productService;
 	 
-	 // 新增產品圖片
+	 // 新增商品圖片
 	    @PostMapping("/{productID}")
 	    public ResponseEntity<ProductPhotoEntity> createProductPhoto(
 	            @PathVariable Integer productID,
@@ -45,7 +45,7 @@ public class AdminProductPhotoAPIController {
 	        }
 	    }
 	    
-	 // 更新產品圖片
+	 // 更新商品圖片
 	    @PutMapping("/{photoID}")
 	    public ResponseEntity<ProductPhotoEntity> editProductPhoto(
 	            @PathVariable Integer photoID,
@@ -62,7 +62,7 @@ public class AdminProductPhotoAPIController {
 	    }
 
 
-	    // 獲取特定產品的所有圖片
+	    // 獲取特定商品的所有圖片
 	    @GetMapping("/product/{productID}")
 	    public ResponseEntity<List<ProductPhotoEntity>> findProductPhotos(@PathVariable Integer productID) {
 	        ProductEntity product = productService.findProductById(productID);
@@ -74,7 +74,7 @@ public class AdminProductPhotoAPIController {
 	    }
 
 
-	    // 刪除產品圖片
+	    // 刪除商品圖片
 	    @DeleteMapping("/{photoID}")
 	    public ResponseEntity<Void> deleteProductPhoto(@PathVariable Integer photoID) {
 	        try {

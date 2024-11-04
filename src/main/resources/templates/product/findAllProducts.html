@@ -45,7 +45,7 @@
                 </tr>
             </thead>
             <tbody id="productTableBody">
-                <!-- 產品數據將在這裡動態插入 -->
+                <!-- 商品數據將在這裡動態插入 -->
             </tbody>
         </table>
 
@@ -126,7 +126,6 @@
                     <td>${product.productTag ? product.productTag.tagName : ''}</td>
                     <td>${product.productName}</td>
                     <td><img src="${imageUrl}" alt="商品圖片" style="width: 120px; height: 60px; object-fit: cover;"></td>
-                    
                     <td>${product.price}</td>
                     <td>${product.stock}</td>
                     <td>${formatDate(product.createdDate)}</td>
@@ -186,7 +185,7 @@
         function renderPagination() {
             paginationDiv.innerHTML = '';
 
-            // 首頁按鈕
+            // 第一頁按鈕
             paginationDiv.innerHTML += `<button class="btn btn-light" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>第一頁</button>`;
 
             // 前一頁按鈕

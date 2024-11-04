@@ -102,7 +102,7 @@
      <div class="w-1/3 pl-4">
         <h3 class="text-xl font-bold mb-3">商品副圖</h3>
         <div id="productPhotos" class="product-photos grid grid-cols-2 gap-2">
-            <!-- 圖片将通過 JavaScript 動態添加到这里 -->
+            <!-- 圖片通過 JavaScript 動態加到這裡 -->
         </div>
         <a th:href="@{/admin/product/productPhoto/{productID}(productID=${product.productID})}" class="btn btn-primary">
     修改商品副圖
@@ -189,13 +189,12 @@
     const productID = document.getElementById('productID').value;
     const productPhotosContainer = document.getElementById('productPhotos');
 
-    // 獲取商品圖片
+    // 獲取商品副圖
     axios.get(`/TickitEasy/admin/api/productPhoto/product/${productID}`)
         .then(response => {
             const photos = response.data;
             photos.forEach(photo => {
                 const img = document.createElement('img');
-                // 假設 ProductPhotoEntity 中存儲圖片路徑的屬性名為 fileName
                 if (photo.fileName) {
                     let imageUrl = `/TickitEasy${photo.fileName}`;
                     img.src = imageUrl;

@@ -23,7 +23,7 @@ import jakarta.persistence.Table;
 @Table(name = "prodFavorites")
 public class ProdFavoritesEntity {
     
-    // 定義嵌入式複合主鍵類
+    // 定義複合主鍵
     @Embeddable
     public static class ProdFavoriteID implements Serializable {
         private static final long serialVersionUID = 1L;
