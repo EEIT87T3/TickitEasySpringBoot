@@ -11,25 +11,29 @@
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <style>
-        .w600px{
+        .w600px {
             width: 600px;
         }
-        .h500px{
+
+        .h500px {
             height: 500px;
         }
-        .h600px{
+
+        .h600px {
             height: 600px;
         }
-        .my-textarea{
+
+        .my-textarea {
             /* width: 300px;
             height: 200px; */
             /* resize: both; 可同時調整寬度和高度 */
             /* resize: horizontal;  只允許調整寬度 */
             /* resize: vertical;     */
             /* 只允許調整高度 */
-            resize: none;       
-             /* 禁用調整大小 */
+            resize: none;
+            /* 禁用調整大小 */
         }
     </style>
     <title>留言列表</title>
@@ -95,6 +99,32 @@
 
         // 當頁面加載時抓取所有貼文
         $(document).ready(function () {
+            $('#commentsTable').DataTable({
+                "language": {
+                    "sProcessing": "處理中...",
+                    "sLengthMenu": "顯示 _MENU_ 項結果",
+                    "sZeroRecords": "沒有符合條件的結果",
+                    "sInfo": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                    "sInfoEmpty": "顯示第 0 至 0 項結果，共 0 項",
+                    "sInfoFiltered": "(從 _MAX_ 項結果過濾)",
+                    "sInfoPostFix": "",
+                    "sSearch": "搜尋:",
+                    "sUrl": "",
+                    "sEmptyTable": "表中資料為空",
+                    "sLoadingRecords": "載入中...",
+                    "sInfoThousands": ",",
+                    "oPaginate": {
+                        "sFirst": "第一頁",
+                        "sPrevious": "上一頁",
+                        "sNext": "下一頁",
+                        "sLast": "最後一頁"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": 升冪排列",
+                        "sSortDescending": ": 降冪排列"
+                    }
+                }
+            });
             const postID = $('body').attr('data-post-id');
 
             console.log("Selected Comment ID:", commentID); // 確認 commentID 是否正確
@@ -130,7 +160,7 @@
                 })
                     .then(function (response) {
                         console.log("Response:", response.data);
-                        swal("新增成功！",  "","success");
+                        swal("新增成功！", "", "success");
                         $("#postModal").removeClass("flex").addClass("hidden");
                         fetchAllComments(postID);
                     })
@@ -170,12 +200,13 @@
                 })
                     .then(function (response) {
                         console.log("Response:", response.data);
-                        alert("留言更新成功");
+                        swal("留言更新成功！", "", "success");
                         $("#updateModal").removeClass("flex").addClass("hidden");
                         fetchAllComments(postID);
                     })
                     .catch(function (error) {
-                        alert("錯誤：" + (error.response ? error.response.data : error.message));
+                        swal("留言更新失敗！", "您可能未登入或發生錯誤", "error");
+                        // alert("錯誤：" + (error.response ? error.response.data : error.message));
                     });
 
 
@@ -184,7 +215,13 @@
             // 刪除留言=================================
             $('#commentsTable').on('click', '.delete-post', function () {
                 const commentID = $(this).data('comment-id');  // 獲取 data-comment-id
-                if (confirm('確定要刪除此留言嗎？')) {
+                swal({
+                    title: "確定要刪除這條留言嗎？",
+                    text: "這個動作無法復原！",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willDelete) => {
                     axios.delete(`/TickitEasy/admin/api/post/comment/DELETE/${commentID}`)
                         .then(response => {
                             swal("刪除成功！", "", "success");
@@ -194,7 +231,7 @@
                             console.error("Error fetching comments:", error);
                             swal("刪除失敗！", "您可能未登入或發生錯誤", "error");
                         });
-                }
+                })
             });
             // 彈窗控制==================================
             // 打開新增留言視窗
@@ -285,8 +322,8 @@
 
                 <div class="mb-4">
                     <label for="postContent" class="block mb-2">內容：</label>
-                    <textarea style="resize: none; "  rows="10" cols="50" name="content" id="content" placeholder="輸入你的留言" required
-                        class="w-full px-3 py-2 border rounded"></textarea>
+                    <textarea style="resize: none; " rows="10" cols="50" name="content" id="content"
+                        placeholder="輸入你的留言" required class="w-full px-3 py-2 border rounded"></textarea>
                 </div>
 
 
@@ -306,8 +343,8 @@
 
                 <div class="mb-4">
                     <label for="postContent" class="block mb-2">內容：</label>
-                    <textarea style="resize: none; "  rows="10" cols="50" name="content" id="content" placeholder="輸入你的留言" required
-                        class="w-full px-3 py-2 border rounded"></textarea>
+                    <textarea style="resize: none; " rows="10" cols="50" name="content" id="content"
+                        placeholder="輸入你的留言" required class="w-full px-3 py-2 border rounded"></textarea>
                 </div>
 
 

@@ -103,8 +103,13 @@ $('#fullCreatePostForm').on('submit', function (event) {
   const button = event.target;
     button.disabled = true;
     console.log('按鈕禁用')
-    
-   
+  //   const content = $('#fullPostContent').val().trim();
+  //   if (!content) {
+  //     // 在 Summernote 編輯器上方顯示自定義錯誤提示
+  //     $('<div class="alert alert-danger">內容是必填的！</div>').insertBefore('#fullPostContent');
+  //     event.preventDefault();
+      
+  // }
   console.log($('#fullPostCategory').val());
 
   // 使用formData取代json傳遞資料
