@@ -3,17 +3,8 @@
 
 <head>
 	
-	<!-- 在這裡放要引入的 CSS 與 JS library -->
-
     <meta th:replace="~{commons/adminHead}">
 	<title>商品圖表分析</title>
-	<script>
-		$(document).ready(function () {
-			
-			// 這裡是 JavaScript 內容
-			
-		});
-	</script>
 	<!-- 引入 Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -55,7 +46,7 @@
 	
 	<!-- 將兩個圖表合併為同一列 -->
     <div class="stat-row">
-        <!-- 圓餅圖：各標籤的商品庫存數 -->
+        <!-- 圓餅圖：各標籤的商品庫存總數 -->
         <div class="stat-card card-body" >
             <h2>各標籤的商品庫存數</h2>
             <div class="chart-container">
@@ -64,7 +55,7 @@
         </div>
 
         <!-- 長條圖：每個商品的收藏次數 -->
-        <div class="stat-card">
+        <div class="stat-card card-body">
             <h2>各商品的收藏次數</h2>
             <div class="chart-container">
                 <canvas id="productFavoriteChart"></canvas>

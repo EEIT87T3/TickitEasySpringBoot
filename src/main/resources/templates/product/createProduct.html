@@ -3,7 +3,7 @@
 
 <head>
 	<meta th:replace="~{commons/adminHead}">
-    <!-- 添加 FilePond CSS -->
+    <!-- 新增 FilePond CSS -->
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
         rel="stylesheet">
@@ -11,17 +11,17 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-  /* 隐藏 PQINA 链接 */
+ /* 隱藏 PQINA 連結 */
   .filepond--credits {
     display: none !important;
   }
- /* 覆盖 FilePond 默认样式 */
+ /* 覆蓋 FilePond 預設樣式 */
 .filepond--item {
-    width: calc(33.33% - 0.5em); /* 设定每个文件项的宽度 */
-    height: auto; /* 允许高度自适应 */
+    width: calc(33.33% - 0.5em); /* 設定每個圖片的寬度 */
+    height: auto; /* 允許高度自適應 */
 }
 
-/* 自定义已存在的图片样式 */
+/* 自訂已存在的圖片樣式 */
 .existing-photo {
     position: relative;
     display: inline-block;
@@ -29,13 +29,14 @@
 }
 
 .existing-photo img {
-    max-width: 200px; /* 最大宽度为 200px */
-    max-height: 200px; /* 最大高度为 200px */
-    width: auto; /* 确保图片不超出范围 */
-    height: auto; /* 确保图片不超出范围 */
+    max-width: 200px; /* 最大寬度為 200px */
+    max-height: 200px; /* 最大高度為 200px */
+    width: auto; /* 確保圖片不超出範圍 */
+    height: auto; /* 確保圖片不超出範圍 */
 }
 
-/* 删除图片按钮样式 */
+
+/* 刪除圖片按鈕樣式 */
 .delete-photo {
     position: absolute;
     top: 5px;
@@ -179,7 +180,7 @@
                     .then(response => {
                         const productID = response.data.productID;
 
-                        // 上傳商品詳情圖片
+                        // 上傳商品副圖
                         const files = pond.getFiles();
                         const uploadPromises = files.map(fileItem => {
                             const picFormData = new FormData();

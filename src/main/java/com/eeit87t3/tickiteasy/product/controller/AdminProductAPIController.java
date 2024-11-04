@@ -35,7 +35,7 @@ public class AdminProductAPIController {
 	@Autowired
 	ProductService productService;
 	
-	// 获取各标签的商品库存数，用于圆饼图
+	// 獲取各標籤的商品庫存數，用於圓餅圖
     @GetMapping("/tag-stock")
     public ResponseEntity<Map<String, Integer>> getProductTagStock() {
         Map<String, Integer> tagStockData = productService.getProductTagStock();
@@ -83,7 +83,6 @@ public class AdminProductAPIController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("商品名稱重複");
         }
     	
     }
@@ -113,7 +112,6 @@ public class AdminProductAPIController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("商品名稱重複");
         }
     }
  

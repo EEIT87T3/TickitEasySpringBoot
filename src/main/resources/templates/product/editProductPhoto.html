@@ -42,7 +42,7 @@
     align-items: center; /* 垂直居中對齊 */
     justify-content: center; /* 水平居中對齊 */
         }
-  /* 隐藏 PQINA 链接 */
+  /* 隱藏 PQINA 連結 */
   .filepond--credits {
     display: none !important;
   }
@@ -59,7 +59,6 @@
    		<button id="backToEditBtn" class="btn btn-secondary">
     返回修改商品頁面
 </button>
-    </div>
 
     
 
@@ -70,7 +69,7 @@
     <script th:inline="javascript">
         const productID = /*[[${productID}]]*/ null;
 
-        // 註冊 FilePond 插件
+        // 註冊 FilePond 
     FilePond.registerPlugin(FilePondPluginImagePreview, FilePondPluginFileValidateType);
 
    // 初始化 FilePond
@@ -90,7 +89,7 @@
         // 移除 server.process 來避免自動上傳
     });
 
-    // 更新照片按鈕點擊處理器
+    // 更新照片按鈕
     document.getElementById('updatePhotos').addEventListener('click', () => {
         const files = pond.getFiles(); // 獲取所有 FilePond 中的文件
 
@@ -99,7 +98,7 @@
             return;
         }
 
-        // 遍歷 FilePond 中的所有文件，並逐一上傳
+        // 遍歷 FilePond 中的所有圖片，並逐一上傳
         files.forEach(fileItem => {
             const file = fileItem.file;
             const formData = new FormData();

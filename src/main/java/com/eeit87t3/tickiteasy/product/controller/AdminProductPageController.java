@@ -57,7 +57,7 @@ public class AdminProductPageController {
             model.addAttribute("categories", productService.getProductCategories());
             model.addAttribute("tags", productService.getProductTags());
             
-            // 獲取並添加商品詳細圖片
+            // 獲取並添加商品副圖
             List<ProductPhotoEntity> productPhotos = productPhotoService.getProductPhotos(product);
             model.addAttribute("productPhotos", productPhotos);
             

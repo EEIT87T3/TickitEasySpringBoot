@@ -28,13 +28,13 @@ public class UserProdFavoritesService {
 	
 	@Autowired
 	private ProdFavoritesRepo prodFavoritesRepo;
-	
+			
 	public Map<String, Integer> getProductFavoriteCount() {
 	    List<ProdFavoritesEntity> favorites = prodFavoritesRepo.findAll();
-	    // 将商品按照名称分组，统计每个商品的收藏次数
+	    // 將商品按照名稱分組，統計每個商品的收藏次數
 	    return favorites.stream()
 	            .collect(Collectors.groupingBy(
-	                    favorite -> favorite.getProduct().getProductName(),  // 确保是字符串类型
+	                    favorite -> favorite.getProduct().getProductName(),  
 	                    Collectors.summingInt(ProdFavoritesEntity::getFavoriteCount)
 	            ));
 	}

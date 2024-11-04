@@ -67,7 +67,7 @@ public class UserProductService {
             ProductEntity entity = optional.get();
             ProductDTO dto = convertToDTO(entity);
             
-            // 獲取並設置詳細圖片
+            // 獲取並設置商品副圖
             List<ProductPhotoEntity> photos = productPhotoRepo.findByProduct(entity);
             List<String> detailPhotoUrls = photos.stream()
                 .map(ProductPhotoEntity::getFileName)
@@ -139,7 +139,7 @@ public class UserProductService {
         }
     }
     
-    ////修改購物車商品數量
+    //修改購物車商品數量
     public ProductCartItemEntity updateCartItemQuantity(ProductCartItemEntity cartItem, Integer newQuantity) {
         cartItem.setQuantity(newQuantity);
         return cartItem;

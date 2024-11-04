@@ -53,13 +53,13 @@ public class ProductService {
         return tagService.findProductTagList();
     }
     
- // 1. 获取各标签的商品库存数
+    // 獲取各標籤的商品庫存數量
     public Map<String, Integer> getProductTagStock() {
         List<ProductEntity> products = productRepo.findAll();
-        // 将商品按照标签分组，计算每个标签的总库存
+        // 將商品按照標籤分組，計算每個標籤的總庫存
         return products.stream()
                 .collect(Collectors.groupingBy(
-                        product -> product.getProductTag().getTagName(),  // 假设 TagEntity 有 getTagName() 方法
+                        product -> product.getProductTag().getTagName(), 
                         Collectors.summingInt(ProductEntity::getStock)
                 ));
     }
@@ -113,7 +113,7 @@ public class ProductService {
     @Transactional
     public ProductEntity createProduct(ProductDTO productDTO, MultipartFile imageFile) throws IOException {
         ProductEntity product = new ProductEntity();
-        // 設置基本属性
+        // 設置基本屬性
         product.setProductName(productDTO.getProductName());
         product.setProductDesc(productDTO.getProductDesc());
         product.setPrice(productDTO.getPrice());
@@ -143,7 +143,7 @@ public class ProductService {
         if (optional.isPresent()) {
             ProductEntity product = optional.get();
 
-            // 更新基本属性
+            // 更新基本屬性
             product.setProductName(productDTO.getProductName());
             product.setProductDesc(productDTO.getProductDesc());
             product.setPrice(productDTO.getPrice());
@@ -185,7 +185,6 @@ public class ProductService {
                 } catch (IOException e) {
                 	System.out.println("刪除商品圖片時發生錯誤: " + e.getMessage());
                 	e.printStackTrace(); 
-                    // 即使圖片刪除失敗，我們仍然繼續刪除數據庫記錄
                 }
             }
             try {
