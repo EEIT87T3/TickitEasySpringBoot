@@ -71,6 +71,7 @@ $(document).ready(async function () {
   const linePayButton = document.getElementById("linePayButton");
   linePayButton.addEventListener("click", async function (e) {
     e.preventDefault();
+    $(this).addClass("disabled");
     try {
       await Promise.all([requestLinePay(), sendEmail()]);
     } catch (error) {
