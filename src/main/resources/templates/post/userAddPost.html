@@ -8,17 +8,16 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script th:src="@{/Token/auth.js}" defer></script>
-  <script th:src="@{/post/js/getMember.js}"></script>
-  <script src="/TickitEasy/post/js/postAdd.js" defer></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 禁用以配合summernote-->
-	<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js"></script>
-	<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" rel="stylesheet">
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script th:src="@{/post/js/getMember.js}"></script>
+  <script src="/TickitEasy/post/js/postAdd.js" defer></script>
   <title>新增貼文</title>
   <style>
-
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -44,7 +43,7 @@
 
     label {
       display: block;
-      margin-bottom: 10px;
+      margin-top: 5px;
       font-weight: bold;
     }
 
@@ -103,12 +102,10 @@
       text-align: center;
       font-weight: bold;
       color: #d9534f;
-      /* Red color for errors */
     }
 
     .success {
       color: #5F46E8;
-      /* Green color for success */
     }
 
     #imagePreview {
@@ -126,6 +123,26 @@
       /* 縮小顯示圖片 */
       margin-right: 10px;
     }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 0.875rem;
+
+      text-align: right;
+    }
+
+    .input-error {
+      border-color: #dc3545 !important;
+    }
+
+    .title-container {
+      display: flex;
+      /* 使用 Flexbox */
+      justify-content: space-between;
+      /* 將元素置於兩端 */
+      align-items: center;
+      /* 垂直置中對齊 */
+    }
   </style>
 
 </head>
@@ -135,12 +152,18 @@
   <h1>新增貼文</h1>
   <button class="button listbtn postList ">上一頁</button></td>
   <form id="fullCreatePostForm">
-    <label for="fullPostTitle">標題:</label>
+
+    <div class="title-container">
+      <label for="fullPostTitle">標題:</label>
+      <div id="titleError" class="error-message"></div>
+    </div>
     <input type="text" id="fullPostTitle" name="postTitle" required class="border p-2 mb-4 w-full">
 
-    <label for="fullPostContent">內容:</label>
-    <textarea id="fullPostContent" name="postContent" required class="border p-2 mb-4 w-full"></textarea>
-
+    <div class="title-container">
+      <label for="fullPostContent">內容: </label>
+      <div id="contentError" class="error-message"></div>
+    </div>
+    <textarea id="fullPostContent" name="postContent" class="border p-2 mb-4 w-full"></textarea>
     <label for="fullPostCategory">分類:</label>
     <select id="fullPostCategory" name="categoryID" class="border p-2 mb-4 w-full"></select>
 
@@ -164,38 +187,29 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
 
-    $(document).ready(function () {
-   
-      $('#fullPostContent').summernote({
-        placeholder: '',
-        tabsize: 4,
-        height: 200,
-        toolbar: [
-          ['style', ['bold', 'italic', 'underline']],
-          ['font', ['strikethrough', 'superscript', 'subscript']],
-          ['fontsize', ['fontsize']],
-          ['color', ['color']],
-          ['para', ['ul', 'ol', 'paragraph']],
-          ['insert', ['link']],
-          ['view', ['fullscreen', 'help']]
-        ]
-      });
-    });
-   
-  
+    // $(document).ready(function () {
+
+    // });
+    let currentUserID;
+
     document.getElementById("fillDataButton").addEventListener("click", function () {
-      // 自動填入資料
+      // 填入demo資料
       document.getElementById("fullPostTitle").value = "五月天演唱會的震撼回憶";
-     
-      
-      $('#fullPostContent').summernote('code', 
-        
-      "最近參加了五月天的演唱會，真的是一場視覺和聽覺的盛宴！當「倔強」響起時，全場都跟著一起高唱，氣氛熱烈得讓我感受到滿滿的青春與激情。特別是他們現場的演出，不僅讓我回憶起了許多過去的點滴，也讓我感受到音樂的力量。期待他們下一次的演出！有參加的朋友也來分享一下你們的經歷吧！"
-      ); 
+
+
+      $('#fullPostContent').summernote('code',
+
+        "最近參加了五月天的演唱會，真的是一場視覺和聽覺的盛宴！當「倔強」響起時，全場都跟著一起高唱，氣氛熱烈得讓我感受到滿滿的青春與激情。特別是他們現場的演出，不僅讓我回憶起了許多過去的點滴，也讓我感受到音樂的力量。期待他們下一次的演出！有參加的朋友也來分享一下你們的經歷吧！"
+      );
       document.getElementById("fullPostCategory").value = "5";
       document.getElementById("fullPostTag").value = "11";
+      //清除沒填入的錯誤提示:
+      $('#contentError').html('');
+      $('.note-editor').removeClass('input-error');
+      $('#titleError').html('');
+      $('#fullPostTitle').removeClass('input-error');
     });
-    
+
   </script>
 
   <div th:replace="~{commons/userFooter}"></div>

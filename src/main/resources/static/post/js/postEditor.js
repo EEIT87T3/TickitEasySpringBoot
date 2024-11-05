@@ -117,21 +117,82 @@ async function fetchPost() {
     }
 }
 
-// 更新貼文
 $(document).ready(function () {
-    $('#editPostForm').on('submit', async function (event) {
-        event.preventDefault();
-        console.log("updatePost called")
+    $('#postContent').summernote({
+        placeholder: '',
+        tabsize: 4,
+        height: 200,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['font', ['strikethrough', 'superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link']],
+            ['view', ['fullscreen', 'help']]
+        ], callbacks: {
+            onChange: function () {//如果輸入內容則清除無填入錯誤提示
+                const content = $('#postContent').summernote('code').trim();
+                if (content) {
+                    $('#contentError').html('');
+                    $('.note-editor').removeClass('input-error');
+                }
+            }
+        }
+
+    });
+    //如果輸入內容則清除無填入錯誤提示
+    $('#postTitle').on('input', function () {
+        const title = $(this).val().trim();
+        if (title) {
+            $('#titleError').html('');
+            $('#postTitle').removeClass('input-error');
+        }
+    });
+    $(document).on('click', '#saveButton', async function (event) {
+        event.preventDefault(); // 防止表單默認提交
+        console.log("updatePost called");
+
         // 禁用按鈕，避免重複點擊
         const button = document.getElementById("saveButton");
         button.disabled = true;
+
         const title = document.getElementById("postTitle").value;
-        // const content = document.getElementById("postContent").value;
-        // 改用 Summernote 的方法獲取內容
-        const content = $('#postContent').summernote('code'); // 這一行已修改
+        const content = $('#postContent').summernote('code'); // 使用 Summernote 獲取內容
         const category = document.getElementById("fullPostCategory").value;
         const tag = document.getElementById("fullPostTag").value;
 
+        // 清除所有錯誤提示
+        $('.error-message').empty();
+        $('#fullPostTitle').removeClass('input-error');
+        $('.note-editor').removeClass('input-error');
+
+        // 獲取內容
+        const contentText = content.replace(/<[^>]*>/g, '').trim();
+
+        let isValid = true;
+
+        // 驗證標題
+        if (!title) {
+            $('#titleError').html('標題不能為空！');
+            $('#postTitle').addClass('input-error');
+            isValid = false;
+        }
+
+        // 驗證內容
+        if (!contentText) {
+            $('#contentError').html('內容不能為空！');
+            $('.note-editor').addClass('input-error');
+            isValid = false;
+        }
+
+        // 如果驗證失敗，重新啟用按鈕並退出
+        if (!isValid) {
+            button.disabled = false; // 重新啟用按鈕
+            return; // 不執行後續的提交邏輯
+        }
+
+        // 生成表單數據
         const formData = new FormData();
         formData.append('postTitle', title);
         formData.append('postContent', content);
@@ -159,7 +220,7 @@ $(document).ready(function () {
                 } else {
                     window.location.href = `/TickitEasy/post/${postID}`;
                 }
-                button.disabled = false;
+                button.disabled = false; // 在重定向之前重新啟用按鈕
             }, 100);
         } catch (error) {
             if (error.response) {
@@ -167,9 +228,11 @@ $(document).ready(function () {
             } else {
                 document.getElementById("updateResult").innerText = `Error: ${error.message}`;
             }
+            button.disabled = false; // 在發生錯誤時重新啟用按鈕
         }
-    })
-})
+    });
+});
+
 
 // 刪除圖片
 async function deleteImage(imageID) {
@@ -194,3 +257,5 @@ if (!Auth.isLoggedIn()) {
     // 初始化載入
     fetchPost();
 }
+
+
