@@ -190,7 +190,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
 		obj.setTotalAmount(totalAmount); //交易金額 String類型
 		obj.setTradeDesc("test Description"); //交易描述
 		obj.setItemName(itemname); //商品名稱
-		obj.setReturnURL("https://7c9d-114-25-159-200.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
+		obj.setReturnURL("https://f93a-61-222-34-1.ngrok-free.app/TickitEasy/admin/order/ECPayReturn"); //為付款結果通知回傳網址，為特店server或主機的URL，用來接收綠界後端回傳的付款結果通知。
 		obj.setNeedExtraPaidInfo("N"); //額外的付款資訊
 		obj.setClientBackURL("http://localhost:8080/TickitEasy/user/clientSide/orderPaymentCompleted"); //消費者點選此按鈕後，會將頁面導回到此設定的網址
 				
@@ -374,7 +374,7 @@ public class ProdOrdersServiceImpl implements ProdOrdersService{
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setAppPackageName(""); //N 在Android環境切換應用時所需的資訊，用於防止網路釣魚攻擊（phishing）
         redirectUrls.setConfirmUrlType("SERVER");
-        redirectUrls.setConfirmUrl("https://7c9d-114-25-159-200.ngrok-free.app/TickitEasy/admin/order/LinePayReturn"); //Y 設定支付完成後用戶跳轉的網址。
+        redirectUrls.setConfirmUrl("https://f93a-61-222-34-1.ngrok-free.app/TickitEasy/admin/order/LinePayReturn"); //Y 設定支付完成後用戶跳轉的網址。
         redirectUrls.setCancelUrl("http://localhost:8080/TickitEasy"); //Y 設定支付取消後用戶跳轉的網址。
         form.setRedirectUrls(redirectUrls);
         
