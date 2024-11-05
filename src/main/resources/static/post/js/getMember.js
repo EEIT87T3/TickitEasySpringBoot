@@ -1,4 +1,5 @@
 function currentMember() {
+	console.log('執行currentMember()')
 	return new Promise((resolve, reject) => {
 		const token = Auth.getToken(); // 確保這裡獲取到有效的 Token
 		if (!token || !token.includes('.')) {
