@@ -158,6 +158,7 @@
         //////////////////////////////////////////////////
         // 根據ID取得單一貼文
         function fetchPost() {
+            console.log('執行fetchPost()')
             axios.get(`/TickitEasy/admin/api/post/GET/${postID}`)
                 .then(response => {
                     const post = response.data;
@@ -187,6 +188,7 @@
                         <div>${post.postContent}</div>
                         <div class="post-images">${postImagesHTML}</div> <!-- 新增圖片顯示 -->
                     `;
+                    console.log("編輯當前:" + currentUserID);
                     // 檢查當前登入會員ID是否等於貼文的會員ID
                     if (post.member.memberID === currentUserID) {
                         document.getElementById('delete-btn').style.display = 'inline-flex';
@@ -269,6 +271,7 @@
 
         // 根據貼文ID取得多筆留言
         function fetchComments() {
+            console.log('執行fetchComments()')
             axios.get(`/TickitEasy/admin/api/post/comments?postID=${postID}`)
                 .then(response => {
                     document.getElementById('comments-container').innerHTML = '';
@@ -446,6 +449,7 @@
         document.getElementById('like-btn').addEventListener('click', function () {
             fetchLikesStatus(currentUserID, postID)
                 .then(isLiked => {
+                    console.log('執行fetchLikesStatus(currentUserID, postID)')
                     if (!Auth.isLoggedIn()) {
                         // 如果未登入，重定向到登入頁面
                         Auth.logout();
@@ -662,13 +666,19 @@
         // });
 
         document.addEventListener('DOMContentLoaded', initializeLikesCount);
-        // 初始化函數
-        fetchPost();
-        fetchComments();
-        currentMember();
-        // fetchLikesCount();
-        fetchLikesStatus(currentUserID, postID);
 
+        async function initialize() {
+            try {
+                await currentMember(); // 等待 currentMember() 執行完成
+                // 初始化函數
+                fetchPost();
+                fetchComments();
+                fetchLikesStatus(currentUserID, postID);         // 執行 fetchPost()
+            } catch (error) {
+                console.error("Error initializing:", error);
+            }
+        }
+        initialize();
     </script>
 </body>
 
